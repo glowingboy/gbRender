@@ -1,29 +1,45 @@
 #include <gbUtils/args.h>
 #include <gbUtils/logger.h>
+#include <gbUtils/filesystem.h>
+
+#include "freetypeLoader.h"
 
 using gb::utils::logger;
+using gb::utils::string;
 int main(int argc, char** argv)
 {
     gb::utils::args arg;
 
+    string srcFontFile, dstFontFile;
     try
     {
 	arg.parse(argc, argv);
 
-	const char* srcFontFilePath = arg.unnamed_arg(1);
-	const char* dstFontFilePath = arg.unnamed_arg(2);
-	logger::Instance().log(srcFontFilePath);
-	logger::Instance().log(dstFontFilePath);
-    
+	srcFontFile = arg.unnamed_arg(1);
+	dstFontFile = arg.unnamed_arg(2);
     }
-    catch(const gb::utils::string& err)
+    catch(const string& err)
     {
 	logger::Instance().error("args::parse error: " + err);
-
-	gb::utils::string test = "hello";
-	gb::utils::string r = "world" + test;
-	logger::Instance().error(r);
+	return 1;
     }
+
+    srcFontFile = gb::utils::filesystem::Instance().get_absolute_path(srcFontFile);
+    dstFontFile = gb::utils::filesystem::Instance().get_absolute_path(dstFontFile);
+
+    logger::Instance().log("\nsrcFontfile: " + srcFontFile + "\n" + "dstFontFile: " + dstFontFile);
+
+    try
+    {
+	freetypeLoader::Instance().load2gbFont(srcFontFile, dstFontFile);	
+    }
+    catch(string& err)
+    {
+	logger::Instance().error("freetypeLoader::load2gbfont error: " + err);
+	return 1;
+    }
+
+    
 
     return 0;
 }

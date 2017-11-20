@@ -13,6 +13,7 @@ find_package(gbUtils REQUIRED)
 set(fontGen_srcs)
 
 gb_add_class(fontGen src fontGen_srcs)
+gb_add_class(freetypeLoader src fontGen_srcs)
 
 add_executable(fontGen
   ${fontGen_srcs}
@@ -23,4 +24,7 @@ target_link_libraries(fontGen
   optimized ${gbUtils_LIBRARIES}
   debug ${libfreetype_LIBRARIES_d}
   optimized ${libfreetype_LIBRARIES}
+  -lpng
+  -lz
+  -lharfbuzz
   )

@@ -16,8 +16,9 @@ cd build
 if [ "$1" = "-r" ]
 then
     #rebuilding
-    rm -rfv ./* && cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON .. && cmake --build .
+    rm -rfv ./* && cmake .. && cmake --build .
 else
     cmake --build .
 fi
 
+./fontGen ../../../resources/FZSTK.TTF gbFont
