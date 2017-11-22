@@ -9,6 +9,7 @@ find_package(libfreetype REQUIRED)
 include_directories(SYSTEM ${libfreetype_INCLUDE_DIRS})
 
 find_package(gbUtils REQUIRED)
+find_package(gbPhysics REQUIRED)
 
 set(fontGen_srcs)
 
@@ -20,10 +21,9 @@ add_executable(fontGen
 )
 
 target_link_libraries(fontGen
-  debug ${gbUtils_LIBRARIES_d}
-  optimized ${gbUtils_LIBRARIES}
-  debug ${libfreetype_LIBRARIES_d}
-  optimized ${libfreetype_LIBRARIES}
+  ${gbUtils_LIBRARIES}
+  ${gbPhysics_LIBRARIES}
+  ${libfreetype_LIBRARIES}
   -lpng
   -lz
   -lharfbuzz

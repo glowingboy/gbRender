@@ -16,7 +16,7 @@ cd build
 if [ "$1" = "-r" ]
 then
     #rebuilding
-    rm -rfv ./* && cmake .. && cmake --build .
+    rm -rfv ./* && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON .. && cmake --build .
 else
     cmake --build .
 fi
