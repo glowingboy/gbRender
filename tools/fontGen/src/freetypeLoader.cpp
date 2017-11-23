@@ -10,13 +10,16 @@ extern "C"
 #include <gbUtils/logger.h>
 
 #include "../../../src/data/font.h"
-
+#include <gbUtils/concurrency.h>
+#include <atomic>
 using gb::render::data::font;
 using gb::render::data::glyph;
 
 using gb::utils::string;
 using gb::algorithm::bit_vector;
 using gb::utils::logger;
+using gb::utils::concurrency;
+
 static int _gb_ft_26dot6ToInt(const FT_Pos val)
 {
     return val >> 6;
@@ -42,9 +45,9 @@ static void _gb_ft_spans_callback(int y, int count, const FT_Span* spans, void* 
 
     FT_BBox& bbox = ud->bbox;
 
-    const unsigned int offset = (ud->height - (y - bbox.yMin) - 1)* ud->width;
+    const uint32 offset = (ud->height - (y - bbox.yMin) - 1)* ud->width;
 
-    for(int i = 0; i < count; i++)
+   for(int i = 0; i < count; i++)
     {
 	const FT_Span& span = spans[i];
 	short x = span.x;
@@ -58,59 +61,120 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
 {
     assert(szSrcFontName != nullptr && szDstFontName != nullptr);
 
-    FT_Library ftLib;
 
-    FT_Error ftErr = FT_Init_FreeType(&ftLib);
-    if(ftErr != 0)
-	throw string("FT_Init_FreeType error: ") + ftErr;
+    concurrency::Instance().initialize();
 
-    FT_Face ftFace;
+    const uint8 threadCount = concurrency::Instance().get_threadscount();
+	
 
-    ftErr = FT_New_Face(ftLib, szSrcFontName, 0, &ftFace);
-    if(ftErr != 0)
+    //thread variable
+    struct th_va_t
     {
-	string errInfo("FT_New_Face error: ");
-	if(ftErr == FT_Err_Unknown_File_Format)
-	    errInfo += "unknown format";
-	else
-	    errInfo += ftErr;
-	throw errInfo;
+	FT_Library ftLib;
+	FT_Face ftFace;
+	FT_Raster_Params rp;
+	_gb_ft_raster_param_usrdata ud;
+    };
+
+    th_va_t* th_vas = new th_va_t[threadCount];
+
+    for(int i = 0 ; i < threadCount; i++)
+    {
+	FT_Face& ftFace = th_vas[i].ftFace;
+	FT_Library& ftLib = th_vas[i].ftLib;
+
+	FT_Error ftErr = FT_Init_FreeType(&ftLib);
+	if(ftErr != 0)
+	    throw string("FT_Init_FreeType error: ") + ftErr;
+
+	ftErr = FT_New_Face(ftLib, szSrcFontName, 0, &ftFace);
+	if(ftErr != 0)
+	{
+	    string errInfo("FT_New_Face error: ");
+	    if(ftErr == FT_Err_Unknown_File_Format)
+		errInfo += "unknown format";
+	    else
+		errInfo += ftErr;
+	    throw errInfo;
+	}
+
+	FT_Set_Char_Size(ftFace, 0, _gb_ft_IntTo26dot6(GB_FREETYPE_RENDER_GLYPH_SIZE), 0, 0);
+	FT_Raster_Params& rp = th_vas[i].rp;
+	memset(&rp, 0, sizeof(FT_Raster_Params));
+	rp.flags = FT_RASTER_FLAG_AA | FT_RASTER_FLAG_DIRECT;
+	rp.gray_spans = _gb_ft_spans_callback;
+
+	_gb_ft_raster_param_usrdata& ud = th_vas[i].ud;
+	memset(&ud, 0, sizeof(_gb_ft_raster_param_usrdata));
+	rp.user = &ud;
     }
 
-    FT_Set_Char_Size(ftFace, 0, _gb_ft_IntTo26dot6(GB_FREETYPE_RENDER_GLYPH_SIZE), 0, 0);
-    FT_GlyphSlot ftSlot = ftFace->glyph;
-    FT_Raster_Params rp;
-    memset(&rp, 0, sizeof(FT_Raster_Params));
-    rp.flags = FT_RASTER_FLAG_AA | FT_RASTER_FLAG_DIRECT;
-    rp.gray_spans = _gb_ft_spans_callback;
-
-    _gb_ft_raster_param_usrdata ud;
-    memset(&ud, 0, sizeof(_gb_ft_raster_param_usrdata));
-    rp.user = &ud;
-    FT_BBox& bbox = ud.bbox;
-    
-
+    const uint8 sampleScale = 64;
     std::vector<glyph*> glyphs;
+    std::mutex mtx;
+
+    std::atomic<uint32> progress;
+    
+    auto gen_sdf = [sampleScale, &glyphs, &mtx, &th_vas](const uint8 threadCount, void* arg)
+    	{
+    	    th_va_t& th_va = th_vas[threadCount];
+    	    FT_Face& ftFace = th_va.ftFace;
+    	    FT_Library& ftLib = th_va.ftLib;
+	    
+    	    FT_Raster_Params& rp = th_va.rp;
+    	    _gb_ft_raster_param_usrdata& ud = th_va.ud;
+    	    FT_BBox& bbox = ud.bbox;
+    	    FT_GlyphSlot& ftSlot = ftFace->glyph;
+	    
+    	    uint32 idx = *(uint32*)arg;
+	    delete (uint32*)arg;
+	    arg = nullptr;
+	    
+    	    FT_UInt charIdx = FT_Get_Char_Index(ftFace, idx);
+    	    FT_Error ftErr;
+    	    if(charIdx != 0)
+    	    {
+    		ftErr = FT_Load_Glyph(ftFace, charIdx, FT_LOAD_NO_BITMAP);
+    		assert(ftErr == 0);
+
+    		FT_Outline_Get_CBox(&(ftSlot->outline), &bbox);
+
+    		glyph* gly = new glyph;
+
+    		gly->advanceX = _gb_ft_26dot6ToInt(ftSlot->advance.x)/sampleScale;
+
+    		bbox.xMax = _gb_ft_26dot6ToInt(bbox.xMax + 63);
+    		bbox.yMax = _gb_ft_26dot6ToInt(bbox.yMax + 63);
+
+    		bbox.xMin = _gb_ft_26dot6ToInt(bbox.xMin);
+    		bbox.yMin = _gb_ft_26dot6ToInt(bbox.yMin);
+
+    		ud.width = bbox.xMax - bbox.xMin;
+    		ud.height = bbox.yMax - bbox.yMin;
+
+    		ud.data.reserve(ud.width * ud.height);
+
+    		ftErr = FT_Outline_Render(ftLib, &(ftSlot->outline), &rp);
+    		assert(ftErr == 0);
+
+    		{
+    		    std::lock_guard<std::mutex> lck(mtx);
+    		    glyphs.push_back(gly);
+    		}
+
+    	    }
+    	};
+
     const unsigned int startCode = 0x5f;
     const unsigned int endCode = 65535;
 
-    auto _gen_sdf_tex = [&](void* arg)
-	{
-	    
-	};
     for(int i = startCode; i < endCode; i++)
     {
-	FT_UInt charIdx = FT_Get_Char_Index(ftFace, i);
-	if(charIdx != 0)
-	{
-	    ftErr = FT_Load_Glyph(ftFace, charIdx, FT_LOAD_NO_BITMAP);
-	    assert(ftErr == 0);
-
-	    FT_Outline_Get_CBox(&(ftSlot->outline), &bbox);
-	    logger::Instance().log(string("charIdx @") + i);
-	}
-	else
-	    logger::Instance().warning(string("charIdx @") + i);	    
+	concurrency::Instance().pushtask(concurrency::task_t(gen_sdf, new uint32(i)));
     }
+
+    concurrency::Instance().done();
+
+    
     return 0;
 }

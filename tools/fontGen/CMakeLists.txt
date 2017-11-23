@@ -27,4 +27,5 @@ target_link_libraries(fontGen
   -lpng
   -lz
   -lharfbuzz
+  -lpthread
   )

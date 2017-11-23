@@ -6,6 +6,7 @@
 
 using gb::utils::logger;
 using gb::utils::string;
+
 int main(int argc, char** argv)
 {
     gb::utils::args arg;
@@ -31,7 +32,7 @@ int main(int argc, char** argv)
 
     try
     {
-	freetypeLoader::Instance().load2gbFont(srcFontFile, dstFontFile);	
+	freetypeLoader::Instance().load2gbFont(srcFontFile, dstFontFile);
     }
     catch(string& err)
     {
