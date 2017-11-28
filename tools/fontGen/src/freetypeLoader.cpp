@@ -11,7 +11,9 @@ extern "C"
 
 #include "../../../src/data/font.h"
 #include <gbUtils/concurrency.h>
-#include <atomic>
+
+#include <gbUtils/time.h>
+
 using gb::render::data::font;
 using gb::render::data::glyph;
 
@@ -109,13 +111,13 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
 	rp.user = &ud;
     }
 
-    const uint8 sampleScale = 64;
     std::vector<glyph*> glyphs;
     std::mutex mtx;
 
-    std::atomic<uint32> progress;
-    
-    auto gen_sdf = [sampleScale, &glyphs, &mtx, &th_vas](const uint8 threadCount, void* arg)
+    const unsigned int startCode = 0x5f;
+    const unsigned int endCode = 65535;
+    const unsigned int totalCode = endCode - startCode;
+    auto gen_sdf = [&glyphs, &mtx, &th_vas, totalCode](const uint8 threadCount, const size_t taskCount, void* arg)
     	{
     	    th_va_t& th_va = th_vas[threadCount];
     	    FT_Face& ftFace = th_va.ftFace;
@@ -141,7 +143,7 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
 
     		glyph* gly = new glyph;
 
-    		gly->advanceX = _gb_ft_26dot6ToInt(ftSlot->advance.x)/sampleScale;
+    		gly->advanceX = _gb_ft_26dot6ToInt(ftSlot->advance.x) / GB_FREETYPE_SAMPLESCALE;
 
     		bbox.xMax = _gb_ft_26dot6ToInt(bbox.xMax + 63);
     		bbox.yMax = _gb_ft_26dot6ToInt(bbox.yMax + 63);
@@ -156,25 +158,23 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
 
     		ftErr = FT_Outline_Render(ftLib, &(ftSlot->outline), &rp);
     		assert(ftErr == 0);
-
+		
     		{
     		    std::lock_guard<std::mutex> lck(mtx);
     		    glyphs.push_back(gly);
+		    logger::Instance().progress(((float)(totalCode - taskCount + 1))/totalCode, string("glyph@") + idx);
     		}
 
     	    }
     	};
 
-    const unsigned int startCode = 0x5f;
-    const unsigned int endCode = 65535;
 
     for(int i = startCode; i < endCode; i++)
     {
 	concurrency::Instance().pushtask(concurrency::task_t(gen_sdf, new uint32(i)));
     }
-
     concurrency::Instance().done();
-
+    logger::Instance().progress_done();
     
     return 0;
 }
