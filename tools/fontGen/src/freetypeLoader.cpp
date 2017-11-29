@@ -13,14 +13,17 @@ extern "C"
 #include <gbUtils/concurrency.h>
 
 #include <gbUtils/time.h>
+#include <gbPhysics/image.h>
 
 using gb::render::data::font;
 using gb::render::data::glyph;
 
 using gb::utils::string;
-using gb::algorithm::bit_vector;
+using namespace gb::algorithm;
 using gb::utils::logger;
 using gb::utils::concurrency;
+
+using namespace gb::image;
 
 static int _gb_ft_26dot6ToInt(const FT_Pos val)
 {
@@ -72,6 +75,11 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
     //thread variable
     struct th_va_t
     {
+	~th_va_t()
+	    {
+		FT_Done_Face(ftFace);
+		FT_Done_FreeType(ftLib);
+	    }
 	FT_Library ftLib;
 	FT_Face ftFace;
 	FT_Raster_Params rp;
@@ -111,13 +119,14 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
 	rp.user = &ud;
     }
 
-    std::vector<glyph*> glyphs;
+    std::vector<glyph> glyphs;
+    std::vector<array_2d<std::uint8_t>> sdfs;
     std::mutex mtx;
 
     const unsigned int startCode = 0x5f;
     const unsigned int endCode = 65535;
     const unsigned int totalCode = endCode - startCode;
-    auto gen_sdf = [&glyphs, &mtx, &th_vas, totalCode](const uint8 threadCount, const size_t taskCount, void* arg)
+    auto gen_sdf = [&glyphs, &sdfs, &mtx, &th_vas, totalCode](const uint8 threadCount, const size_t taskCount, void* arg)
     	{
     	    th_va_t& th_va = th_vas[threadCount];
     	    FT_Face& ftFace = th_va.ftFace;
@@ -141,9 +150,9 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
 
     		FT_Outline_Get_CBox(&(ftSlot->outline), &bbox);
 
-    		glyph* gly = new glyph;
+    		glyph gly;
 
-    		gly->advanceX = _gb_ft_26dot6ToInt(ftSlot->advance.x) / GB_FREETYPE_SAMPLESCALE;
+    		gly.advanceX = _gb_ft_26dot6ToInt(ftSlot->advance.x) / GB_FREETYPE_SAMPLESCALE;
 
     		bbox.xMax = _gb_ft_26dot6ToInt(bbox.xMax + 63);
     		bbox.yMax = _gb_ft_26dot6ToInt(bbox.yMax + 63);
@@ -158,10 +167,18 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
 
     		ftErr = FT_Outline_Render(ftLib, &(ftSlot->outline), &rp);
     		assert(ftErr == 0);
+
+		array_2d<std::uint8_t> sdf = signed_distance_field(ud.data, ud.width, ud.height, GB_FREETYPE_SAMPLESCALE);
+
+		gly.width = sdf.width;
+		gly.height = sdf.height;
+		gly.yDelta = gly.height - (_gb_ft_26dot6ToInt(ftSlot->metrics.horiBearingY / GB_FREETYPE_SAMPLESCALE));
 		
     		{
     		    std::lock_guard<std::mutex> lck(mtx);
     		    glyphs.push_back(gly);
+		    sdfs.push_back(std::move(sdf));
+		    
 		    logger::Instance().progress(((float)(totalCode - taskCount + 1))/totalCode, string("glyph@") + idx);
     		}
 
@@ -175,6 +192,15 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
     }
     concurrency::Instance().done();
     logger::Instance().progress_done();
-    
+
+    if(th_vas != nullptr)
+    {
+	delete [] th_vas;
+	th_vas = nullptr;
+    }
+	    
+    logger::Instance().log("sdfs generated completed");
+
+    //packing to one big array_2d
     return 0;
 }
