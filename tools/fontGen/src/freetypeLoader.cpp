@@ -161,6 +161,8 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
     		bbox.yMin = _gb_ft_26dot6ToInt(bbox.yMin);
 
     		ud.width = bbox.xMax - bbox.xMin;
+		if(ud.width == 0)
+		    return;
     		ud.height = bbox.yMax - bbox.yMin;
 
     		ud.data.reserve(ud.width * ud.height);
