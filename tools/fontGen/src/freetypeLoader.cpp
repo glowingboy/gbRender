@@ -204,5 +204,6 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
     logger::Instance().log("sdfs generated completed");
 
     //packing to one big array_2d
+    array_2d<std::uint8_t> bin = packing<std::uint8_t>(sdfs);
     return 0;
 }
