@@ -13,10 +13,8 @@ struct glyph:public sprite
     };
 //#pragma pack(pop)
 
-class font:public texture
+class font:public _atlas<unsigned long>
 {
-public:
-private:
-    std::unordered_map<uint32, glyph*> _mpGlyphs;
+    
 };
 GB_RENDER_DATA_NAMESPACE_END

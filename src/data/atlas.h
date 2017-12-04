@@ -13,12 +13,15 @@ struct sprite
     };
 //#pragma pack(pop)
 
-class atlas:public texture
+template<typename Key>
+class _atlas:public texture
 {
 public:
 
 private:
-    std::unordered_map<std::string, sprite*> _mpSprites;
+    std::unordered_map<Key, sprite*> _mpSprites;
 };
+
+typedef _atlas<std::string> atlas;
 
 GB_RENDER_DATA_NAMESPACE_END

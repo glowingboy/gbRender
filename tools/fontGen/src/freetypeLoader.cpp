@@ -67,9 +67,9 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
     assert(szSrcFontName != nullptr && szDstFontName != nullptr);
 
 
-    concurrency::Instance().initialize();
+    concurrency<FT_ULong>::Instance().initialize();
 
-    const uint8 threadCount = concurrency::Instance().get_threadscount();
+    const uint8 threadCount = concurrency<FT_ULong>::Instance().get_threadscount();
 	
 
     //thread variable
@@ -119,14 +119,32 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
 	rp.user = &ud;
     }
 
-    std::vector<glyph> glyphs;
-    std::vector<array_2d<std::uint8_t>> sdfs;
+    struct glyph_ex:public glyph
+    {
+	glyph_ex(FT_ULong idx):
+	    code(idx)
+	    {}
+	glyph_ex(glyph_ex&& other):
+	    sdf(std::move(other.sdf))
+	    {}
+	array_2d<std::uint8_t> data()
+	    {
+		return sdf;
+	    }
+	
+	FT_ULong code;
+	array_2d<std::uint8_t> sdf;
+    };
+    std::vector<_glyph_ex> glyphs;
+    
+//    std::vector<glyph> glyphs;
+    // std::vector<array_2d<std::uint8_t>> sdfs;
     std::mutex mtx;
 
-    const unsigned int startCode = 0x5f;
-    const unsigned int endCode = 65535;
-    const unsigned int totalCode = endCode - startCode;
-    auto gen_sdf = [&glyphs, &sdfs, &mtx, &th_vas, totalCode](const uint8 threadCount, const size_t taskCount, void* arg)
+    const FT_ULong startCode = 0x5f;
+    const FT_ULong endCode = 0x6f;//65535;
+    const FT_ULong totalCode = endCode - startCode;
+    auto gen_sdf = [&glyphs, &sdfs, &mtx, &th_vas, totalCode](const uint8 threadCount, const size_t taskCount, FT_ULong idx)
     	{
     	    th_va_t& th_va = th_vas[threadCount];
     	    FT_Face& ftFace = th_va.ftFace;
@@ -137,10 +155,6 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
     	    FT_BBox& bbox = ud.bbox;
     	    FT_GlyphSlot& ftSlot = ftFace->glyph;
 	    
-    	    uint32 idx = *(uint32*)arg;
-	    delete (uint32*)arg;
-	    arg = nullptr;
-	    
     	    FT_UInt charIdx = FT_Get_Char_Index(ftFace, idx);
     	    FT_Error ftErr;
     	    if(charIdx != 0)
@@ -150,7 +164,7 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
 
     		FT_Outline_Get_CBox(&(ftSlot->outline), &bbox);
 
-    		glyph gly;
+    		glyph_ex gly(idx);
 
     		gly.advanceX = _gb_ft_26dot6ToInt(ftSlot->advance.x) / GB_FREETYPE_SAMPLESCALE;
 
@@ -170,7 +184,7 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
     		ftErr = FT_Outline_Render(ftLib, &(ftSlot->outline), &rp);
     		assert(ftErr == 0);
 
-		array_2d<std::uint8_t> sdf = signed_distance_field(ud.data, ud.width, ud.height, GB_FREETYPE_SAMPLESCALE);
+		gly.sdf = signed_distance_field(ud.data, ud.width, ud.height, GB_FREETYPE_SAMPLESCALE);
 
 		gly.width = sdf.width;
 		gly.height = sdf.height;
@@ -178,8 +192,8 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
 		
     		{
     		    std::lock_guard<std::mutex> lck(mtx);
-    		    glyphs.push_back(gly);
-		    sdfs.push_back(std::move(sdf));
+    		    glyphs.push_back(std::move(gly));
+//		    sdfs.push_back(std::move(sdf));
 		    
 		    logger::Instance().progress(((float)(totalCode - taskCount + 1))/totalCode, string("glyph@") + idx);
     		}
@@ -188,11 +202,11 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
     	};
 
 
-    for(int i = startCode; i < endCode; i++)
+    for(FT_ULong i = startCode; i < endCode; i++)
     {
-	concurrency::Instance().pushtask(concurrency::task_t(gen_sdf, new uint32(i)));
+	concurrency<FT_ULong>::Instance().pushtask(concurrency::task_t(gen_sdf, i));
     }
-    concurrency::Instance().done();
+    concurrency<FT_ULong>::Instance().done();
     logger::Instance().progress_done();
 
     if(th_vas != nullptr)
@@ -201,9 +215,9 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
 	th_vas = nullptr;
     }
 	    
-    logger::Instance().log("sdfs generated completed");
+    logger::Instance().log("sdfs generating completed");
 
     //packing to one big array_2d
-    array_2d<std::uint8_t> bin = packing<std::uint8_t>(sdfs);
+    array_2d<std::uint8_t> bin = packing<glyph_ex, std::uint8_t>(glyphs);
     return 0;
 }
