@@ -125,9 +125,19 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
 	    code(idx)
 	    {}
 	glyph_ex(glyph_ex&& other):
+	    glyph(other),
+	    code(other.code),
 	    sdf(std::move(other.sdf))
 	    {}
-	array_2d<std::uint8_t> data()
+	void operator=(glyph_ex&& other)
+	    {
+		glyph::operator=(other);
+		code = other.code;
+		sdf = std::move(other.sdf);
+	    }
+
+	    
+	array_2d<std::uint8_t>& data()
 	    {
 		return sdf;
 	    }
@@ -135,16 +145,16 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
 	FT_ULong code;
 	array_2d<std::uint8_t> sdf;
     };
-    std::vector<_glyph_ex> glyphs;
+    std::vector<glyph_ex> glyphs;
     
 //    std::vector<glyph> glyphs;
     // std::vector<array_2d<std::uint8_t>> sdfs;
     std::mutex mtx;
 
     const FT_ULong startCode = 0x5f;
-    const FT_ULong endCode = 0x6f;//65535;
+    const FT_ULong endCode = 0x666f;//65535;
     const FT_ULong totalCode = endCode - startCode;
-    auto gen_sdf = [&glyphs, &sdfs, &mtx, &th_vas, totalCode](const uint8 threadCount, const size_t taskCount, FT_ULong idx)
+    auto gen_sdf = [&glyphs, &mtx, &th_vas, totalCode](const uint8 threadCount, const size_t taskCount, FT_ULong idx)
     	{
     	    th_va_t& th_va = th_vas[threadCount];
     	    FT_Face& ftFace = th_va.ftFace;
@@ -183,8 +193,8 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
 
     		ftErr = FT_Outline_Render(ftLib, &(ftSlot->outline), &rp);
     		assert(ftErr == 0);
-
-		gly.sdf = signed_distance_field(ud.data, ud.width, ud.height, GB_FREETYPE_SAMPLESCALE);
+		array_2d<std::uint8_t>& sdf = gly.sdf;
+		sdf = signed_distance_field(ud.data, ud.width, ud.height, GB_FREETYPE_SAMPLESCALE);
 
 		gly.width = sdf.width;
 		gly.height = sdf.height;
@@ -204,7 +214,7 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
 
     for(FT_ULong i = startCode; i < endCode; i++)
     {
-	concurrency<FT_ULong>::Instance().pushtask(concurrency::task_t(gen_sdf, i));
+	concurrency<FT_ULong>::Instance().pushtask(concurrency<FT_ULong>::task_t(gen_sdf, i));
     }
     concurrency<FT_ULong>::Instance().done();
     logger::Instance().progress_done();
