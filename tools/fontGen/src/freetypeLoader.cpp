@@ -152,7 +152,7 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
     std::mutex mtx;
 
     const FT_ULong startCode = 0x5f;
-    const FT_ULong endCode = 0x666f;//65535;
+    const FT_ULong endCode = 0x6f;//65535;
     const FT_ULong totalCode = endCode - startCode;
     auto gen_sdf = [&glyphs, &mtx, &th_vas, totalCode](const uint8 threadCount, const size_t taskCount, FT_ULong idx)
     	{
@@ -229,5 +229,7 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
 
     //packing to one big array_2d
     array_2d<std::uint8_t> bin = packing<glyph_ex, std::uint8_t>(glyphs);
+    
+    
     return 0;
 }

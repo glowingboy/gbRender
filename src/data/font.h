@@ -2,16 +2,16 @@
 #include "atlas.h"
 
 GB_RENDER_DATA_NAMESPACE_BEGIN
-//#pragma pack(push, 1)
 struct glyph:public sprite
     {
 	//unit: pixel
-	uint8 advanceX;
-	uint8 yDelta;
 	uint16 width;
 	uint16 height;
+	uint16 advanceX;
+	uint16 yDelta;
+
+	static size_t size;
     };
-//#pragma pack(pop)
 
 class font:public _atlas<unsigned long>
 {

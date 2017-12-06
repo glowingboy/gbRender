@@ -1,16 +1,16 @@
 #pragma once
+
 #include "../type.h"
 
 using namespace gb::render;
 
-#define GB_RENDER_DATA_NAMESPACE_BEGIN		\
+#define GB_RENDER_FILE_NAMESPACE_BEGIN		\
     namespace gb				\
     {						\
 	namespace render			\
 	{					\
-	    namespace data			\
+	    namespace file			\
 	    {
 
-#define GB_RENDER_DATA_NAMESPACE_END		\
-		};};};
-
+#define GB_RENDER_FILE_NAMESPACE_END		\
+    };};};

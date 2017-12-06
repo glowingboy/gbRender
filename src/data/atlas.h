@@ -2,8 +2,7 @@
 #include "texture.h"
 #include <unordered_map>
 GB_RENDER_DATA_NAMESPACE_BEGIN
-//#pragma pack(push, 4)
-//serialize in other way
+
 struct sprite
     {
 	sprite():
@@ -16,8 +15,9 @@ struct sprite
 	float32 uv_l;
 	float32 uv_t;
 	float32 uv_r;
+	uint32 width;
+	uint32 height;
     };
-//#pragma pack(pop)
 
 template<typename Key>
 class _atlas:public texture
