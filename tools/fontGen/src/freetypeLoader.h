@@ -8,5 +8,5 @@ class freetypeLoader
     GB_SINGLETON(freetypeLoader);
 
 public:
-    int load2gbFont(const char* szSrcFontName, const char* szDstFontName);
+    void load2gbFont(const char* szSrcFontName, const char* szDstFontName);
 };

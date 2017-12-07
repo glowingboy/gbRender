@@ -9,14 +9,16 @@ extern "C"
 #include <gbPhysics/algorithm.h>
 #include <gbUtils/logger.h>
 
-#include "../../../src/data/font.h"
+#include "../../../src/file/font.h"
 #include <gbUtils/concurrency.h>
 
 #include <gbUtils/time.h>
 #include <gbPhysics/image.h>
 
-using gb::render::data::font;
-using gb::render::data::glyph;
+using namespace gb::render;
+
+using gb::render::file::font;
+using gb::render::file::glyph_ex;
 
 using gb::utils::string;
 using namespace gb::algorithm;
@@ -62,7 +64,7 @@ static void _gb_ft_spans_callback(int y, int count, const FT_Span* spans, void* 
     }
 }
 
-int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFontName)
+void freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFontName)
 {
     assert(szSrcFontName != nullptr && szDstFontName != nullptr);
 
@@ -119,32 +121,6 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
 	rp.user = &ud;
     }
 
-    struct glyph_ex:public glyph
-    {
-	glyph_ex(FT_ULong idx):
-	    code(idx)
-	    {}
-	glyph_ex(glyph_ex&& other):
-	    glyph(other),
-	    code(other.code),
-	    sdf(std::move(other.sdf))
-	    {}
-	void operator=(glyph_ex&& other)
-	    {
-		glyph::operator=(other);
-		code = other.code;
-		sdf = std::move(other.sdf);
-	    }
-
-	    
-	array_2d<std::uint8_t>& data()
-	    {
-		return sdf;
-	    }
-	
-	FT_ULong code;
-	array_2d<std::uint8_t> sdf;
-    };
     std::vector<glyph_ex> glyphs;
     
 //    std::vector<glyph> glyphs;
@@ -229,7 +205,9 @@ int freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFont
 
     //packing to one big array_2d
     array_2d<std::uint8_t> bin = packing<glyph_ex, std::uint8_t>(glyphs);
-    
-    
-    return 0;
+
+    font::Instance().SerializeToFile(GB_FREETYPE_RENDER_GLYPH_SIZE / GB_FREETYPE_SAMPLESCALE,
+				     glyphs,
+				     bin,
+				     szDstFontName);
 }

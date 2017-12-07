@@ -1,5 +1,5 @@
 #pragma once
-
+#include <cstdint>
 /****************fundamental types****************/
 #define GB_TYPE_DEF(type, alias, size)		\
     typedef type alias;				\

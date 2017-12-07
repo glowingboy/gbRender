@@ -15,6 +15,7 @@ set(fontGen_srcs)
 
 gb_add_class(fontGen src fontGen_srcs)
 gb_add_class(freetypeLoader src fontGen_srcs)
+gb_add_class(font ../../src/file fontGen_srcs)
 
 add_executable(fontGen
   ${fontGen_srcs}

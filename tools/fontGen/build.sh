@@ -21,4 +21,4 @@ else
     cmake --build .
 fi
 
-./fontGen ../../../resources/FZSTK.TTF gbFont
+./fontGen ../../../resources/FZSTK.TTF FZSTK
