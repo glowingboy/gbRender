@@ -54,7 +54,7 @@ static void _gb_ft_spans_callback(int y, int count, const FT_Span* spans, void* 
 
     const uint32 offset = (ud->height - (y - bbox.yMin) - 1)* ud->width;
 
-   for(int i = 0; i < count; i++)
+    for(int i = 0; i < count; i++)
     {
 	const FT_Span& span = spans[i];
 	short x = span.x;
@@ -128,7 +128,7 @@ void freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFon
     std::mutex mtx;
 
     const FT_ULong startCode = 0x5f;
-    const FT_ULong endCode = 0x6f;//65535;
+    const FT_ULong endCode = 65535;
     const FT_ULong totalCode = endCode - startCode;
     auto gen_sdf = [&glyphs, &mtx, &th_vas, totalCode](const uint8 threadCount, const size_t taskCount, FT_ULong idx)
     	{
@@ -142,7 +142,13 @@ void freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFon
     	    FT_GlyphSlot& ftSlot = ftFace->glyph;
 	    
     	    FT_UInt charIdx = FT_Get_Char_Index(ftFace, idx);
-    	    FT_Error ftErr;
+    	    FT_Error ftErr
+#ifdef NDEBUG
+#ifdef __GNUC__
+	    __attribute__((unused))
+#endif
+#endif
+	    ;
     	    if(charIdx != 0)
     	    {
     		ftErr = FT_Load_Glyph(ftFace, charIdx, FT_LOAD_NO_BITMAP);

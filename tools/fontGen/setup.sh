@@ -8,7 +8,7 @@ fi
 
 if ! [ -f ./setup.sh ]
 then
-    echo "need run this right in dir: gbRender"
+    echo "need run this right in the same dir as setup.sh"
     exit 1
 fi
 
@@ -17,7 +17,10 @@ echo "******** checking dependencies ********"
 echo "**** checking for freetype ****"
 if ! [ -f /usr/local/lib/libfreetype.a ]
 then
-   echo "*** freetype not found ***"
+    echo "*** freetype not found ***"
+    echo "** installing freetype dependencies **"
+    printf "y\ny\n" | apt-get install libpng-dev libharfbuzz-dev
+    echo "** freetype dependencies installed **"
    echo "** downloading freetype v2.6.5 **"
    wget https://download.savannah.gnu.org/releases/freetype/freetype-2.6.5.tar.gz
    echo "** freetype v2.6.5 downloaded **"
@@ -31,7 +34,7 @@ then
    rm -rfv ./* && cmake -DCMAKE_BUILD_TYPE=Release .. && cmake --build . --target install
    echo "** freetype v2.6.5 installed **"
    cd ../../
-   if [ -f /usr/local/lib/libevent.a ]
+   if [ -f /usr/local/lib/libfreetype.a ]
    then
        rm -rfv freetype-2.6.5*
        echo "**** freetype found ****"
