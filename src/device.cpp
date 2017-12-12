@@ -98,8 +98,11 @@ LRESULT CALLBACK device::_windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
     if(bShouldGetCursorPos)
     {
 	POINT point;
-	assert(GetCursorPos(&point));
-	assert(ScreenToClient(hWnd, &point));
+	BOOL ret = ::GetCursorPos(&point);
+	assert(ret);
+
+	ret = ::ScreenToClient(hWnd, &point);
+	assert(ret);
 	// gbInput::_cursorPos.X = point.x;
 	// gbInput::_cursorPos.Y = point.y;
 	bShouldGetCursorPos = false;

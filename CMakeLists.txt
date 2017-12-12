@@ -12,7 +12,7 @@ set(VERSION_MINOR 0)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/gbRenderConfig.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/gbRenderConfig.h)
 
-option(SHARED_LIB ON)
+option(SHARED_LIB "build shared lib?" ON)
 
 set(lib_type SHARED)
 if(NOT SHARED_LIB)
@@ -41,8 +41,10 @@ set_target_properties(gbRender
   )
 
 target_link_libraries(gbRender
-  ${gbUtils_LIBRARIES}
-  ${gbPhysics_LIBRARIES}
+  debug ${gbUtils_LIBRARIES_d}
+  optimized ${gbUtils_LIBRARIES}
+  debug ${gbPhysics_LIBRARIES_d}
+  optimized ${gbPhysics_LIBRARIES}
   )
 
 # install
