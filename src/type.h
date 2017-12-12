@@ -27,5 +27,6 @@ namespace gb
 
 /****************fundamental types****************/
 
+#include "thirdpartylib/glm/glm.hpp"
 
 

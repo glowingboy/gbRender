@@ -23,19 +23,19 @@ void font::SerializeToFile(const uint32_t glyphSize,
 
     fontFile.write(GB_RENDER_FILE_FONT_IDENDIFIER, strlen(GB_RENDER_FILE_FONT_IDENDIFIER));
     
-    fontFile.write((const char*)&glyphSize, 4);
+    fontFile.write(&glyphSize, 4);
     const uint32 count = glyphs.size();
-    fontFile.write((const char*)&count, 4);
+    fontFile.write(&count, 4);
 
     std::for_each(glyphs.begin(), glyphs.end(), [&fontFile](const glyph_ex& gly)
 		  {
 		      fontFile.write((const char*)&gly, glyph::size);
 		  });
 
-    fontFile.write((const char*)&(texture.width), 4);
-    fontFile.write((const char*)&(texture.height), 4);
+    fontFile.write(&(texture.width), 4);
+    fontFile.write(&(texture.height), 4);
 
-    fontFile.write((const char*)texture.data(), texture.row * texture.col);
+    fontFile.write(texture.data(), texture.row * texture.col);
 }
 
 data::font font::ParseFromFile(const char* filePath)const
@@ -51,10 +51,10 @@ data::font font::ParseFromFile(const char* filePath)const
 	throw string("font::ParseFromFile error identifier@") + identifier + " @filePath" + filePath;
     uint32 buf_uint32 = 0;
     //glyph size
-    fontFile.read((char*)&buf_uint32, 4);
+    fontFile.read(&buf_uint32, 4);
     ret.SetGlyphSize(buf_uint32);
     //glyph count
-    fontFile.read((char*)&buf_uint32, 4);
+    fontFile.read(&buf_uint32, 4);
     const uint32 count = buf_uint32;
 
     //glyphs
@@ -63,16 +63,16 @@ data::font font::ParseFromFile(const char* filePath)const
     uint8 data_glyph_offset = sizeof(uint32);//glyph::code
     for(uint32 i = 0; i < count; i++)
     {
-	fontFile.read((char*)&tmpGlyph, glyph::size);
+	fontFile.read(&tmpGlyph, glyph::size);
 	data::glyph gly(*(data::glyph*)((char*)&tmpGlyph + data_glyph_offset));
 	ret.InsertGlyph(tmpGlyph.code, gly);
     }
 
     //texture
-    fontFile.read((char*)&buf_uint32, 4);
+    fontFile.read(&buf_uint32, 4);
     const uint32 width = buf_uint32;
 
-    fontFile.read((char*)&buf_uint32, 4);
+    fontFile.read(&buf_uint32, 4);
     const uint32 height = buf_uint32;
 
     char* tex_data = new char[width * height];
