@@ -1,10 +1,9 @@
 #pragma once
-#include "atlas.h"
+#include "Atlas.h"
 #include <gbPhysics/algorithm.h>
 
-using gb::algorithm::array_2d;
+GB_RENDER_DATA_NS_BEGIN
 
-GB_RENDER_DATA_NAMESPACE_BEGIN
 struct glyph:public sprite
     {
 	//unit: pixel
@@ -14,7 +13,7 @@ struct glyph:public sprite
 	uint32 yDelta;
     };
 
-class font:public _atlas<uint32, glyph>
+class Font:public _atlas<uint32, glyph>
 {
 public:
     inline void SetGlyphSize(uint32 glyphSize)
@@ -35,4 +34,5 @@ private:
     uint32 _glyphSize;
     array_2d<uint8> _texture;
 };
-GB_RENDER_DATA_NAMESPACE_END
+
+GB_RENDER_DATA_NS_END

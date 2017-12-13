@@ -2,7 +2,7 @@
 #include <gbUtils/logger.h>
 #include <gbUtils/filesystem.h>
 
-#include "freetypeLoader.h"
+#include "FreetypeLoader.h"
 
 using gb::utils::logger;
 using gb::utils::string;

@@ -1,24 +1,29 @@
-#include "director.h"
-#include "device.h"
+#include "Director.h"
+#include "Device.h"
 #include <gbUtils/logger.h>
 using namespace gb::render;
 using gb::utils::string;
 using gb::utils::logger;
-void director::Ready(const vec2<uint32>& screenSize)
+Scene* Director::Ready(const vec2<uint32>& screenSize)
 {
     _screenSize = screenSize;
 
-    if(! device::Instance().Initialize())
+    if(! Device::Instance().Initialize())
 		throw string("director::Initialize device::Initialize failed");
+
+	_curScene = new Scene;
+
+	return _curScene;
 }
 
-void director::Action()
+void Director::Action()
 {
 	try
 	{
 		for (;;)
 		{
-			Directing();
+			if (!_directing())
+				break;
 		}
 	}
 	catch (const string& error)
@@ -31,7 +36,7 @@ void director::Action()
 	}
 }
 
-void director::Directing()
+bool Director::_directing()
 {
-	device::Instance().Update();
+	return Device::Instance().Update();
 }

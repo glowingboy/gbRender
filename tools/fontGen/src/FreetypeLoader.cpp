@@ -1,4 +1,4 @@
-#include "freetypeLoader.h"
+#include "FreetypeLoader.h"
 extern "C"
 {
 #include <ft2build.h>

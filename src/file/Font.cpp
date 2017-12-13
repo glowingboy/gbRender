@@ -1,16 +1,15 @@
-#include "font.h"
+#include "Font.h"
 #include <gbUtils/filesystem.h>
 #include <gbUtils/file.h>
-using gb::render::file::font;
-using gb::render::file::glyph;
 
-using namespace gb;
+using namespace gb::render::file;
+
 using gb::utils::filesystem;
 using gb::utils::string;
 
 size_t glyph::size = sizeof(glyph);
 
-void font::SerializeToFile(const uint32_t glyphSize,
+void Font::SerializeToFile(const uint32_t glyphSize,
 		     const std::vector<glyph_ex>& glyphs,
 		     const array_2d<std::uint8_t>& texture,
 		     const char* filePath)const
@@ -38,13 +37,13 @@ void font::SerializeToFile(const uint32_t glyphSize,
     fontFile.write(texture.data(), texture.row * texture.col);
 }
 
-data::font font::ParseFromFile(const char* filePath)const
+data::Font Font::ParseFromFile(const char* filePath)const
 {
     assert(filePath != nullptr);
 
     utils::file fontFile(filesystem::Instance().get_absolute_path(filePath));
 
-    data::font ret;
+    data::Font ret;
     char* identifier = new char[strlen(GB_RENDER_FILE_FONT_IDENDIFIER) + 1]{'\0'};
     fontFile.read(identifier, strlen(GB_RENDER_FILE_FONT_IDENDIFIER));
     if(string(identifier) != GB_RENDER_FILE_FONT_IDENDIFIER)

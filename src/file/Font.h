@@ -1,9 +1,9 @@
 #pragma once
-#include "file.h"
+#include "FileNS.h"
 #include <gbUtils/common.h>
 #include <gbPhysics/algorithm.h>
 #include <vector>
-#include "../data/font.h"
+#include "../data/Font.h"
 /*
   font file format
 
@@ -18,7 +18,7 @@
 
 */
 
-GB_RENDER_FILE_NAMESPACE_BEGIN;
+GB_RENDER_FILE_NS_BEGIN;
 
 #define GB_RENDER_FILE_FONT_IDENDIFIER "gbFont"
 #define GB_RENDER_FILE_FONT_EXTENSION "gbFont"
@@ -66,16 +66,16 @@ struct glyph_ex:public glyph
 };
 
 
-class font
+class Font
 {
-    GB_SINGLETON(font);
+    GB_SINGLETON(Font);
 public:
     void SerializeToFile(const uint32_t glyphSize,
 			 const std::vector<glyph_ex>& glyphs,
 			 const array_2d<uint8>& texture,
 			 const char* filePath)const;
 
-    data::font ParseFromFile(const char* filePath)const;
+    data::Font ParseFromFile(const char* filePath)const;
 };
 
-GB_RENDER_FILE_NAMESPACE_END;
+GB_RENDER_FILE_NS_END;

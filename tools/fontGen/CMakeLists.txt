@@ -13,9 +13,9 @@ find_package(gbPhysics REQUIRED)
 
 set(fontGen_srcs)
 
-gb_add_class(fontGen src fontGen_srcs)
-gb_add_class(freetypeLoader src fontGen_srcs)
-gb_add_class(font ../../src/file fontGen_srcs)
+gb_add_class(FontGen src fontGen_srcs)
+gb_add_class(FreetypeLoader src fontGen_srcs)
+gb_add_class(Font ../../src/file fontGen_srcs)
 
 add_executable(fontGen
   ${fontGen_srcs}

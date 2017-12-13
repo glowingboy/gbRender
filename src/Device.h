@@ -4,18 +4,16 @@
 #ifdef _MSC_VER
 #include <windows.h>
 #endif
+#include "RenderNS.h"
 
-namespace gb
-{
-    namespace render
-    {
-	class device
+GB_RENDER_NS_BEGIN
+	class Device
 	{
-	    GB_SINGLETON(device);
+	    GB_SINGLETON(Device);
 
 	public:
 	    bool Initialize();
-		void Update();
+		bool Update()const;
 #ifdef _MSC_VER
 	private:
 		static HGLRC _glContext;
@@ -26,8 +24,6 @@ namespace gb
 	    static bool _createGLContext(const HWND hWnd);
 #endif
 	};
-	
-    };
-    
-};
+
+GB_RENDER_NS_END
 

@@ -1,7 +1,8 @@
 #pragma once
-#include "data.h"
+#include "DataNS.h"
+#include "../Type.h"
 
-GB_RENDER_DATA_NAMESPACE_BEGIN
+GB_RENDER_DATA_NS_BEGIN
 
 struct texture
 {
@@ -10,4 +11,4 @@ struct texture
     uint8* data;
 };
 
-GB_RENDER_DATA_NAMESPACE_END
+GB_RENDER_DATA_NS_END

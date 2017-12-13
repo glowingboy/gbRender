@@ -1,7 +1,7 @@
 #pragma once
-#include "texture.h"
+#include "Texture.h"
 #include <unordered_map>
-GB_RENDER_DATA_NAMESPACE_BEGIN
+GB_RENDER_DATA_NS_BEGIN
 
 struct sprite
     {
@@ -30,6 +30,6 @@ protected:
     std::unordered_map<Key, Sprite> _mpSprites;
 };
 
-typedef _atlas<std::string, sprite> atlas;
+typedef _atlas<std::string, sprite> Atlas;
 
-GB_RENDER_DATA_NAMESPACE_END
+GB_RENDER_DATA_NS_END
