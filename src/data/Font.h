@@ -24,15 +24,15 @@ public:
 	{
 	    _mpSprites.insert(std::pair<uint32, glyph>(code, gly));
 	}
-    inline void SetTexture(array_2d<uint8>&& texture)
+    inline void SetTexture(gb::algorithm::array_2d<uint8>&& texture)
 	{
 	    _texture = std::move(texture);
 	}
 
-    const array_2d<uint8>& GetTexture()const { return _texture; }
+    const gb::algorithm::array_2d<uint8>& GetTexture()const { return _texture; }
 private:
     uint32 _glyphSize;
-    array_2d<uint8> _texture;
+	gb::algorithm::array_2d<uint8> _texture;
 };
 
 GB_RENDER_DATA_NS_END

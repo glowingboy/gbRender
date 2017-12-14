@@ -5,15 +5,29 @@
 #include <windows.h>
 #endif
 #include "RenderNS.h"
+#include "Type.h"
+#include <gbPhysics/algorithm.h>
 
 GB_RENDER_NS_BEGIN
 	class Device
 	{
-	    GB_SINGLETON(Device);
-
+		GB_SINGLETON_EXCLUDECTOR(Device);
+		Device();
 	public:
-	    bool Initialize();
+	    bool Initialize(const gb::algorithm::vec2<uint32>*screenSize = nullptr);
 		bool Update()const;
+
+
+		inline const gb::algorithm::vec2<uint32>& GetScreenSize()const
+		{
+			return _screenSize;
+		}
+
+		inline bool IsInitialized()const { return _bInitialized; }
+
+	private:
+		gb::algorithm::vec2<uint32> _screenSize;
+		bool _bInitialized;
 #ifdef _MSC_VER
 	private:
 		static HGLRC _glContext;

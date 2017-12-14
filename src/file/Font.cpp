@@ -11,7 +11,7 @@ size_t glyph::size = sizeof(glyph);
 
 void Font::SerializeToFile(const uint32_t glyphSize,
 		     const std::vector<glyph_ex>& glyphs,
-		     const array_2d<std::uint8_t>& texture,
+		     const gb::algorithm::array_2d<std::uint8_t>& texture,
 		     const char* filePath)const
 {
     assert( glyphSize != 0 && glyphs.size() !=0 && filePath != nullptr);
@@ -76,7 +76,7 @@ data::Font Font::ParseFromFile(const char* filePath)const
 
     char* tex_data = new char[width * height];
     fontFile.read(tex_data, width * height);
-    array_2d<uint8> texture;
+	gb::algorithm::array_2d<uint8> texture;
     texture.assign(height, width, (uint8*)tex_data);
     ret.SetTexture(std::move(texture));
     return ret;

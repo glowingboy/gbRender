@@ -3,13 +3,6 @@ cmake_minimum_required(VERSION 3.0)
 if(NOT WIN32)
   message(FATAL_ERROR "NOT WIN32")
 endif()
-# project(gbEditor)
-
-# include(${CMAKE_CURRENT_SOURCE_DIR}/../../gbCMake/gbCommon.cmake)
-
-# set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/../../gbCMake)
-
-# find_package(gbRender REQUIRED)
 
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/src)
 
@@ -36,7 +29,15 @@ set_target_properties(gbRender gbEditor
 
 add_dependencies(gbEditor gbRender)
 
+find_package(gbUtils REQUIRED)
+find_package(gbPhysics REQUIRED)
+
 target_link_libraries(gbEditor
   debug ${CMAKE_SOURCE_DIR}/Debug/gbRenderd.lib
   optimized ${CMAKE_SOURCE_DIR}/Release/gbRender.lib
+  debug ${gbUtils_LIBRARIES_d}
+  optimized ${gbUtils_LIBRARIES}
+  debug ${gbPhysics_LIBRARIES_d}
+  optimized ${gbPhysics_LIBRARIES}
+
  )

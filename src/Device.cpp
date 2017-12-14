@@ -3,16 +3,28 @@
 #include "Director.h"
 #include "GL.h"
 #include <wglext.h>
+#include <gbUtils/logger.h>
 using namespace gb::render;
 using gb::utils::string;
-
+using gb::utils::logger;
 #ifdef _MSC_VER
 HDC Device::_hDC;
 HGLRC Device::_glContext;
 #endif
 
-bool Device::Initialize()
+Device::Device():
+	_bInitialized(false)
 {
+
+}
+
+bool Device::Initialize(const gb::algorithm::vec2<uint32>*screenSize)
+{
+	if (_bInitialized)
+	{
+		logger::Instance().warning("Device has been Initialized");
+		return false;
+	}
 #ifdef _MSC_VER
 	WNDCLASS wc;
 	::memset(&wc, 0, sizeof(WNDCLASS));
@@ -22,20 +34,33 @@ bool Device::Initialize()
 	wc.lpszClassName = TEXT("gbRender");
 	wc.style = CS_OWNDC;
 
+	//fixed cursor always is busy state issue.
+	wc.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+
 	if (!::RegisterClass(&wc))
 	{
 		MessageBox(NULL, TEXT("device::Initialize Registerclass failed"), TEXT("gbRender"), MB_OK | MB_ICONERROR);
 		return false;
 	}
 
+	if (screenSize != nullptr)
+		_screenSize = *screenSize;
+	else
+	{
+		_screenSize.x = ::GetSystemMetrics(SM_CXSCREEN);
+		_screenSize.y = ::GetSystemMetrics(SM_CYSCREEN);
+	}
+
 	RECT rect;
 	rect.left = 0;
 	rect.top = 0;
-	const vec2<uint32>& screenSize = Director::Instance().GetScreenSize();
-	rect.right = screenSize.x;
-	rect.bottom = screenSize.y;
 
-	const DWORD dwStyle = WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+	rect.right = _screenSize.x;
+	rect.bottom = _screenSize.y;
+
+	DWORD dwStyle =  WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+	if (screenSize == nullptr)
+		dwStyle = WS_POPUP;
 	::AdjustWindowRectEx(&rect, dwStyle, FALSE, 0);
 	const HWND hWnd = ::CreateWindow(wc.lpszClassName, TEXT("gbRender"), dwStyle, 0, 0, rect.right - rect.left, rect.bottom - rect.top, 0, 0, wc.hInstance, 0);
 
@@ -44,6 +69,7 @@ bool Device::Initialize()
 
 	::ShowWindow(hWnd, SW_SHOW);
 
+	_bInitialized = true;
 	return true;
 #endif
 }

@@ -4,39 +4,47 @@
 using namespace gb::render;
 using gb::utils::string;
 using gb::utils::logger;
-Scene* Director::Ready(const vec2<uint32>& screenSize)
+Scene* Director::Ready(const char* firstSceneFilePath)
 {
-    _screenSize = screenSize;
 
-    if(! Device::Instance().Initialize())
-		throw string("director::Initialize device::Initialize failed");
+	if (!Device::Instance().IsInitialized())
+	{
+		logger::Instance().error("Director::Ready Device has not been Initialized");
+		return nullptr;
+	}
 
-	_curScene = new Scene;
+	_curScene = LoadScene(firstSceneFilePath);
 
 	return _curScene;
 }
 
 void Director::Action()
 {
-	try
-	{
+//	try
+//	{
 		for (;;)
 		{
 			if (!_directing())
 				break;
+
 		}
-	}
-	catch (const string& error)
-	{
-		logger::Instance().error("director::Action quit@" + error);
-	}
-	catch (...)
-	{
-		logger::Instance().error("director::Action quit unknown error");
-	}
+//	}
+	//catch (const string& error)
+	//{
+	//	logger::Instance().error("director::Action quit@" + error);
+	//}
+	//catch (...)
+	//{
+	//	logger::Instance().error("director::Action quit unknown error");
+	//}
 }
 
 bool Director::_directing()
 {
 	return Device::Instance().Update();
+}
+
+Scene* Director::LoadScene(const char* sceneFilePath = nullptr)
+{
+
 }

@@ -58,11 +58,11 @@ struct glyph_ex:public glyph
 	    sdf = std::move(other.sdf);
 	}
 	    
-    array_2d<uint8>& data()
+	gb::algorithm::array_2d<uint8>& data()
 	{
 	    return sdf;
 	}
-    array_2d<uint8> sdf;
+	gb::algorithm::array_2d<uint8> sdf;
 };
 
 
@@ -72,7 +72,7 @@ class Font
 public:
     void SerializeToFile(const uint32_t glyphSize,
 			 const std::vector<glyph_ex>& glyphs,
-			 const array_2d<uint8>& texture,
+			 const gb::algorithm::array_2d<uint8>& texture,
 			 const char* filePath)const;
 
     data::Font ParseFromFile(const char* filePath)const;

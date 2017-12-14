@@ -8,13 +8,13 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/gbCMake)
 find_package(gbUtils REQUIRED)
 find_package(gbPhysics REQUIRED)
 
-option(SHARED_LIB "build shared lib?" ON)
+option(GB_RENDER_STATIC_LIB "build shared lib?" ON)
 
-set(VERSION_MAJOR 0)
-set(VERSION_MINOR 0)
-if(NOT SHARED_LIB)
-  set(GB_RENDER_STATIC_LIB)
-endif()
+set(GB_RENDER_VERSION_MAJOR 0)
+set(GB_RENDER_VERSION_MINOR 0)
+# if( SHARED_LIB)
+#   set(GB_RENDER_STATIC_LIB)
+# endif()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.h.in ${CMAKE_CURRENT_SOURCE_DIR}/src/Config.h)
 
 set(srcs)
@@ -37,9 +37,9 @@ gb_add_class(Entity src srcs)
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/src/thirdpartylib)
 
 
-set(lib_type SHARED)
-if(NOT SHARED_LIB)
-  set(lib_type STATIC)
+set(lib_type STATIC)
+if(NOT GB_RENDER_STATIC_LIB)
+  set(lib_type SHARED)
 endif()
 
 add_library(gbRender ${lib_type}
@@ -52,7 +52,7 @@ set_target_properties(gbRender
   RELEASE_OUTPUT_NAME gbRender
   )
 
-if(SHARED_LIB)
+if(NOT GB_RENDER_STATIC_LIB)
   set_target_properties(gbRender
     PROPERTIES
     COMPILE_FLAGS -DGB_RENDER_SHARED_LIB
