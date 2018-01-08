@@ -6,6 +6,7 @@ int main(int argc, char** argv)
 {
 	vec2<uint32> screenSize(640, 480);
 	Device::Instance().Initialize(&screenSize);
+
 	Scene* curScene = Director::Instance().Ready();
 	if (curScene == nullptr)
 		return 1;

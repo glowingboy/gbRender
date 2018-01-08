@@ -13,7 +13,7 @@ Scene* Director::Ready(const char* firstSceneFilePath)
 		return nullptr;
 	}
 
-	_curScene = LoadScene(firstSceneFilePath);
+	LoadScene(firstSceneFilePath);
 
 	return _curScene;
 }
@@ -44,7 +44,8 @@ bool Director::_directing()
 	return Device::Instance().Update();
 }
 
-Scene* Director::LoadScene(const char* sceneFilePath = nullptr)
+Scene* Director::LoadScene(const char* sceneFilePath)
 {
-
+	_curScene = new Scene(sceneFilePath);
+	return _curScene;
 }
