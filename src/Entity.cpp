@@ -1,10 +1,13 @@
 #include "Entity.h"
+#include <algorithm>
 
 using namespace gb::render;
 
-void Instantiate(data::Entity& dEntity)
+void Entity::Instantiate(data::Entity& dEntity)
 {
-	_strName = std::move(dEntity.)
+	_Name = dEntity.GetName();
+
+	std::for_each(dEntity.GetName)
 }
 void Entity::Awake()
 {

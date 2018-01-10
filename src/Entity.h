@@ -15,7 +15,7 @@ private:
 	virtual void Awake() override;
 	virtual void Start() override;
 private:
-	gb::utils::string _strName;
+	GB_PROPERTY(gb::utils::string, Name);
 	std::unordered_map<gb::utils::string, Entity*> _mpChildren;
 };
 
