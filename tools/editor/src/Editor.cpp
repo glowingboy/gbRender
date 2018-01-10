@@ -2,6 +2,7 @@
 #include <Director.h>
 using namespace gb::render;
 using namespace gb::algorithm;
+
 int main(int argc, char** argv)
 {
 	vec2<uint32> screenSize(640, 480);

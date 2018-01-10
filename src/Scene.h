@@ -3,6 +3,7 @@
 #include "RenderNS.h"
 
 #include <unordered_map>
+#include <string>
 #include <gbUtils/string.h>
 #include "Entity.h"
 GB_RENDER_NS_BEGIN
@@ -17,7 +18,7 @@ public:
 	Scene(const char* sceneFilePath = nullptr);
 	Entity* AddEntity(const char* name = nullptr);
 private:
-	std::unordered_multimap<gb::utils::string, Entity*> _mpEntities;
+	Entity _root;
 };
 
 GB_RENDER_NS_END

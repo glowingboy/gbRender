@@ -1,9 +1,12 @@
 #include "Director.h"
 #include "Device.h"
 #include <gbUtils/logger.h>
+
+#include <gbUtils/luastate.h>
+
 using namespace gb::render;
-using gb::utils::string;
-using gb::utils::logger;
+using namespace gb::utils;
+
 Scene* Director::Ready(const char* firstSceneFilePath)
 {
 
@@ -13,6 +16,9 @@ Scene* Director::Ready(const char* firstSceneFilePath)
 		return nullptr;
 	}
 
+	//luastate initialize
+	luastate_mgr::Instance().initialize();
+	
 	LoadScene(firstSceneFilePath);
 
 	return _curScene;
