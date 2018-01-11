@@ -18,10 +18,10 @@ public:
 public:
 	void from_lua(const gb::utils::luatable_mapper& mapper);
 
-	GB_PROPERTY_R(gb::utils::string, Name);
+	GB_PROPERTY_R(Name, gb::utils::string);
 
 private:
-	GB_PROPERTY_R(std::unordered_multimap<gb::utils::string, Entity*>, Children);
+	GB_PROPERTY_R(Children, std::unordered_multimap<const gb::utils::string, Entity*>);
 };
 
 GB_RENDER_DATA_NS_END

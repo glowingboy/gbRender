@@ -1,6 +1,6 @@
 #include "Entity.h"
 #include <algorithm>
-
+#include <gbUtils/logger.h>
 using namespace gb::render::data;
 using namespace gb::utils;
  
@@ -12,7 +12,7 @@ Entity::Entity(Entity && o) :
 }
 Entity::~Entity()
 {
-	std::for_each(_Children.begin(), _Children.end(), [](std::pair<string, Entity*> e)
+	std::for_each(_Children.begin(), _Children.end(), [](std::pair<const string, Entity*> e)
 	{
 		GB_SAFE_DELETE(e.second);
 	});
@@ -21,13 +21,20 @@ Entity::~Entity()
 
 void Entity::from_lua(const luatable_mapper& mapper)
 {
-	_Name = mapper.get_string_by_key(GB_RENDER_DATA_ENTITY_KEY_NAME);
-
-	mapper.for_each_in([this, &mapper](const size_t idx)
+	if(mapper.has_key(GB_RENDER_DATA_ENTITY_KEY_NAME))
+		_Name = mapper.get_string_by_key(GB_RENDER_DATA_ENTITY_KEY_NAME);
+	else
 	{
-		Entity* e = new Entity(mapper.get_table_by_idx<Entity>(idx));
-		_Children.insert(std::pair<string, Entity*>(e->GetName(), e));
-	}, GB_RENDER_DATA_ENTITY_KEY_CHILDREN);
+		logger::Instance().error(string("Entity::from_lua broken entity mapper@ ") + mapper.GetFile());
+		return;
+	}
+
+	if(mapper.has_key(GB_RENDER_DATA_ENTITY_KEY_CHILDREN))
+		mapper.for_each_in([this, &mapper](const size_t idx)
+		{
+			Entity* e = new Entity(mapper.get_table_by_idx<Entity>(idx));
+			_Children.insert(std::pair<string, Entity*>(e->GetName(), e));
+		}, GB_RENDER_DATA_ENTITY_KEY_CHILDREN);
 
 
 }

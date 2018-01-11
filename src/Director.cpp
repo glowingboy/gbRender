@@ -1,27 +1,38 @@
 #include "Director.h"
 #include "Device.h"
-#include <gbUtils/logger.h>
-
 #include <gbUtils/luastate.h>
 
 using namespace gb::render;
 using namespace gb::utils;
 
-Scene* Director::Ready(const char* firstSceneFilePath)
+Director::Argument::Argument(const char* fileOfRootEntity, const gb::algorithm::vec2<gb::render::uint32>& sizeOfScreen):
+	rootEntity(fileOfRootEntity),
+	screenSize(sizeOfScreen)
 {
 
-	if (!Device::Instance().IsInitialized())
+}
+
+Director::Argument::Argument(Argument && other) :
+	rootEntity(std::move(other.rootEntity)),
+	screenSize(other.screenSize)
+{
+}
+
+bool Director::Ready(const Argument& arg)
+{
+	if (!Device::Instance().Initialize(arg.screenSize))
 	{
 		logger::Instance().error("Director::Ready Device has not been Initialized");
-		return nullptr;
+		return false;
 	}
 
 	//luastate initialize
 	luastate_mgr::Instance().initialize();
 	
-	LoadScene(firstSceneFilePath);
+	if (arg.rootEntity.length() != 0)
+		_Root.Instantiate(arg.rootEntity);
 
-	return _curScene;
+	return true;
 }
 
 void Director::Action()
@@ -48,10 +59,4 @@ void Director::Action()
 bool Director::_directing()
 {
 	return Device::Instance().Update();
-}
-
-Scene* Director::LoadScene(const char* sceneFilePath)
-{
-	_curScene = new Scene(sceneFilePath);
-	return _curScene;
 }

@@ -31,7 +31,7 @@ add_dependencies(gbEditor gbRender)
 
 find_package(gbUtils REQUIRED)
 find_package(gbPhysics REQUIRED)
-
+find_package(lua REQUIRED)
 target_link_libraries(gbEditor
   debug ${CMAKE_SOURCE_DIR}/Debug/gbRenderd.lib
   optimized ${CMAKE_SOURCE_DIR}/Release/gbRender.lib
@@ -39,5 +39,6 @@ target_link_libraries(gbEditor
   optimized ${gbUtils_LIBRARIES}
   debug ${gbPhysics_LIBRARIES_d}
   optimized ${gbPhysics_LIBRARIES}
-
+  debug ${lua_LIBRARIES_d}
+  optimized ${lua_LIBRARIES}
  )

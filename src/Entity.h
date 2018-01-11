@@ -5,18 +5,31 @@
 #include <gbUtils/string.h>
 #include "data/Entity.h"
 
+namespace gb
+{
+	namespace render
+	{
+		class Director;
+	}
+}
 GB_RENDER_NS_BEGIN
 
 GB_RENDER_CLASS Entity: protected GBObject
 {
+	friend class gb::render::Director;
+private:
+	inline Entity() {};
+	~Entity();
 public:
-	void Instantiate(gb::render::data::Entity& dEntity);
+	template<typename DataEntity>
+	void Instantiate(DataEntity && dEntity);
+	void Instantiate(const char* entityFile);
 private:
 	virtual void Awake() override;
 	virtual void Start() override;
 private:
-	GB_PROPERTY(gb::utils::string, Name);
-	std::unordered_map<gb::utils::string, Entity*> _mpChildren;
+	GB_PROPERTY(Name, gb::utils::string)
+	std::unordered_map<const gb::utils::string, Entity*> _mpChildren;
 };
 
 GB_RENDER_NS_END

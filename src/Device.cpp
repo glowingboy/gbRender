@@ -13,12 +13,13 @@ HGLRC Device::_glContext;
 #endif
 
 Device::Device():
-	_bInitialized(false)
+	_bInitialized(false),
+	_bFullScreen(false)
 {
 
 }
 
-bool Device::Initialize(const gb::algorithm::vec2<uint32>*screenSize)
+bool Device::Initialize(const gb::algorithm::vec2<uint32>& screenSize)
 {
 	if (_bInitialized)
 	{
@@ -43,10 +44,14 @@ bool Device::Initialize(const gb::algorithm::vec2<uint32>*screenSize)
 		return false;
 	}
 
-	if (screenSize != nullptr)
-		_screenSize = *screenSize;
+	if (screenSize.x != 0 && screenSize.y != 0)
+	{
+		_bFullScreen = true;
+		_screenSize = screenSize;
+	}
 	else
 	{
+		_bFullScreen = false;
 		_screenSize.x = ::GetSystemMetrics(SM_CXSCREEN);
 		_screenSize.y = ::GetSystemMetrics(SM_CYSCREEN);
 	}
@@ -59,7 +64,7 @@ bool Device::Initialize(const gb::algorithm::vec2<uint32>*screenSize)
 	rect.bottom = _screenSize.y;
 
 	DWORD dwStyle =  WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
-	if (screenSize == nullptr)
+	if (!_bFullScreen)
 		dwStyle = WS_POPUP;
 	::AdjustWindowRectEx(&rect, dwStyle, FALSE, 0);
 	const HWND hWnd = ::CreateWindow(wc.lpszClassName, TEXT("gbRender"), dwStyle, 0, 0, rect.right - rect.left, rect.bottom - rect.top, 0, 0, wc.hInstance, 0);

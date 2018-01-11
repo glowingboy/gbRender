@@ -13,7 +13,7 @@ GB_RENDER_NS_BEGIN
 	{
 		GB_SINGLETON_EXCLUDECTOR(Device);
 	public:
-	    bool Initialize(const gb::algorithm::vec2<uint32>*screenSize = nullptr);
+	    bool Initialize(const gb::algorithm::vec2<uint32>& screenSize);
 		bool Update()const;
 
 
@@ -27,6 +27,7 @@ GB_RENDER_NS_BEGIN
 	private:
 		gb::algorithm::vec2<uint32> _screenSize;
 		bool _bInitialized;
+		bool _bFullScreen;
 #ifdef _MSC_VER
 	private:
 		static HGLRC _glContext;
