@@ -16,7 +16,7 @@ private:
 	*/
 	virtual void Awake() = 0;
 	/*
-	 *@brief called after all siblings'(known by container, in instantiate prefab case) Awake having been called
+	 *@brief called after all siblings'(known by container, when instantiate prefab) Awake having been called
 	*/
 	virtual void Start() = 0;
 };

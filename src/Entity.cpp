@@ -13,17 +13,21 @@ Entity::~Entity()
 }
 
 template<typename DataEntity>
-void Entity::Instantiate(DataEntity && dEntity)
+typename std::enable_if<data::Entity::is_entity<typename gb::rm_cv_ref<DataEntity>::type>::value, void>
+::type Entity::Instantiate(DataEntity && dEntity)
 {
-	_Name = std::forward<DataEntity>(dEntity.GetName());
+	_Name = std::forward<DataEntity>(dEntity).GetName();
 
-	std::for_each(dEntity.GetChildren().begin(), dEntity.GetChildren().end(), [this](typename DataEntity::value_type& dE)
+	std::for_each(dEntity.GetChildren().begin(), dEntity.GetChildren().end(), [this]( typename std::remove_reference<DataEntity>::type::mpChildrenValue_Type & dE)
 	{
 		Entity* e = new Entity;
-		e->Instantiate<DataEntity>(*(dE.second));
+		e->Instantiate(std::forward<DataEntity>(*(dE.second)));
 		_mpChildren.insert(std::pair<string, Entity*>(e->GetName(), e));
 	});
 }
+
+template void Entity::Instantiate<const data::Entity & >(const data::Entity & dEntity);
+template void Entity::Instantiate<data::Entity &&>(data::Entity && dEntity);
 
 void Entity::Instantiate(const char* entityFile)
 {

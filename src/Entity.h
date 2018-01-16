@@ -22,7 +22,8 @@ private:
 	~Entity();
 public:
 	template<typename DataEntity>
-	void Instantiate(DataEntity && dEntity);
+	typename std::enable_if<data::Entity::is_entity<typename gb::rm_cv_ref<DataEntity>::type>::value , void>
+		::type Instantiate(DataEntity && dEntity);
 	void Instantiate(const char* entityFile);
 private:
 	virtual void Awake() override;
