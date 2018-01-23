@@ -23,17 +23,24 @@ gb_add_class(RenderNS src srcs)
 gb_add_class(Type src srcs)
 gb_add_class(Device src srcs)
 gb_add_class(GL src srcs)
+
+# data
 gb_add_class(DataNS src/data srcs)
 gb_add_class(Atlas src/data srcs)
 gb_add_class(Font src/data srcs)
 gb_add_class(Texture src/data srcs)
 gb_add_class(Entity src/data srcs)
+gb_add_class(Element src/data srcs)
+gb_add_class(Render src/data srcs)
+
+# file
 gb_add_class(FileNS src/file srcs)
 gb_add_class(Font src/file srcs)
 gb_add_class(Director src srcs)
 gb_add_class(Scene src srcs)
 gb_add_class(GBObject src srcs)
 gb_add_class(Entity src srcs)
+gb_add_class(Element src srcs)
 
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/src/thirdpartylib)
 

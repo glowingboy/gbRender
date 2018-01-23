@@ -1,17 +1,18 @@
-* Architecture
-** Concepts
+* gbRender
+** Architecture
+*** Concepts
 :PROPERTIES:
 :Interface:
 :END:
-*** Director
+**** Director
 Director contains a root Entity
-**** Interface 
+***** Interface 
 - Ready
 - Action
 
-*** Entity
+**** Entity
 Enity may contain Elements and sub-Entities(children)
-**** Interface 
+***** Interface 
 - Start
   1. elements Start
   2. children Start
@@ -22,32 +23,32 @@ Enity may contain Elements and sub-Entities(children)
   - AddChild(entity name) :: create a new empty child
 - RemoveChild
 - AddElement
-*** Element
+**** Element
 Different element will contribute different feature to the Entity
 (such as transform, render...)
-*** Start
-** C++ Class Hierachy
+**** Start
+*** C++ Class Hierachy
 
 
-* Calling Sequence
-** Basic Rules
-*** Awake & Start
+** Calling Sequence
+*** Basic Rules
+**** Awake & Start
 Awake -> Start
-*** Entity & Element
+**** Entity & Element
 Element Awake 
 -> Entity Start -> Element Start
-*** Parent & Children
+**** Parent & Children
 Children Awake -> Parent Awake
 Parent Start -> Children Start
-*** Summary
+**** Summary
 - Awake :: from bottom to top
 - Start :: from top to bottom
-*** Start
+**** Start
 
 
-** Description
-children element Awake -> children entity Awake 
--> parent element Awake -> parent entity Awake
+*** Description
+children element Awake 
+-> parent element Awake
 -> ... 
 -> parent entity Start -> parent elment Start
 -> children entity Start -> children element Start

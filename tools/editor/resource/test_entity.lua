@@ -1,21 +1,27 @@
 return
    {
-      Name = "test_scene",
+      Name = "test_root",
       Children =
 	 {
 	    {
 	       Name = "test0",
-	       Component =
-		  {}
+	       Elements = 
+		  {
+		     {
+			Type = 1, -- render
+			Mesh = "mesh.path",
+			Material = "mat.path"
+		     }
+		  }
 	    },
 	    {
 	       Name = "test1",
-	       Component =
+	       Elements =
 		  {}
 	    },
 	    {
 	       Name = "test2",
-	       Component =
+	       Elements =
 		  {},
 	       Children =
 		  {

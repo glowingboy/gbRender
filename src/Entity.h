@@ -1,5 +1,5 @@
 #pragma once 
-#include "GBObject.h"
+#include "Element.h"
 #include "Config.h"
 #include "RenderNS.h"
 #include <gbUtils/string.h>
@@ -14,7 +14,7 @@ namespace gb
 }
 GB_RENDER_NS_BEGIN
 
-GB_RENDER_CLASS Entity: protected GBObject
+GB_RENDER_CLASS Entity
 {
 	friend class gb::render::Director;
 private:
@@ -26,11 +26,11 @@ public:
 		::type Instantiate(DataEntity && dEntity);
 	void Instantiate(const char* entityFile);
 private:
-	virtual void Awake() override;
-	virtual void Start() override;
-private:
-	GB_PROPERTY(Name, gb::utils::string)
-	std::unordered_map<const gb::utils::string, Entity*> _mpChildren;
+	void Start();
+
+	GB_PROPERTY(private, Name, gb::utils::string);
+	GB_PROPERTY_R(private, Children, std::unordered_multimap<const gb::utils::string, Entity*>);
+	GB_PROPERTY_R(private, Elements, std::unordered_map<const gb::render::uint8, Element*>);
 };
 
 GB_RENDER_NS_END

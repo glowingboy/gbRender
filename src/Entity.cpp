@@ -6,7 +6,7 @@ using namespace gb::utils;
 
 Entity::~Entity()
 {
-	std::for_each(_mpChildren.begin(), _mpChildren.end(), [](std::pair<const string, Entity*>& e)
+	std::for_each(_Children.begin(), _Children.end(), [](std::pair<const string, Entity*>& e)
 	{
 		GB_SAFE_DELETE(e.second);
 	});
@@ -37,11 +37,9 @@ typename std::enable_if<data::Entity::is_entity<typename gb::rm_cv_ref<DataEntit
 	{
 		Entity* e = new Entity;
 		e->Instantiate(std::forward<DataEntity>(*(dE.second)));
-		_mpChildren.insert(std::pair<string, Entity*>(e->GetName(), e));
+		_Children.insert(std::pair<string, Entity*>(e->GetName(), e));
 	});
 
-	//self Awake
-	this->Awake();
 
 	//self Start
 	this->Start();
@@ -64,10 +62,6 @@ void Entity::Instantiate(const char* entityFile)
 	else
 		logger::Instance().error(string("Entity::Instantiate mapper validate failed entityFile@ ") + entityFile);
 }
-void Entity::Awake()
-{
-	logger::Instance().log(string("Awake from ") + _Name);
-}
 
 void Entity::Start()
 {
@@ -78,7 +72,7 @@ void Entity::Start()
 
 
 	//children Start
-	std::for_each(_mpChildren.begin(), _mpChildren.end(), [](std::pair<const string, Entity*> & e)
+	std::for_each(_Children.begin(), _Children.end(), [](std::pair<const string, Entity*> & e)
 	{
 		e.second->Start();
 	});

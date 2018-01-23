@@ -36,3 +36,4 @@ resources/
 *build/
 Win32/
 *Debug/
+*#*

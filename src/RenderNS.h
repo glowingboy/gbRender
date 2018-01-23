@@ -7,7 +7,7 @@ namespace gb{ namespace render{
 GB_RENDER_NS_BEGIN
 GB_RENDER_NS_END
 
-using namespace gb::render;
+
 
 
 
