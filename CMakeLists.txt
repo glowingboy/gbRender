@@ -19,11 +19,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Config.h.in ${CMAKE_CURRENT_SOURCE_DI
 
 set(srcs)
 
-gb_add_class(RenderNS src srcs)
-gb_add_class(Type src srcs)
-gb_add_class(Device src srcs)
-gb_add_class(GL src srcs)
-
 # data
 gb_add_class(DataNS src/data srcs)
 gb_add_class(Atlas src/data srcs)
@@ -36,11 +31,23 @@ gb_add_class(Render src/data srcs)
 # file
 gb_add_class(FileNS src/file srcs)
 gb_add_class(Font src/file srcs)
+
+# src
+gb_add_class(RenderNS src srcs)
+gb_add_class(Type src srcs)
+gb_add_class(Device src srcs)
+gb_add_class(GL src srcs)
+# 
 gb_add_class(Director src srcs)
 gb_add_class(Scene src srcs)
 gb_add_class(GBObject src srcs)
 gb_add_class(Entity src srcs)
+# element
 gb_add_class(Element src srcs)
+gb_add_class(Render src srcs)
+
+# resource
+gb_add_class(Mesh src/resource srcs)
 
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/src/thirdpartylib)
 

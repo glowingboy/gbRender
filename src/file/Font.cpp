@@ -3,7 +3,7 @@
 #include <gbUtils/file.h>
 
 using namespace gb::render::file;
-
+using namespace gb::render;
 using gb::utils::filesystem;
 using gb::utils::string;
 

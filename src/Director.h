@@ -30,6 +30,6 @@ public:
 	void Action();
 private:
 	bool _directing();
-	GB_PROPERTY_R(Root, Entity);
+	GB_PROPERTY_R(private, Root, Entity);
 };
 GB_RENDER_NS_END

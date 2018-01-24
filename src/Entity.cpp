@@ -12,18 +12,6 @@ Entity::~Entity()
 	});
 }
 
-template <typename DataEntity>
-struct _childrenValue_Type_Selector
-{
-	using type = typename DataEntity::mpChildrenValue_Type;
-};
-
-template <>
-struct _childrenValue_Type_Selector<const data::Entity>
-{
-	using type = const data::Entity::mpChildrenValue_Type;
-};
-
 template<typename DataEntity>
 typename std::enable_if<data::Entity::is_entity<typename gb::rm_cv_ref<DataEntity>::type>::value, void>
 ::type Entity::Instantiate(DataEntity && dEntity)
@@ -31,13 +19,21 @@ typename std::enable_if<data::Entity::is_entity<typename gb::rm_cv_ref<DataEntit
 	_Name = std::forward<DataEntity>(dEntity).GetName();
 
 	//elements instantiate 
-
+	std::for_each(dEntity.GetElements().begin(), dEntity.GetElements().end(), [this](std::conditional
+		<std::is_const<std::remove_reference<DataEntity>::type>::value, const std::pair<const Element::Type, data::Element*>, std::pair<const Element::Type, data::Element*>>
+		::type & dE)
+	{
+		Element* ele = dE.second->Instantiate();
+		ele->Awake();
+	});
 	//children instantiate
-	std::for_each(dEntity.GetChildren().begin(), dEntity.GetChildren().end(), [this](_childrenValue_Type_Selector<std::remove_reference<DataEntity>::type>::type & dE)
+	std::for_each(dEntity.GetChildren().begin(), dEntity.GetChildren().end(), [this](std::conditional
+		<std::is_const<std::remove_reference<DataEntity>::type>::value, const std::pair<const string, data::Entity*>, std::pair<const string, data::Entity*>>
+		::type & dE)
 	{
 		Entity* e = new Entity;
 		e->Instantiate(std::forward<DataEntity>(*(dE.second)));
-		_Children.insert(std::pair<string, Entity*>(e->GetName(), e));
+		_Children.insert(std::pair<const string, Entity*>(e->GetName(), e));
 	});
 
 

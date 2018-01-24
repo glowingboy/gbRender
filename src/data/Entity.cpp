@@ -33,7 +33,8 @@ void Entity::from_lua(const luatable_mapper& mapper)
 	if(mapper.has_key(GB_RENDER_DATA_ENTITY_KEY_ELEMENTS))
 		mapper.for_each_in([this, &mapper](const size_t idx)
 		{
-		Element* ele = mapper.get_table_by_idx<ElementAdapter>(idx).GetElement();
+			Element* ele = mapper.get_table_by_idx<ElementAdapter>(idx).GetElement();
+			_Elements.insert(std::pair<const gb::render::Element::Type, Element*>(ele->GetType(), ele));
 		}, GB_RENDER_DATA_ENTITY_KEY_ELEMENTS);
 
 	//children

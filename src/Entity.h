@@ -30,7 +30,7 @@ private:
 
 	GB_PROPERTY(private, Name, gb::utils::string);
 	GB_PROPERTY_R(private, Children, std::unordered_multimap<const gb::utils::string, Entity*>);
-	GB_PROPERTY_R(private, Elements, std::unordered_map<const gb::render::uint8, Element*>);
+	GB_PROPERTY_R(private, Elements, std::map<const gb::render::Element::Type, Element*>);
 };
 
 GB_RENDER_NS_END

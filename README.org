@@ -55,3 +55,14 @@ children element Awake
 -> ...
 
 
+** Render Order
+*** Order
+RenderQueue -> shader -> Material -> Mesh -> draw
+*** absolute static render(environment buildings)
+vtxAttrib, instVar, UnifVar never changed
+*** partial static render(same type NPC)
+only instaVar changed
+*** dynamic render
+all changed in every frame
+
+

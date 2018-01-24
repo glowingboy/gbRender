@@ -11,14 +11,8 @@ Element::Element(const gb::render::Element::Type type):
 	_Type(type)
 {}
 
-Element::Element(const gb::render::Element::Type type, const gb::utils::luatable_mapper & mapper):
-	_Type(type)
-{
-	from_lua(mapper);
-}
-
 ElementAdapter::ElementAdapter():
-	Element(render::Element::Type::Default),
+	_Type(render::Element::Type::Default),
 	_Element(nullptr)
 {}
 
@@ -33,4 +27,9 @@ void ElementAdapter::from_lua(const luatable_mapper& mapper)
 	}
 	if (_Type == render::Element::Type::Render)
 		_Element = new Render();
+	else if (_Type == render::Element::Type::Text)
+		/*...*/;
+	else
+		return;
+	_Element->from_lua(mapper);
 }
