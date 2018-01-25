@@ -16,6 +16,19 @@ template<typename DataEntity>
 typename std::enable_if<data::Entity::is_entity<typename gb::rm_cv_ref<DataEntity>::type>::value, void>
 ::type Entity::Instantiate(DataEntity && dEntity)
 {
+	_instantiate(std::forward<DataEntity>(dEntity));
+
+	//self Start
+	this->Start();
+}
+
+template void Entity::Instantiate<const data::Entity & >(const data::Entity & dEntity);
+template void Entity::Instantiate<data::Entity &&>(data::Entity && dEntity);
+
+template<typename DataEntity>
+typename std::enable_if<data::Entity::is_entity<typename gb::rm_cv_ref<DataEntity>::type>::value, void>
+::type Entity::_instantiate(DataEntity && dEntity)
+{
 	_Name = std::forward<DataEntity>(dEntity).GetName();
 
 	//elements instantiate 
@@ -23,7 +36,7 @@ typename std::enable_if<data::Entity::is_entity<typename gb::rm_cv_ref<DataEntit
 		<std::is_const<std::remove_reference<DataEntity>::type>::value, const std::pair<const Element::Type, data::Element*>, std::pair<const Element::Type, data::Element*>>
 		::type & dE)
 	{
-		Element* ele = dE.second->Instantiate();
+		Element* ele = dE.second->Instantiate(this);
 		ele->Awake();
 	});
 	//children instantiate
@@ -36,13 +49,8 @@ typename std::enable_if<data::Entity::is_entity<typename gb::rm_cv_ref<DataEntit
 		_Children.insert(std::pair<const string, Entity*>(e->GetName(), e));
 	});
 
-
-	//self Start
-	this->Start();
 }
 
-template void Entity::Instantiate<const data::Entity & >(const data::Entity & dEntity);
-template void Entity::Instantiate<data::Entity &&>(data::Entity && dEntity);
 
 void Entity::Instantiate(const char* entityFile)
 {
@@ -65,12 +73,28 @@ void Entity::Start()
 	logger::Instance().log(string("Start from ") + _Name);
 
 	//self elements Start
-
+	std::for_each(_Elements.begin(), _Elements.end(), [](std::pair<const Element::Type, Element*> & ele)
+	{
+		ele.second->Start();
+	});
 
 	//children Start
 	std::for_each(_Children.begin(), _Children.end(), [](std::pair<const string, Entity*> & e)
 	{
 		e.second->Start();
 	});
+
+}
+
+
+void Entity::AddElement(Element* const ele)
+{
+	const Element::Type t = ele->GetType();
+
+	if (_Elements.find(t) != _Elements.end())
+	{
+		_Elements.insert(std::pair<const Element::Type, Element*>(t, ele));
+	}
+	
 
 }

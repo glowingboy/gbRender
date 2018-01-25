@@ -15,9 +15,9 @@ void Render::from_lua(const gb::utils::luatable_mapper & mapper)
 }
 
 
-render::Element* Render::Instantiate() const
+render::Element* Render::Instantiate(render::Entity* const owner) const
 {
-	render::Render* r = new render::Render;
+	render::Render* r = new render::Render(owner);
 	r->SetMesh(_Mesh);
 	r->SetMaterial(_Material);
 	return r;
