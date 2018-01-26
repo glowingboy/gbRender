@@ -44,6 +44,7 @@ gb_add_class(GBObject src srcs)
 gb_add_class(Entity src srcs)
 # element
 gb_add_class(Element src srcs)
+gb_add_class(Camera src srcs)
 gb_add_class(Render src srcs)
 
 # resource

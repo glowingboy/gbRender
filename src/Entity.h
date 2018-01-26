@@ -1,7 +1,6 @@
 #pragma once 
 #include "Element.h"
 #include "Config.h"
-#include "RenderNS.h"
 #include <gbUtils/string.h>
 #include "data/Entity.h"
 
@@ -14,7 +13,7 @@ namespace gb
 }
 GB_RENDER_NS_BEGIN
 
-GB_RENDER_CLASS Entity
+GB_RENDER_CLASS Entity: public GBObject
 {
 	friend class gb::render::Director;
 private:
@@ -28,7 +27,8 @@ public:
 
 	void AddElement(Element* const ele);
 private:
-	void Start();
+	virtual void Start() override;
+	virtual void End() override;
 
 	template<typename DataEntity>
 	typename std::enable_if<data::Entity::is_entity<typename gb::rm_cv_ref<DataEntity>::type>::value, void>

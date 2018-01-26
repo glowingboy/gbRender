@@ -38,6 +38,7 @@ typename std::enable_if<data::Entity::is_entity<typename gb::rm_cv_ref<DataEntit
 	{
 		Element* ele = dE.second->Instantiate(this);
 		ele->Awake();
+		_Elements.insert(std::pair<const Element::Type, Element*>(ele->GetType(), ele));
 	});
 	//children instantiate
 	std::for_each(dEntity.GetChildren().begin(), dEntity.GetChildren().end(), [this](std::conditional
@@ -45,7 +46,7 @@ typename std::enable_if<data::Entity::is_entity<typename gb::rm_cv_ref<DataEntit
 		::type & dE)
 	{
 		Entity* e = new Entity;
-		e->Instantiate(std::forward<DataEntity>(*(dE.second)));
+		e->_instantiate(std::forward<DataEntity>(*(dE.second)));
 		_Children.insert(std::pair<const string, Entity*>(e->GetName(), e));
 	});
 
@@ -95,6 +96,8 @@ void Entity::AddElement(Element* const ele)
 	{
 		_Elements.insert(std::pair<const Element::Type, Element*>(t, ele));
 	}
+	else
+		logger::Instance().warning("more than one count of same type Element @ " + Element::TypeToString(t));
 	
 
 }

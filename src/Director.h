@@ -13,9 +13,14 @@
 // utils
 #include <gbUtils/logger.h>
 #include <gbUtils/filesystem.h>
+
+#include <set>
+#include "Camera.h"
+
 GB_RENDER_NS_BEGIN
 GB_RENDER_CLASS Director
 {
+	friend class Camera;
 public:
 	struct Argument
 	{
@@ -29,7 +34,10 @@ public:
 	bool Ready(const Argument & arg);
 	void Action();
 private:
+	void AddCamera(Camera * const cam);
 	bool _directing();
+private:
+	std::set<Camera*, gb::utils::less_ptr<Camera>> _Cameras;
 	GB_PROPERTY_R(private, Root, Entity);
 };
 GB_RENDER_NS_END

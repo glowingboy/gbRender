@@ -1,11 +1,8 @@
 * gbRender
 ** Architecture
 *** Concepts
-:PROPERTIES:
-:Interface:
-:END:
 **** Director
-Director contains a root Entity
+Director contains a root Entity, holds camera to shoot
 ***** Interface 
 - Ready
 - Action

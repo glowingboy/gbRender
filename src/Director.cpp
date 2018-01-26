@@ -58,5 +58,12 @@ void Director::Action()
 
 bool Director::_directing()
 {
+	//camera shooting
+
 	return Device::Instance().Update();
+}
+
+void Director::AddCamera(Camera * const cam)
+{
+	_Cameras.insert(cam);
 }
