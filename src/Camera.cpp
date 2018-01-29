@@ -25,3 +25,8 @@ void Camera::Start()
 {
 
 }
+
+void Camera::Shoot()
+{
+
+}

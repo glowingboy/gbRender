@@ -12,7 +12,7 @@ public:
 	virtual Type GetType() const override;
 
 	bool operator < (const Camera & o) const;
-
+	void Shoot();
 private:
 	virtual void Awake() override;
 	virtual void Start() override;

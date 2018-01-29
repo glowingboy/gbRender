@@ -59,7 +59,10 @@ void Director::Action()
 bool Director::_directing()
 {
 	//camera shooting
-
+	std::for_each(_Cameras.begin(), _Cameras.end(), [](std::pair<const bool, Camera*> & cam)
+	{
+		cam.second->Shoot();
+	});
 	return Device::Instance().Update();
 }
 
