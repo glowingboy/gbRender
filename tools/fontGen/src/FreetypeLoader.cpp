@@ -201,11 +201,8 @@ void freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFon
     concurrency<FT_ULong>::Instance().done();
     logger::Instance().progress_done();
 
-    if(th_vas != nullptr)
-    {
-	delete [] th_vas;
-	th_vas = nullptr;
-    }
+    delete [] th_vas;
+    th_vas = nullptr;
 	    
     logger::Instance().log("sdfs generating completed");
 
