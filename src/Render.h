@@ -16,6 +16,7 @@ public:
 private:
 	virtual void Awake() override;
 	virtual void Start() override;
+	virtual void End() override;
 	GB_PROPERTY_R(private, Mesh, gb::render::resource::Mesh*);
 };
 

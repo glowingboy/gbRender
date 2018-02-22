@@ -1,6 +1,6 @@
 #pragma once
 #include "Atlas.h"
-#include <gbPhysics/algorithm.h>
+#include <gbPhysics/type.h>
 
 GB_RENDER_DATA_NS_BEGIN
 
@@ -24,15 +24,15 @@ public:
 	{
 	    _mpSprites.insert(std::pair<uint32, glyph>(code, gly));
 	}
-    inline void SetTexture(gb::algorithm::array_2d<uint8>&& texture)
+    inline void SetTexture(gb::physics::array_2d<uint8>&& texture)
 	{
 	    _texture = std::move(texture);
 	}
 
-    const gb::algorithm::array_2d<uint8>& GetTexture()const { return _texture; }
+    const gb::physics::array_2d<uint8>& GetTexture()const { return _texture; }
 private:
     uint32 _glyphSize;
-	gb::algorithm::array_2d<uint8> _texture;
+	gb::physics::array_2d<uint8> _texture;
 };
 
 GB_RENDER_DATA_NS_END

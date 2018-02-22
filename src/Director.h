@@ -4,7 +4,7 @@
 
 #include <gbUtils/string.h>
 #include "Config.h"
-#include <gbPhysics/algorithm.h>
+#include <gbPhysics/type.h>
 
 #include "Device.h"
 
@@ -24,20 +24,22 @@ GB_RENDER_CLASS Director
 public:
 	struct Argument
 	{
-		Argument(const char* fileOfRootEntity, const gb::algorithm::vec2<gb::render::uint32>& sizeOfScreen);
+		Argument(const char* fileOfRootEntity, const gb::physics::vec2<gb::render::uint32>& sizeOfScreen);
 		Argument(Argument && other);
 		gb::utils::string rootEntity;
-		gb::algorithm::vec2<gb::render::uint32> screenSize;
+		gb::physics::vec2<gb::render::uint32> screenSize;
 	};
 	GB_SINGLETON(Director);
 public:
 	bool Ready(const Argument & arg);
 	void Action();
 private:
-	void AddCamera(Camera * const cam);
+	void AddCamera(const Camera * const cam);
+	void RemoveCamera(const Camera* const cam);
 	bool _directing();
 private:
-	std::set<Camera*, gb::utils::less_ptr<Camera>> _Cameras;
+	typedef std::set<const Camera *, gb::utils::less_ptr<Camera>>::iterator _camItr;
+	std::set<const Camera *, gb::utils::less_ptr<Camera>> _Cameras;
 	GB_PROPERTY_R(private, Root, Entity);
 };
 GB_RENDER_NS_END

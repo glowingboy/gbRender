@@ -19,7 +19,7 @@ Device::Device():
 
 }
 
-bool Device::Initialize(const gb::algorithm::vec2<uint32>& screenSize)
+bool Device::Initialize(const gb::physics::vec2<uint32>& screenSize)
 {
 	if (_bInitialized)
 	{

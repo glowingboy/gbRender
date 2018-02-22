@@ -12,11 +12,12 @@ public:
 	virtual Type GetType() const override;
 
 	bool operator < (const Camera & o) const;
-	void Shoot();
+	void Shoot() const;
+	void SetRenderQueue(const uint32 rq);
 private:
 	virtual void Awake() override;
 	virtual void Start() override;
-
+	virtual void End() override;
 	GB_PROPERTY_R(private, RenderQueue, uint32);
 };
 

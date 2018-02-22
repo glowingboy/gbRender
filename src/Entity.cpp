@@ -87,6 +87,10 @@ void Entity::Start()
 
 }
 
+void Entity::End()
+{
+	logger::Instance().log(string("End from ") + _Name);
+}
 
 void Entity::AddElement(Element* const ele)
 {

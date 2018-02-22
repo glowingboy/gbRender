@@ -26,7 +26,9 @@ gb_add_class(Font src/data srcs)
 gb_add_class(Texture src/data srcs)
 gb_add_class(Entity src/data srcs)
 gb_add_class(Element src/data srcs)
+gb_add_class(Camera src/data srcs)
 gb_add_class(Render src/data srcs)
+
 
 # file
 gb_add_class(FileNS src/file srcs)

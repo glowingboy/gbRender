@@ -18,6 +18,11 @@ void Render::Start()
 	logger::Instance().log("render::start @ " + _Owner->GetName());
 }
 
+void Render::End()
+{
+	logger::Instance().log("render::End @ " + _Owner->GetName());
+}
+
 Element::Type Render::GetType() const
 {
 	return Element::Type::Render;

@@ -1,6 +1,8 @@
 #include "Element.h"
 
 #include "Render.h"
+#include "Camera.h"
+
 #include <gbUtils/logger.h>
 #include <gbUtils/string.h>
 using namespace gb;
@@ -25,11 +27,17 @@ void ElementAdapter::from_lua(const luatable_mapper& mapper)
 		logger::Instance().error(string("ElementAdapter::from_lua error@ ") + mapper.GetFile());
 		return;
 	}
-	if (_Type == render::Element::Type::Render)
+	if (_Type == render::Element::Type::Camera)
+		_Element = new Camera();
+	else if (_Type == render::Element::Type::Render)
 		_Element = new Render();
 	else if (_Type == render::Element::Type::Text)
 		/*...*/;
 	else
+	{
+		logger::Instance().error(string("ElementAdapter::from_lua unkown type error@ ") + mapper.GetFile() + "type@ " + _Type);
 		return;
+	}
+		
 	_Element->from_lua(mapper);
 }

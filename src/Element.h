@@ -3,7 +3,6 @@
 #include <gbUtils/string.h>
 GB_RENDER_NS_BEGIN
 
-class Entity;
 
 class Element: public GBObject
 {

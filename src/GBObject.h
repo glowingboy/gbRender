@@ -4,6 +4,8 @@
 
 GB_RENDER_NS_BEGIN
 
+class Entity;
+
 /*
  * base class of Entity and Component
 */
@@ -11,6 +13,8 @@ GB_RENDER_NS_BEGIN
 //TODO Message Send
 class GBObject
 {
+	friend class Entity;
+
 protected:
 	inline GBObject():
 		_Active(true)

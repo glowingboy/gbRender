@@ -1,7 +1,7 @@
 #include "../../../src/Director.h"
 
 using namespace gb::render;
-using namespace gb::algorithm;
+using namespace gb::physics;
 using namespace gb::utils;
 
 

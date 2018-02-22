@@ -8,7 +8,7 @@ return
 	       Elements = 
 		  {
 		     {
-			Type = 1, -- render
+			Type = 2, -- render
 			Mesh = "mesh.path",
 			Material = "mat.path"
 		     }

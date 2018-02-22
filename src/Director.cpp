@@ -5,7 +5,7 @@
 using namespace gb::render;
 using namespace gb::utils;
 
-Director::Argument::Argument(const char* fileOfRootEntity, const gb::algorithm::vec2<gb::render::uint32>& sizeOfScreen):
+Director::Argument::Argument(const char* fileOfRootEntity, const gb::physics::vec2<gb::render::uint32>& sizeOfScreen):
 	rootEntity(fileOfRootEntity),
 	screenSize(sizeOfScreen)
 {
@@ -59,14 +59,22 @@ void Director::Action()
 bool Director::_directing()
 {
 	//camera shooting
-	std::for_each(_Cameras.begin(), _Cameras.end(), [](std::pair<const bool, Camera*> & cam)
+	std::for_each(_Cameras.begin(), _Cameras.end(), [](const Camera* const & cam)
 	{
-		cam.second->Shoot();
+		cam->Shoot();
 	});
+
 	return Device::Instance().Update();
 }
 
-void Director::AddCamera(Camera * const cam)
+void Director::AddCamera(const Camera * const cam)
 {
 	_Cameras.insert(cam);
+}
+
+void Director::RemoveCamera(const Camera* const cam)
+{
+	_camItr i = _Cameras.find(cam);
+	if (i != _Cameras.end())
+		_Cameras.erase(i);
 }

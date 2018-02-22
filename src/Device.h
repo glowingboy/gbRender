@@ -6,18 +6,18 @@
 #endif
 #include "RenderNS.h"
 #include "Type.h"
-#include <gbPhysics/algorithm.h>
+#include <gbPhysics/type.h>
 
 GB_RENDER_NS_BEGIN
 	class Device
 	{
 		GB_SINGLETON_EXCLUDECTOR(Device);
 	public:
-	    bool Initialize(const gb::algorithm::vec2<uint32>& screenSize);
+	    bool Initialize(const gb::physics::vec2<uint32>& screenSize);
 		bool Update()const;
 
 
-		inline const gb::algorithm::vec2<uint32>& GetScreenSize()const
+		inline const gb::physics::vec2<uint32>& GetScreenSize()const
 		{
 			return _screenSize;
 		}
@@ -25,7 +25,7 @@ GB_RENDER_NS_BEGIN
 		inline bool IsInitialized()const { return _bInitialized; }
 
 	private:
-		gb::algorithm::vec2<uint32> _screenSize;
+		gb::physics::vec2<uint32> _screenSize;
 		bool _bInitialized;
 		bool _bFullScreen;
 #ifdef _MSC_VER

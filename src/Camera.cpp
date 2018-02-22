@@ -25,8 +25,21 @@ void Camera::Start()
 {
 
 }
+void Camera::End()
+{
+	Director::Instance().RemoveCamera(this);
+}
 
-void Camera::Shoot()
+void Camera::SetRenderQueue(const uint32 rq)
+{
+	_RenderQueue = rq;
+
+	//refresh order of camera set 
+	Director::Instance().RemoveCamera(this);
+	Director::Instance().AddCamera(this);
+}
+
+void Camera::Shoot() const
 {
 
 }
