@@ -22,12 +22,19 @@ Entity::~Entity()
 
 void Entity::from_lua(const luatable_mapper& mapper)
 {
+	//name
 	if(mapper.has_key(GB_RENDER_DATA_ENTITY_KEY_NAME))
 		_Name = mapper.get_string_by_key(GB_RENDER_DATA_ENTITY_KEY_NAME);
 	else
 	{
 		logger::Instance().error(string("Entity::from_lua broken entity mapper@ ") + mapper.GetFile());
 		return;
+	}
+
+	//transform
+	if (mapper.has_key(GB_RENDER_DATA_ENTITY_KEY_TRANSFORM))
+	{
+		_Transform = mapper.get_table_by_key<Transform>(GB_RENDER_DATA_ENTITY_KEY_TRANSFORM);
 	}
 
 	//elements

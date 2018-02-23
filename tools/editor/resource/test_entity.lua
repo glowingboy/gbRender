@@ -5,6 +5,12 @@ return
 	 {
 	    {
 	       Name = "test0",
+	       Transform =
+		  {
+			Scale = {1.0, 2.0, 3.0},
+			Rotation = {0.1, 0.2, 0.3},
+			Position = {1.23, 4.56, 7.89}
+		  },
 	       Elements = 
 		  {
 		     {
@@ -16,13 +22,21 @@ return
 	    },
 	    {
 	       Name = "test1",
-	       Elements =
-		  {}
+	       Transform =
+		  {
+		     Scale = {1.0, 1.0, 1.0},
+		     Rotation = {0.1, 0.2, 0.3},
+		     Position = {1.23, 4.56, 7.89}
+		  }
 	    },
 	    {
 	       Name = "test2",
-	       Elements =
-		  {},
+	       Transform =
+		  {
+		     Scale = {1.0, 2.0, 3.0},
+		     Rotation = {0.0, 0.0, 0.0},
+		     Position = {1.23, 4.56, 7.89}
+		  },
 	       Children =
 		  {
 		     {

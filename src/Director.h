@@ -5,6 +5,7 @@
 #include <gbUtils/string.h>
 #include "Config.h"
 #include <gbPhysics/type.h>
+#include <gbPhysics/sptree.h>
 
 #include "Device.h"
 
@@ -41,5 +42,6 @@ private:
 	typedef std::set<const Camera *, gb::utils::less_ptr<Camera>>::iterator _camItr;
 	std::set<const Camera *, gb::utils::less_ptr<Camera>> _Cameras;
 	GB_PROPERTY_R(private, Root, Entity);
+	GB_PROPERTY_R(private, RenderEntities, gb::physics::octree<)
 };
 GB_RENDER_NS_END

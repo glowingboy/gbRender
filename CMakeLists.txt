@@ -26,6 +26,7 @@ gb_add_class(Font src/data srcs)
 gb_add_class(Texture src/data srcs)
 gb_add_class(Entity src/data srcs)
 gb_add_class(Element src/data srcs)
+gb_add_class(Transform src/data srcs)
 gb_add_class(Camera src/data srcs)
 gb_add_class(Render src/data srcs)
 
@@ -46,6 +47,7 @@ gb_add_class(GBObject src srcs)
 gb_add_class(Entity src srcs)
 # element
 gb_add_class(Element src srcs)
+gb_add_class(Transform src srcs)
 gb_add_class(Camera src srcs)
 gb_add_class(Render src srcs)
 

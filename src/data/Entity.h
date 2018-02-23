@@ -6,7 +6,9 @@
 #include <map>
 #include "../Type.h"
 #include "Element.h"
+#include "Transform.h"
 #define GB_RENDER_DATA_ENTITY_KEY_NAME "Name"
+#define GB_RENDER_DATA_ENTITY_KEY_TRANSFORM "Transform"
 #define GB_RENDER_DATA_ENTITY_KEY_ELEMENTS "Elements"
 #define GB_RENDER_DATA_ENTITY_KEY_CHILDREN "Children"
 GB_RENDER_DATA_NS_BEGIN
@@ -25,6 +27,8 @@ public:
 	void from_lua(const gb::utils::luatable_mapper& mapper);
 
 	GB_PROPERTY_R(private, Name, gb::utils::string);
+	GB_PROPERTY_R(private, Transform, Transform);
+
 	GB_PROPERTY_R(private, Children, std::unordered_multimap<const gb::utils::string, Entity*>);
 	GB_PROPERTY_R(private, Elements, std::map<const gb::render::Element::Type, Element*>);
 };

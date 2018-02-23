@@ -3,6 +3,8 @@
 #include "Config.h"
 #include <gbUtils/string.h>
 #include "data/Entity.h"
+#include <gbPhysics/boundingbox.h>
+#include "Transform.h"
 
 namespace gb
 {
@@ -17,7 +19,7 @@ GB_RENDER_CLASS Entity: public GBObject
 {
 	friend class gb::render::Director;
 private:
-	inline Entity() {};
+	Entity();
 	~Entity();
 public:
 	template<typename DataEntity>
@@ -36,6 +38,8 @@ private:
 	GB_PROPERTY(private, Name, gb::utils::string);
 	GB_PROPERTY_R(private, Children, std::unordered_multimap<const gb::utils::string, Entity*>);
 	GB_PROPERTY_R(private, Elements, std::map<const gb::render::Element::Type, Element*>);
+	GB_PROPERTY_R(private, SBB, gb::physics::spherebb<>*);
+	GB_PROPERTY_R(private, Transform, Transform);
 };
 
 GB_RENDER_NS_END

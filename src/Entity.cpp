@@ -4,6 +4,11 @@
 using namespace gb::render;
 using namespace gb::utils;
 
+Entity::Entity():
+	_Transform(this)
+{
+
+}
 Entity::~Entity()
 {
 	std::for_each(_Children.begin(), _Children.end(), [](std::pair<const string, Entity*>& e)
@@ -29,6 +34,7 @@ template<typename DataEntity>
 typename std::enable_if<data::Entity::is_entity<typename gb::rm_cv_ref<DataEntity>::type>::value, void>
 ::type Entity::_instantiate(DataEntity && dEntity)
 {
+
 	_Name = std::forward<DataEntity>(dEntity).GetName();
 
 	//elements instantiate 
