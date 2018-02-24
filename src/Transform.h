@@ -21,6 +21,8 @@ public:
 private:
 	gb::physics::vec4F & _localPosition_Ref;
 	
+private:
+	void _updateLocalMatrix();
 };
 
 GB_RENDER_NS_END
