@@ -13,8 +13,8 @@ GB_RENDER_DATA_NS_BEGIN
 
 struct Transform 
 {
+	Transform();
 	void from_lua(const gb::utils::luatable_mapper & mapper);
-	void operator=(const Transform & other);
 
 	gb::physics::vec3F scale;
 	gb::physics::vec3F rotation;

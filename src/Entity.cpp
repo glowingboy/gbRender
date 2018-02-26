@@ -4,8 +4,7 @@
 using namespace gb::render;
 using namespace gb::utils;
 
-Entity::Entity():
-	_Transform(this)
+Entity::Entity()
 {
 
 }
@@ -36,6 +35,8 @@ typename std::enable_if<data::Entity::is_entity<typename gb::rm_cv_ref<DataEntit
 {
 
 	_Name = std::forward<DataEntity>(dEntity).GetName();
+
+	_Transform = dEntity.GetTransform();
 
 	//elements instantiate 
 	std::for_each(dEntity.GetElements().begin(), dEntity.GetElements().end(), [this](std::conditional

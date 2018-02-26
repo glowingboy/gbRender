@@ -2,17 +2,18 @@
 ** Architecture
 *** Concepts
 **** Director
-Director contains a root Entity, holds camera to shoot
+     Director contains a root Entity, holds camera to shoot
 ***** Interface 
 - Ready
 - Action
-
+  
 **** Entity
-Enity may contain Elements and sub-Entities(children)
-***** Interface 
+     Enity may contain Elements and sub-Entities(children)
+***** Interface
 - Start
   1. elements Start
   2. children Start
+- +Awake+
 - Instantiate
 - AddChild
   - AddChild(dataEntity) :: create an new instantiated child
@@ -21,45 +22,114 @@ Enity may contain Elements and sub-Entities(children)
 - RemoveChild
 - AddElement
 **** Element
-Different element will contribute different feature to the Entity
-(such as transform, render...)
+     Different element will contribute different feature to the Entity
+     (such as transform, render...)
 **** Start
 *** C++ Class Hierachy
-
-
+    
+    
 ** Calling Sequence
 *** Basic Rules
 **** Awake & Start
-Awake -> Start
+     Awake \to Start
 **** Entity & Element
-Element Awake 
--> Entity Start -> Element Start
+     Element Awake 
+     \to Entity Start \to Element Start
 **** Parent & Children
-Children Awake -> Parent Awake
-Parent Start -> Children Start
+     Children Awake \to Parent Awake
+     Parent Start \to Children Start
 **** Summary
 - Awake :: from bottom to top
 - Start :: from top to bottom
 **** Start
-
-
+     
+     
 *** Description
-children element Awake 
--> parent element Awake
--> ... 
--> parent entity Start -> parent elment Start
--> children entity Start -> children element Start
--> ...
-
-
+    #+BEGIN_VERSE
+    children element Awake
+    \to parent element Awake
+    \to ... 
+    \to parent entity Start \to parent elment Start
+    \to children entity Start \to children element Start
+    \to ...
+    #+END_VERSE
+    
 ** Render Order
 *** Order
-RenderQueue -> shader -> Material -> Mesh -> draw
-*** absolute static render(environment buildings)
-vtxAttrib, instVar, UnifVar never changed
+    RenderQueue \to shader \to Material \to Mesh \to draw
+*** absolute static render(/environment buildings/)
+    vtxAttrib, instVar, UnifVar never changed
 *** partial static render(same type NPC)
-only instaVar changed
+    only instaVar changed
 *** dynamic render
-all changed in every frame
+    all changed in every frame
+    
+    
+    
+** Class Design
+   
+*** Director
+    
++ Data Members
+  - octree :: store the enties which all have render element
+	      
+*** Entity
++ Data Members
+  - name
+  - transform
+  - components
+  - children
+    
+*** Element
+    
+**** Render
+     
++ Data Members
+  - mesh
+  - material
+    
++ Member Functions
+  - Awake :: register to director's octree
+	     
+  - End :: unregister
+	   
+***  Resource
+     
+**** mesh
++ Data Members
+  - sphere boundingbox :: calculating on the fly every time or storing in mesh file?
+  - vertex data
+    
+**** material
++ Data Members
+  - shader
+  - uniformVar
+  - /instVar?/
+    
+** Vertex Naming Convension
+   - vertex variable :: gb_vtxVar_[pos, uv, color, idx]
+    - instance variable :: gb_instVar_[mvp, color, ...]
+    - uniform variable :: gb_uniform_...
+	  
+	  
+** File Format
+   
+*** Mesh
+    - name ::
+	     gb_vtx_{pos, idx, uv, color}
+    example:
+    #+BEGIN_SRC lua
+return
+   {
+      gb_vtx_pos = 
+	 {
+	    {1.0, 0.0, 0.0},
+	    {2.0, 0.0, 0.0},
+	    (0.0, 1.0, 0.0)
+	 },
+      gb_vtx_index = {0, 1, 2}
+   }
+    #+END_SRC
 
 
+#+OPTIONS: ^:nil

@@ -1,5 +1,4 @@
 #include "Transform.h"
-#include <gbPhysics/math.h>
 
 using namespace gb::render;
 using namespace gb;
@@ -16,7 +15,7 @@ void Transform::operator=(const render::data::Transform & dataTrans)
 	_LocalScale = dataTrans.scale;
 	_LocalRotation = dataTrans.rotation;
 
-
+	_updateLocalMatrix();
 }
 
 void Transform::_updateLocalMatrix()
@@ -35,5 +34,10 @@ void Transform::_updateLocalMatrix()
 	each transform is based on local coordinate system(parent transformed coordinate system).
 	*/
 
-	mat4F sM = 
+	_LocalTransMat *= scaleMat(_LocalScale);
+
+	_LocalTransMat *= rotateXAxisMat<Float>(_LocalRotation[0]);
+	_LocalTransMat *= rotateXAxisMat<Float>(_LocalRotation[1]);
+	_LocalTransMat *= rotateXAxisMat<Float>(_LocalRotation[2]);
+
 }

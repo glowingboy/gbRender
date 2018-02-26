@@ -6,6 +6,7 @@ using namespace gb::utils;
  
 Entity::Entity(Entity && o) :
 	_Name(std::move(o._Name)),
+	_Transform(o._Transform),
 	_Children(std::move(o._Children)),
 	_Elements(std::move(o._Elements))
 {
