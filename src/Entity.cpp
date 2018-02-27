@@ -64,15 +64,7 @@ void Entity::Instantiate(const char* entityFile)
 {
 	GB_ASSERT(entityFile != nullptr);
 
-	luatable_mapper mapper(entityFile, luastate_mgr::Instance().getconfig_state());
-	if (mapper.validate())
-	{
-		data::Entity e;
-		e.from_lua(mapper);
-		Instantiate(std::move(e));
-	}
-	else
-		logger::Instance().error(string("Entity::Instantiate mapper validate failed entityFile@ ") + entityFile);
+	Instantiate(resource::Res<data::Entity>::Instance().Get(entityFile));
 }
 
 void Entity::Start()

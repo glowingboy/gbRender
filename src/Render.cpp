@@ -1,9 +1,13 @@
 #include "Render.h"
 #include "Entity.h"
 #include <gbUtils/logger.h>
+
+#include "resource/Resource.h"
+#include "data/Mesh.h"
+
 using namespace gb::render;
 using namespace gb::utils;
-
+using namespace gb;
 Render::Render(Entity* const owner):
 	Element(owner)
 {}
@@ -29,6 +33,7 @@ Element::Type Render::GetType() const
 }
 void Render::SetMesh(const string & mesh)
 {
+	const data::Mesh & m = resource::Res<data::Mesh>::Instance().Get(mesh);
 	logger::Instance().log("render::setMesh @ " + mesh);
 }
 void Render::SetMaterial(const string & material)

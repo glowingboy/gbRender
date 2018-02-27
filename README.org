@@ -109,7 +109,7 @@
 ** Vertex Naming Convension
    - vertex variable :: gb_vtxVar_[pos, uv, color, idx]
     - instance variable :: gb_instVar_[mvp, color, ...]
-    - uniform variable :: gb_uniform_...
+    - uniform variable :: gb_uniVar_...
 	  
 	  
 ** File Format

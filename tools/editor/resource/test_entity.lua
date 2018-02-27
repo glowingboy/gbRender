@@ -15,7 +15,7 @@ return
 		  {
 		     {
 			Type = 2, -- render
-			Mesh = "mesh.path",
+			Mesh = "test_mesh.lua",
 			Material = "mat.path"
 		     }
 		  }

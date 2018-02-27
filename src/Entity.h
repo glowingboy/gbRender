@@ -2,6 +2,7 @@
 #include "Element.h"
 #include "Config.h"
 #include <gbUtils/string.h>
+#include "resource/Resource.h"
 #include "data/Entity.h"
 #include <gbPhysics/boundingbox.h>
 #include "Transform.h"
