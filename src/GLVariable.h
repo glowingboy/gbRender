@@ -2,7 +2,7 @@
 
 #include "RenderNS.h"
 #include <cstring>
-#include <gbUtils/vector.h>
+#include <vector>
 #include "Type.h"
 // vertex variable
 #define GB_RENDER_VTXVAR_POS "gb_vtxVar_pos"
@@ -18,21 +18,28 @@
 
 GB_RENDER_NS_BEGIN
 
-class vtxVar
+class GLVar
 {
 public:
-    vtxVar(const uint8 unitSize, const size_t capacity);
-    template <typename T>
-    vtxVar(gb::utils::vector<T> && vec):
-	_unitSize(sizeof(T)),
-	_count(vec.count()),
-	_capacity(vec.capacity()),
-	_data(vec.move_data())
-	{}
-    ~vtxVar();
+    GLVar(const uint8 unitSize, const size_t capacity);
+	GLVar(GLVar && o);
+	GLVar(const GLVar & o);
+	template <typename T>
+	GLVar(const std::vector<T> & vec) :
+		_unitSize(sizeof(T)),
+		_count(vec.size()),
+		_capacity(_count)
+	{
+		const size_t size = _unitSize * _capacity;
+		_data = new char[size];
+
+		std::memcpy(_data, vec.data(), size);
+	}
+    
+    ~GLVar();
 public:
     void append(void* data, const size_t count);
-    const void* data() const;
+    const char* data() const;
     uint8 unitSize() const;
     size_t count() const;
 private:
@@ -40,7 +47,7 @@ private:
     size_t _count;
     size_t _capacity;
     
-	void* _data;
+    char* _data;
 };
 
 

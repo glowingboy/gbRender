@@ -3,7 +3,7 @@
 #include <gbUtils/logger.h>
 
 #include "resource/Resource.h"
-#include "data/Mesh.h"
+
 
 using namespace gb::render;
 using namespace gb::utils;

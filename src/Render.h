@@ -1,7 +1,7 @@
 #pragma once
 #include "Element.h"
 #include <gbUtils/string.h>
-
+#include "data/Mesh.h"
 GB_RENDER_NS_BEGIN
 
 class Render : public Element

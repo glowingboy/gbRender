@@ -4,6 +4,7 @@
 #include <gbUtils/string.h>
 #include "resource/Resource.h"
 #include "data/Entity.h"
+#include "Render.h"
 #include <gbPhysics/boundingbox.h>
 #include "Transform.h"
 
