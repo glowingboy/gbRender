@@ -22,6 +22,7 @@ GB_RENDER_NS_BEGIN
 GB_RENDER_CLASS Director
 {
 	friend class Camera;
+	friend class Render;
 public:
 	struct Argument
 	{
@@ -37,11 +38,20 @@ public:
 private:
 	void AddCamera(const Camera * const cam);
 	void RemoveCamera(const Camera* const cam);
+
+	void AddRenderEntity(Entity* const entity);
+	void RemoveRenderEntity(Entity* const entity);
+	//void
 	bool _directing();
 private:
 	typedef std::set<const Camera *, gb::utils::less_ptr<Camera>>::iterator _camItr;
 	std::set<const Camera *, gb::utils::less_ptr<Camera>> _Cameras;
 	GB_PROPERTY_R(private, Root, Entity);
 	//GB_PROPERTY_R(private, RenderEntities, gb::physics::octree<Entity*>)
+
+public:
+	typedef gb::physics::octree<Entity*, Entity::octreeSBBContain, Entity::octreeSBBAPG, gb::physics::Float> octreeEntity;
+
+	GB_PROPERTY_R(private, RenderEntities, octreeEntity);
 };
 GB_RENDER_NS_END

@@ -5,7 +5,8 @@
 using namespace gb::render;
 
 Camera::Camera(Entity * const owner):
-	Element(owner)
+	Element(owner),
+	_InterestLayer(GB_RENDER_CAMERA_DEFAULT_INTERESTLAYER)
 {}
 
 Element::Type Camera::GetType() const
@@ -41,5 +42,6 @@ void Camera::SetRenderQueue(const uint32 rq)
 
 void Camera::Shoot() const
 {
-
+	const Director::octreeEntity& renderEntities = Director::Instance().GetRenderEntities();
+	auto ret = renderEntities.query_intersect();
 }

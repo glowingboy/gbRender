@@ -1,10 +1,14 @@
 #include "Entity.h"
 #include <algorithm>
 #include <gbUtils/logger.h>
+#include <queue>
 using namespace gb::render;
 using namespace gb::utils;
+using namespace gb::physics;
 
-Entity::Entity()
+Entity::Entity(Entity* const parent):
+	_Parent(parent),
+	_Layer(GB_RENDER_ENTITY_LAYER_DEFAULT)
 {
 
 }
@@ -52,7 +56,7 @@ typename std::enable_if<data::Entity::is_entity<typename gb::rm_cv_ref<DataEntit
 		<std::is_const<std::remove_reference<DataEntity>::type>::value, const std::pair<const string, data::Entity*>, std::pair<const string, data::Entity*>>
 		::type & dE)
 	{
-		Entity* e = new Entity;
+		Entity* e = new Entity(this);
 		e->_instantiate(std::forward<DataEntity>(*(dE.second)));
 		_Children.insert(std::pair<const string, Entity*>(e->GetName(), e));
 	});
@@ -69,6 +73,9 @@ void Entity::Instantiate(const char* entityFile)
 
 void Entity::Start()
 {
+
+	_updateWorldTransform();
+
 	//self Start
 	logger::Instance().log(string("Start from ") + _Name);
 
@@ -103,4 +110,60 @@ void Entity::AddElement(Element* const ele)
 		logger::Instance().warning("more than one count of same type Element @ " + Element::TypeToString(t));
 	
 
+}
+
+void Entity::_updateWorldTransform()
+{
+	std::deque<const Entity*> qParents;
+
+	qParents.push_back(this);
+
+	const Entity* parent = _Parent;
+
+	while (parent)
+	{
+		qParents.push_back(parent);
+
+		parent = parent->_Parent;
+	}
+
+	_WorldTransformMatrix = mat4F::make_identity();
+
+	std::for_each(qParents.rbegin(), qParents.rend(), [this](const Entity*& e)
+	{
+		_WorldTransformMatrix *= e->GetTransform().GetLocalTransMat();
+	});
+}
+
+void Entity::_setRender(gb::render::Render* const render)
+{
+	_Render = render;
+}
+
+bool Entity::octreeSBBContain::operator()(const Entity* entity, const gb::physics::aabb<>& o) const
+{
+	Render* render = entity->GetRender();
+	if (render != nullptr)
+	{
+		return o.contain(render->GetTransformedSphereBB());
+	}
+
+	logger::Instance().error("Entity::octreeSBBContain::operator() render is nullptr@ " + entity->GetName());
+
+	return false;
+}
+
+
+static const vec3F __error__apg__('e', 'r', 'r');
+const vec3F & Entity::octreeSBBAPG::operator()(const Entity* entity) const
+{
+	Render* render = entity->GetRender();
+	if (render != nullptr)
+	{
+		return render->GetTransformedSphereBB().centre;
+	}
+
+	logger::Instance().error("Entity::octreeSBBAPG::operator() render is nullptr@ " + entity->GetName());
+
+	return __error__apg__;
 }

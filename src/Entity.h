@@ -8,6 +8,10 @@
 #include <gbPhysics/boundingbox.h>
 #include "Transform.h"
 
+#define GB_RENDER_ENTITY_LAYER_DEFAULT 0x1u
+
+#define GB_RENDER_ENTITY_LAYER_UI 0x1u << 1
+
 namespace gb
 {
 	namespace render
@@ -20,8 +24,9 @@ GB_RENDER_NS_BEGIN
 GB_RENDER_CLASS Entity: public GBObject
 {
 	friend class gb::render::Director;
+	friend class gb::render::Render;
 private:
-	Entity();
+	Entity(Entity* parent = nullptr);
 	~Entity();
 public:
 	template<typename DataEntity>
@@ -40,8 +45,31 @@ private:
 	GB_PROPERTY(private, Name, gb::utils::string);
 	GB_PROPERTY_R(private, Children, std::unordered_multimap<const gb::utils::string, Entity*>);
 	GB_PROPERTY_R(private, Elements, std::map<const gb::render::Element::Type, Element*>);
-	GB_PROPERTY_R(private, SBB, gb::physics::spherebb<>*);
 	GB_PROPERTY_R(private, Transform, Transform);
+
+	GB_PROPERTY_R(private, WorldTransformMatrix, gb::physics::mat4F);
+	GB_PROPERTY_R(private, Parent, Entity*);
+
+	GB_PROPERTY_R(private, Render, gb::render::Render*);
+
+	GB_PROPERTY_R(private, Layer, uint32);
+
+private:
+	void _updateWorldTransform();
+	void _setRender(gb::render::Render* const render);
+
+
+public:
+	struct octreeSBBContain
+	{
+		bool operator()(const Entity* entity, const gb::physics::aabb<>& o) const;
+	};
+
+	struct octreeSBBAPG
+	{
+		const gb::physics::vec3F & operator()(const Entity* entity) const;
+	};
+
 };
 
 GB_RENDER_NS_END

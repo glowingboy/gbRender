@@ -4,17 +4,23 @@
 
 #include "resource/Resource.h"
 
+#include "Director.h"
 
 using namespace gb::render;
 using namespace gb::utils;
 using namespace gb;
 Render::Render(Entity* const owner):
-	Element(owner)
-{}
+	Element(owner),
+	_Mesh(nullptr)
+{
+	owner->_setRender(this);
+}
 
 void Render::Awake()
 {
 	logger::Instance().log("render::awake @ " + _Owner->GetName());
+
+	Director::Instance().AddRenderEntity(_Owner);
 }
 
 void Render::Start()
@@ -25,6 +31,8 @@ void Render::Start()
 void Render::End()
 {
 	logger::Instance().log("render::End @ " + _Owner->GetName());
+
+	Director::Instance().RemoveRenderEntity(_Owner);
 }
 
 Element::Type Render::GetType() const
@@ -33,7 +41,12 @@ Element::Type Render::GetType() const
 }
 void Render::SetMesh(const string & mesh)
 {
-	const data::Mesh & m = resource::Res<data::Mesh>::Instance().Get(mesh);
+	_Mesh = &(resource::Res<data::Mesh>::Instance().Get(mesh));
+
+	_originSBB = &(_Mesh->GetSphereBB());
+
+	_TransformedSphereBB = (*_originSBB) * _Owner->GetWorldTransformMatrix();
+
 	logger::Instance().log("render::setMesh @ " + mesh);
 }
 void Render::SetMaterial(const string & material)

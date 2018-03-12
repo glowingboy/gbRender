@@ -25,15 +25,28 @@ void Mesh::from_lua(const gb::utils::luatable_mapper & mapper)
 	if (mapper.has_key(GB_RENDER_VTXVAR_POS))
 		_mpVtxVars.insert(std::pair<const string, GLVar>(GB_RENDER_VTXVAR_POS, mapper.get_tables_by_key<_lua_vec<3>>(GB_RENDER_VTXVAR_POS)));
 	else
+	{
 		logger::Instance().error("Mesh::from_lua no gb_vtxVar_pos key found@ " + mapper.GetFile());
+		return;
+	}
+		
 
 	//idx
 	if (mapper.has_key(GB_RENDER_VTXVAR_IDX))
 		_mpVtxVars.insert(std::pair<string, GLVar>(GB_RENDER_VTXVAR_IDX, mapper.get_integers_by_key(GB_RENDER_VTXVAR_IDX)));
 	else
+	{
 		logger::Instance().error("Mesh::from_lua no gb_vtxVar_idx key found@ " + mapper.GetFile());
+		return;
+	}
+		
 
 	//uv(optional)
 	if(mapper.has_key(GB_RENDER_VTXVAR_UV))
 		_mpVtxVars.insert(std::pair<string, GLVar>(GB_RENDER_VTXVAR_UV, mapper.get_tables_by_key<_lua_vec<2>>(GB_RENDER_VTXVAR_UV)));
+
+
+	const render::GLVar& pos = _mpVtxVars.at(GB_RENDER_VTXVAR_POS);
+	_SphereBB = genSphereBB((vec3F*)(pos.data()), pos.count());
+
 }

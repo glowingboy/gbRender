@@ -78,3 +78,12 @@ void Director::RemoveCamera(const Camera* const cam)
 	if (i != _Cameras.end())
 		_Cameras.erase(i);
 }
+
+void Director::AddRenderEntity(Entity* const entity)
+{
+	_RenderEntities.insert(entity);
+}
+void Director::RemoveRenderEntity(Entity* const entity)
+{
+	_RenderEntities.remove(entity);
+}
