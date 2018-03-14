@@ -6,7 +6,9 @@ using namespace gb::render;
 
 Camera::Camera(Entity * const owner):
 	Element(owner),
-	_InterestLayer(GB_RENDER_CAMERA_DEFAULT_INTERESTLAYER)
+	_InterestLayer(GB_RENDER_CAMERA_DEFAULT_INTERESTLAYER),
+	_frustumAABB(_Frustum.AABB),
+	_projectionMatrix(_Frustum.projectionMatrix)
 {}
 
 Element::Type Camera::GetType() const
