@@ -3,11 +3,13 @@
 #include "Director.h"
 
 using namespace gb::render;
+using namespace gb::physics;
 
 Camera::Camera(Entity * const owner):
 	Element(owner),
 	_InterestLayer(GB_RENDER_CAMERA_DEFAULT_INTERESTLAYER),
-	_frustumAABB(_Frustum.AABB),
+	_frustumSphereBB(_Frustum.sphereBB),
+	_transformedFSBB(_Frustum.sphereBB),
 	_projectionMatrix(_Frustum.projectionMatrix)
 {}
 
@@ -23,6 +25,12 @@ bool Camera::operator < (const Camera & o) const
 void Camera::Awake()
 {
 	Director::Instance().AddCamera(this);
+
+	GB_UTILS_CALLBACK_REG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, Camera, _onOwnerTransformChanged);
+
+	//_Owner->GetCBs().RegisterCB(GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, (void*)&Camera::_onOwnerTransformChanged, std::bind(&(Camera::_onOwnerTransformChanged), this));
+
+
 }
 void Camera::Start()
 {
@@ -31,6 +39,7 @@ void Camera::Start()
 void Camera::End()
 {
 	Director::Instance().RemoveCamera(this);
+	GB_UTILS_CALLBACK_REG(_Owner->GetCBs)
 }
 
 void Camera::SetRenderQueue(const uint32 rq)
@@ -45,5 +54,22 @@ void Camera::SetRenderQueue(const uint32 rq)
 void Camera::Shoot() const
 {
 	const Director::octreeEntity& renderEntities = Director::Instance().GetRenderEntities();
-	auto ret = renderEntities.query_intersect();
+	struct intersectMethod
+	{
+		bool operator()(const aabb<>& octanBB, const spherebb<>& q) const
+		{
+			return octanBB.intersect(q);
+		}
+	};
+	auto ret = renderEntities.query_intersect<spherebb<>, intersectMethod>(_transformedFSBB);
+
+	std::for_each(ret.begin(), ret.end(), [](Entity* e)
+	{
+
+	});
+}
+
+void Camera::_onOwnerTransformChanged()
+{
+
 }

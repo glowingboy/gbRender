@@ -52,6 +52,9 @@ private:
 public:
 	typedef gb::physics::octree<Entity*, Entity::octreeSBBContain, Entity::octreeSBBAPG, gb::physics::Float> octreeEntity;
 
+	/*
+		in world space
+	*/
 	GB_PROPERTY_R(private, RenderEntities, octreeEntity);
 };
 GB_RENDER_NS_END

@@ -6,12 +6,15 @@
 #include <gbPhysics/matrix.h>
 
 #include "data/Transform.h"
+
 GB_RENDER_NS_BEGIN
+
+class Entity;
 
 class Transform
 {
 public:
-	Transform();
+	Transform(Entity* owner);
 	void operator=(const gb::render::data::Transform & dataTrans);
 public:
 
@@ -20,7 +23,7 @@ public:
 	GB_PROPERTY_R(private, LocalRotation, gb::physics::vec3F);
 private:
 	gb::physics::vec4F & _localPosition_Ref;
-	
+	Entity* _owner;
 private:
 	void _updateLocalMatrix();
 };

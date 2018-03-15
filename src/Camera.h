@@ -31,11 +31,16 @@ private:
 	GB_PROPERTY_R(private, InterestLayer, uint32);
 
 	GB_PROPERTY_R(private, Frustum, gb::physics::frustum<gb::physics::Float>);
-	const gb::physics::aabb<>& _frustumAABB;
+	//const gb::physics::aabb<>& _frustumAABB;
+	//using spherebb rather than aabb, for the reason, when transforming frustumAABB 
+	//from camera space to world space, the frustumAABB will not be still an aabb,
+	//but the sphere not.
+	const gb::physics::spherebb<>& _frustumSphereBB;
+	gb::physics::spherebb<> _transformedFSBB;
 	const gb::physics::mat4F& _projectionMatrix;
 
 private:
-	
+	void _onOwnerTransformChanged();
 };
 
 GB_RENDER_NS_END

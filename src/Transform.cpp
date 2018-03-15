@@ -1,10 +1,11 @@
 #include "Transform.h"
-
+#include "Entity.h"
 using namespace gb::render;
 using namespace gb;
 using namespace gb::physics;
-Transform::Transform():
-	_localPosition_Ref(_LocalTransMat[3])
+Transform::Transform(Entity* owner):
+	_localPosition_Ref(_LocalTransMat[3]),
+	_owner(owner)
 {}
 
 
@@ -39,5 +40,7 @@ void Transform::_updateLocalMatrix()
 	_LocalTransMat *= rotateXAxisMat<Float>(_LocalRotation[0]);
 	_LocalTransMat *= rotateXAxisMat<Float>(_LocalRotation[1]);
 	_LocalTransMat *= rotateXAxisMat<Float>(_LocalRotation[2]);
+
+	_owner->_updateWorldTransform();
 
 }

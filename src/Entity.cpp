@@ -133,12 +133,50 @@ void Entity::_updateWorldTransform()
 	{
 		_WorldTransformMatrix *= e->GetTransform().GetLocalTransMat();
 	});
+
+	_CBs.Trigger(GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED);
+
 }
 
 void Entity::_setRender(gb::render::Render* const render)
 {
 	_Render = render;
 }
+
+//void Entity::RegisterCB(const uint32 triggerKey, const std::uintptr_t cbAddr, const std::function<void(void)>& cb)
+//{
+//	auto triggerItr = _mpCBs.find(triggerKey);
+//	if (triggerItr != _mpCBs.end())
+//	{
+//		triggerItr->second.insert(std::make_pair(cbAddr, cb));
+//	}
+//	else
+//		_mpCBs.insert(std::make_pair(triggerKey, std::unordered_map<std::uintptr_t, std::function<void(void)>>{ {cbAddr, cb}}));
+//}
+//
+//void Entity::UnregisterCB(const uint32 triggerKey, const std::uintptr_t cbAddr)
+//{
+//	auto triggerItr = _mpCBs.find(triggerKey);
+//	if (triggerItr != _mpCBs.end())
+//	{
+//		triggerItr->second.erase(cbAddr);
+//	}
+//}
+//
+//void Entity::Trigger(const uint32 triggerKey)
+//{
+//	auto triggerItr = _mpCBs.find(triggerKey);
+//	if (triggerItr != _mpCBs.end())
+//	{
+//		const std::unordered_map<std::uintptr_t, std::function<void(void)>>& cbs = triggerItr->second;
+//
+//		std::for_each(cbs.begin(), cbs.end(), [](const std::pair<std::uintptr_t, std::function<void(void)>>& cb)
+//		{
+//			cb.second();
+//		});
+//	}
+//}
+
 
 bool Entity::octreeSBBContain::operator()(const Entity* entity, const gb::physics::aabb<>& o) const
 {
