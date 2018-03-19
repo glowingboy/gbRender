@@ -11,7 +11,7 @@
 GB_RENDER_NS_BEGIN
 	class Device
 	{
-		GB_SINGLETON_EXCLUDECTOR(Device);
+		GB_SINGLETON_NO_CTORDEF(Device);
 	public:
 	    bool Initialize(const gb::physics::vec2<uint32>& screenSize);
 		bool Update()const;

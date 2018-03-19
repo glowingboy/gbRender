@@ -14,7 +14,7 @@ return
 	       Elements = 
 		  {
 		     {
-			Type = 2, -- render
+			Type = ElementType.Render, -- render
 			Mesh = "test_mesh.lua",
 			Material = "mat.path"
 		     }
@@ -27,6 +27,13 @@ return
 		     Scale = {1.0, 1.0, 1.0},
 		     Rotation = {0.1, 0.2, 0.3},
 		     Position = {1.23, 4.56, 7.89}
+		  },
+	       Elements =
+		  {
+		     {
+			Type = ElementType.Camera,
+			RenderQueue = RenderQueue.Background
+		     }
 		  }
 	    },
 	    {

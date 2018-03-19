@@ -4,6 +4,7 @@
 
 using namespace gb::render;
 using namespace gb::utils;
+using namespace gb::physics;
 
 Director::Argument::Argument(const char* fileOfRootEntity, const gb::physics::vec2<gb::render::uint32>& sizeOfScreen):
 	rootEntity(fileOfRootEntity),
@@ -18,6 +19,10 @@ Director::Argument::Argument(Argument && other) :
 {
 }
 
+Director::Director():
+	_RenderEntities(aabb<>(vec3F(-GB_RENDER_DIRECTOR_SCENE_SIZE, -GB_RENDER_DIRECTOR_SCENE_SIZE, -GB_RENDER_DIRECTOR_SCENE_SIZE),
+		vec3F(GB_RENDER_DIRECTOR_SCENE_SIZE, GB_RENDER_DIRECTOR_SCENE_SIZE, GB_RENDER_DIRECTOR_SCENE_SIZE)))
+{}
 bool Director::Ready(const Argument& arg)
 {
 	if (!Device::Instance().Initialize(arg.screenSize))
@@ -25,9 +30,6 @@ bool Director::Ready(const Argument& arg)
 		logger::Instance().error("Director::Ready Device has not been Initialized");
 		return false;
 	}
-
-	//luastate initialize
-	luastate_mgr::Instance().initialize();
 	
 	if (arg.rootEntity.length() != 0)
 		_Root.Instantiate(arg.rootEntity);

@@ -4,6 +4,7 @@
 #include <gbUtils/common.h>
 #include <unordered_map>
 #include <gbUtils/string.h>
+#include <gbUtils/luastate.h>
 
 GB_RENDER_RESOURCE_NS_BEGIN
 
@@ -23,7 +24,7 @@ public:
 			return itr->second;
 		else
 		{
-			luatable_mapper mapper(resPath, luastate_mgr::Instance().getconfig_state());
+			luatable_mapper mapper(resPath, _LuaStates[0]);
 			if (mapper.validate())
 			{
 				T r;
@@ -49,6 +50,7 @@ private:
     std::unordered_map<const gb::utils::string, T> _mpRes;
 
 	GB_PROPERTY(private, Path, gb::utils::string);
+	GB_PROPERTY_R(private, LuaStates, gb::utils::luastate_mt);
 };
 
 GB_RENDER_RESOURCE_NS_END

@@ -18,6 +18,8 @@
 #include <set>
 #include "Camera.h"
 
+#define GB_RENDER_DIRECTOR_SCENE_SIZE 100
+
 GB_RENDER_NS_BEGIN
 GB_RENDER_CLASS Director
 {
@@ -31,7 +33,7 @@ public:
 		gb::utils::string rootEntity;
 		gb::physics::vec2<gb::render::uint32> screenSize;
 	};
-	GB_SINGLETON(Director);
+	GB_SINGLETON_NO_CTORDEF(Director);
 public:
 	bool Ready(const Argument & arg);
 	void Action();

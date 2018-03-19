@@ -7,6 +7,7 @@ using namespace gb::utils;
 using namespace gb::physics;
 
 Entity::Entity(Entity* const parent):
+	_Transform(this),
 	_Parent(parent),
 	_Layer(GB_RENDER_ENTITY_LAYER_DEFAULT)
 {
@@ -75,6 +76,7 @@ void Entity::Start()
 {
 
 	_updateWorldTransform();
+	
 
 	//self Start
 	logger::Instance().log(string("Start from ") + _Name);

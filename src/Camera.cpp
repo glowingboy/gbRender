@@ -4,6 +4,7 @@
 
 using namespace gb::render;
 using namespace gb::physics;
+using namespace gb::utils;
 
 Camera::Camera(Entity * const owner):
 	Element(owner),
@@ -26,7 +27,7 @@ void Camera::Awake()
 {
 	Director::Instance().AddCamera(this);
 
-	GB_UTILS_CALLBACK_REG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, Camera, _onOwnerTransformChanged);
+	GB_UTILS_CALLBACK_REG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, Camera::_onOwnerTransformChanged);
 
 	//_Owner->GetCBs().RegisterCB(GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, (void*)&Camera::_onOwnerTransformChanged, std::bind(&(Camera::_onOwnerTransformChanged), this));
 
@@ -39,7 +40,7 @@ void Camera::Start()
 void Camera::End()
 {
 	Director::Instance().RemoveCamera(this);
-	GB_UTILS_CALLBACK_REG(_Owner->GetCBs)
+	GB_UTILS_CALLBACK_REG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, Camera::_onOwnerTransformChanged);
 }
 
 void Camera::SetRenderQueue(const uint32 rq)
@@ -71,5 +72,7 @@ void Camera::Shoot() const
 
 void Camera::_onOwnerTransformChanged()
 {
+	logger::Instance().log("Camera::_onOwnerTransformChanged");
 
+	_transformedFSBB = _frustumSphereBB * _Owner->GetWorldTransformMatrix();
 }

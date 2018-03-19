@@ -8,6 +8,10 @@ using namespace gb::utils;
 int main(int argc, char** argv)
 {
 	resource::Res<data::Entity>::Instance().SetPath(filesystem::Instance().get_absolute_path("../tools/editor/resource/"));
+	luastate_mt& entity_ls = resource::Res<data::Entity>::Instance().GetLuaStates();
+	entity_ls.dofile(filesystem::Instance().get_absolute_path("../resource/ElementType.lua"));
+	entity_ls.dofile(filesystem::Instance().get_absolute_path("../resource/RenderQueue.lua"));
+
 	resource::Res<data::Mesh>::Instance().SetPath(filesystem::Instance().get_absolute_path("../tools/editor/resource/"));
 
 
