@@ -21,6 +21,8 @@ void Render::Awake()
 	logger::Instance().log("render::awake @ " + _Owner->GetName());
 
 	Director::Instance().AddRenderEntity(_Owner);
+
+	GB_UTILS_CALLBACK_REG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, Render::_onOwnerTransformChanged);
 }
 
 void Render::Start()
@@ -33,6 +35,7 @@ void Render::End()
 	logger::Instance().log("render::End @ " + _Owner->GetName());
 
 	Director::Instance().RemoveRenderEntity(_Owner);
+	GB_UTILS_CALLBACK_UNREG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, Render::_onOwnerTransformChanged);
 }
 
 Element::Type Render::GetType() const
@@ -52,4 +55,9 @@ void Render::SetMesh(const string & mesh)
 void Render::SetMaterial(const string & material)
 {
 	logger::Instance().log("render::setmat @ " + material);
+}
+
+void Render::_onOwnerTransformChanged()
+{
+	_TransformedSphereBB = (*_originSBB) * _Owner->GetWorldTransformMatrix();
 }

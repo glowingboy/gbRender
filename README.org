@@ -131,5 +131,9 @@ return
    }
     #+END_SRC
 
+** TODO 
+   - using cache algorithm for vtxData storing in GPU memory
+   - 
+
 
 #+OPTIONS: ^:nil

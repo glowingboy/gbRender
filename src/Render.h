@@ -22,6 +22,9 @@ private:
 
 	const gb::physics::spherebb<>* _originSBB;
 	GB_PROPERTY_R(private, TransformedSphereBB, gb::physics::spherebb<>);
+
+private:
+	void _onOwnerTransformChanged();
 };
 
 GB_RENDER_NS_END
