@@ -30,9 +30,20 @@ bool Director::Ready(const Argument& arg)
 		logger::Instance().error("Director::Ready Device has not been Initialized");
 		return false;
 	}
+
+	_ScreenSize = arg.screenSize;
 	
 	if (arg.rootEntity.length() != 0)
 		_Root.Instantiate(arg.rootEntity);
+
+	//
+	glGenFramebuffers(GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT, _frameBuffers);
+
+	glGenTextures(1, &_cameraTextures);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, _cameraTextures);
+	glTextureStorage3D(GL_TEXTURE_2D_ARRAY, GB_RENDER_DIRECTOR_CAMERA_TEXTURE_LEVEL, GL_RGBA8, _ScreenSize.x, _ScreenSize.y, GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT);
+
+
 
 	return true;
 }

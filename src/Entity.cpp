@@ -9,7 +9,7 @@ using namespace gb::physics;
 Entity::Entity(Entity* const parent):
 	_Transform(this),
 	_Parent(parent),
-	_Layer(GB_RENDER_ENTITY_LAYER_DEFAULT)
+	_Tag(GB_RENDER_ENTITY_TAG_DEFAULT)
 {
 
 }

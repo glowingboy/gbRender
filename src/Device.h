@@ -8,6 +8,7 @@
 #include "Type.h"
 #include <gbPhysics/type.h>
 
+#include "GL.h"
 GB_RENDER_NS_BEGIN
 	class Device
 	{

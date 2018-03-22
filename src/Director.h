@@ -20,11 +20,17 @@
 
 #define GB_RENDER_DIRECTOR_SCENE_SIZE 100
 
+#define GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT 5
+#define GB_RENDER_DIRECTOR_CAMERA_TEXTURE_LEVEL 6
+
+static_assert(GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT > 0, "GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT must greater than 0");
+
 GB_RENDER_NS_BEGIN
 GB_RENDER_CLASS Director
 {
 	friend class Camera;
 	friend class Render;
+
 public:
 	struct Argument
 	{
@@ -49,8 +55,12 @@ private:
 	typedef std::set<const Camera *, gb::utils::less_ptr<Camera>>::iterator _camItr;
 	std::set<const Camera *, gb::utils::less_ptr<Camera>> _Cameras;
 	GB_PROPERTY_R(private, Root, Entity);
+	GB_PROPERTY_R(private, ScreenSize, gb::physics::vec2<gb::render::uint32>);
 	//GB_PROPERTY_R(private, RenderEntities, gb::physics::octree<Entity*>)
 
+	GLuint _frameBuffers[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];
+	GLuint _cameraTextures;
+	
 public:
 	typedef gb::physics::octree<Entity*, Entity::octreeSBBContain, Entity::octreeSBBAPG, gb::physics::Float> octreeEntity;
 

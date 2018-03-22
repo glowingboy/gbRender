@@ -3,7 +3,7 @@
 #include "Element.h"
 #include <gbPhysics/camera.h>
 
-#define GB_RENDER_CAMERA_DEFAULT_INTERESTLAYER 0xffffffffu
+#define GB_RENDER_CAMERA_DEFAULT_INTERESTTAG 0xffffffffu
 
 GB_RENDER_NS_BEGIN
 
@@ -28,7 +28,8 @@ private:
 private:
 	GB_PROPERTY_R(private, RenderQueue, uint32);
 
-	GB_PROPERTY_R(private, InterestLayer, uint32);
+	// bitfiled
+	GB_PROPERTY_R(private, InterestTag, uint32);
 
 	GB_PROPERTY_R(private, Frustum, gb::physics::frustum<gb::physics::Float>);
 	//const gb::physics::aabb<>& _frustumAABB;

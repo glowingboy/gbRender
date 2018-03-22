@@ -9,9 +9,9 @@
 #include "Transform.h"
 #include <gbUtils/callback.h>
 
-#define GB_RENDER_ENTITY_LAYER_DEFAULT 0x1u
+#define GB_RENDER_ENTITY_TAG_DEFAULT 0x1u
 
-#define GB_RENDER_ENTITY_LAYER_UI 0x1u << 1
+#define GB_RENDER_ENTITY_TAG_UI 0x1u << 1
 
 #define GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED 1
 
@@ -60,7 +60,8 @@ private:
 
 	GB_PROPERTY_R(private, Render, gb::render::Render*);
 
-	GB_PROPERTY_R(private, Layer, uint32);
+	//bitfield
+	GB_PROPERTY_R(private, Tag, uint32);
 
 	//std::unordered_map<uint32, std::unordered_map<std::uintptr_t, std::function<void(void)>>> _mpCBs;
 

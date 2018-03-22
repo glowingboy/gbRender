@@ -1,7 +1,6 @@
 #include "Device.h"
 #include <gbUtils/string.h>
 #include "Director.h"
-#include "GL.h"
 #include <wglext.h>
 #include <gbUtils/logger.h>
 using namespace gb::render;

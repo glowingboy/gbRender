@@ -8,7 +8,7 @@ using namespace gb::utils;
 
 Camera::Camera(Entity * const owner):
 	Element(owner),
-	_InterestLayer(GB_RENDER_CAMERA_DEFAULT_INTERESTLAYER),
+	_InterestTag(GB_RENDER_CAMERA_DEFAULT_INTERESTTAG),
 	_frustumSphereBB(_Frustum.sphereBB),
 	_transformedFSBB(_Frustum.sphereBB),
 	_projectionMatrix(_Frustum.projectionMatrix)
@@ -55,7 +55,7 @@ void Camera::SetRenderQueue(const uint32 rq)
 void Camera::Shoot() const
 {
 	const Director::octreeEntity& renderEntities = Director::Instance().GetRenderEntities();
-	struct intersectMethod
+	struct intersectMethod//TODO change to _Ele Type
 	{
 		bool operator()(const aabb<>& octanBB, const spherebb<>& q) const
 		{
@@ -64,9 +64,12 @@ void Camera::Shoot() const
 	};
 	auto ret = renderEntities.query_intersect<spherebb<>, intersectMethod>(_transformedFSBB);
 
-	std::for_each(ret.begin(), ret.end(), [](Entity* e)
+	std::for_each(ret.begin(), ret.end(), [this](Entity* e)
 	{
+		if (_InterestTag & e->GetTag())
+		{
 
+		}
 	});
 }
 
