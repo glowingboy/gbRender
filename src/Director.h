@@ -16,12 +16,13 @@
 #include <gbUtils/filesystem.h>
 
 #include <set>
+#include <queue>
 #include "Camera.h"
 
-#define GB_RENDER_DIRECTOR_SCENE_SIZE 100
+#define GB_RENDER_DIRECTOR_SCENE_SIZE 100u
 
-#define GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT 5
-#define GB_RENDER_DIRECTOR_CAMERA_TEXTURE_LEVEL 6
+#define GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT 5u
+//#define GB_RENDER_DIRECTOR_CAMERA_TEXTURE_LEVEL 6
 
 static_assert(GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT > 0, "GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT must greater than 0");
 
@@ -60,7 +61,8 @@ private:
 
 	GLuint _frameBuffers[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];
 	GLuint _cameraTextures;
-	
+	//GLuint _cameraTexIndices[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];
+	std::queue<GLuint> _cameraTexIndices;
 public:
 	typedef gb::physics::octree<Entity*, Entity::octreeSBBContain, Entity::octreeSBBAPG, gb::physics::Float> octreeEntity;
 

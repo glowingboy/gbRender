@@ -24,7 +24,7 @@ private:
 	virtual void Awake() override;
 	virtual void Start() override;
 	virtual void End() override;
-
+	//void _frameBufferSetup(GLuint f)
 private:
 	GB_PROPERTY_R(private, RenderQueue, uint32);
 
