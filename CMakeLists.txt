@@ -30,6 +30,7 @@ gb_add_class(Element src/data srcs)
 gb_add_class(Transform src/data srcs)
 gb_add_class(Camera src/data srcs)
 gb_add_class(Render src/data srcs)
+gb_add_class(Material src/data srcs)
 
 
 # file

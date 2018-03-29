@@ -6,12 +6,13 @@ using namespace gb::render;
 using namespace gb::physics;
 using namespace gb::utils;
 
-Camera::Camera(Entity * const owner):
+Camera::Camera(Entity * const owner) :
 	Element(owner),
 	_InterestTag(GB_RENDER_CAMERA_DEFAULT_INTERESTTAG),
 	_frustumSphereBB(_Frustum.sphereBB),
 	_transformedFSBB(_Frustum.sphereBB),
-	_projectionMatrix(_Frustum.projectionMatrix)
+	_projectionMatrix(_Frustum.projectionMatrix),
+	_screenSize(Director::Instance().GetScreenSize())
 {}
 
 Element::Type Camera::GetType() const
@@ -54,6 +55,16 @@ void Camera::SetRenderQueue(const uint32 rq)
 
 void Camera::Shoot() const
 {
+	//viewport setup
+	glViewport((GLint)(_screenSize.x * _ViewPort.x),
+		(GLint)(_screenSize.y * _ViewPort.y),
+		(GLsizei)(_screenSize.x * _ViewPort.z),
+		(GLsizei)(_screenSize.y * _ViewPort.w));
+
+	glClearColor(_ClearColor.r, _ClearColor.g, _ClearColor.b, _ClearColor.a);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+
 	const Director::octreeEntity& renderEntities = Director::Instance().GetRenderEntities();
 	struct intersectMethod//TODO change to _Ele Type
 	{
@@ -78,4 +89,9 @@ void Camera::_onOwnerTransformChanged()
 	logger::Instance().log("Camera::_onOwnerTransformChanged");
 
 	_transformedFSBB = _frustumSphereBB * _Owner->GetWorldTransformMatrix();
+}
+
+void Camera::_setFrameBufferIdx(const std::uint8_t idx)
+{
+	_FrameBufferIdx = idx;
 }

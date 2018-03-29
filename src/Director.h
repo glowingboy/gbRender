@@ -45,8 +45,8 @@ public:
 	bool Ready(const Argument & arg);
 	void Action();
 private:
-	void AddCamera(const Camera * const cam);
-	void RemoveCamera(const Camera* const cam);
+	void AddCamera(Camera * const cam);
+	void RemoveCamera(Camera* const cam);
 
 	void AddRenderEntity(Entity* const entity);
 	void RemoveRenderEntity(Entity* const entity);
@@ -61,8 +61,11 @@ private:
 
 	GLuint _frameBuffers[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];
 	GLuint _cameraTextures;
+	GLuint _cameraDepthBuffers[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];
 	//GLuint _cameraTexIndices[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];
-	std::queue<GLuint> _cameraTexIndices;
+	std::queue<GLuint> _cameraFBOIndices;
+
+	GB_PROPERTY(private, ClearColor, gb::physics::vec4F);
 public:
 	typedef gb::physics::octree<Entity*, Entity::octreeSBBContain, Entity::octreeSBBAPG, gb::physics::Float> octreeEntity;
 

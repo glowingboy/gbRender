@@ -53,8 +53,7 @@ return
 			      Scale = {1.0, 1.0, 1.0},
 			      Rotation = {0.0, 0.0, 0.0},
 			      Position = {0.0, 0.0, 0.0}	
-			   }
-
+			   },
 			Elements =
 			   {
 			      {

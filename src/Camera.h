@@ -8,9 +8,11 @@
 GB_RENDER_NS_BEGIN
 
 class Entity;
+class Director;
 
 class Camera: public Element
 {
+	friend class Director;
 public:
 	Camera(Entity * const owner);
 public:
@@ -24,7 +26,7 @@ private:
 	virtual void Awake() override;
 	virtual void Start() override;
 	virtual void End() override;
-	//void _frameBufferSetup(GLuint f)
+	void _setFrameBufferIdx(const std::uint8_t idx);
 private:
 	GB_PROPERTY_R(private, RenderQueue, uint32);
 
@@ -39,6 +41,15 @@ private:
 	const gb::physics::spherebb<>& _frustumSphereBB;
 	gb::physics::spherebb<> _transformedFSBB;
 	const gb::physics::mat4F& _projectionMatrix;
+
+	GB_PROPERTY_R(private, FrameBufferIdx, std::uint8_t);
+
+	//range[0, 1]
+	GB_PROPERTY(private, ViewPort, gb::physics::vec4F);
+
+	const gb::physics::vec2<gb::render::uint32>& _screenSize;
+
+	GB_PROPERTY(private, ClearColor, gb::physics::vec4F);
 
 private:
 	void _onOwnerTransformChanged();
