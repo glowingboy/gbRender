@@ -26,7 +26,7 @@ void Mesh::from_lua(const gb::utils::luatable_mapper & mapper)
 		_mpVtxVars.insert(std::pair<const string, GLVar>(GB_RENDER_VTXVAR_POS, mapper.get_tables_by_key<_lua_vec<3>>(GB_RENDER_VTXVAR_POS)));
 	else
 	{
-		logger::Instance().error("Mesh::from_lua no gb_vtxVar_pos key found@ " + mapper.GetFile());
+		logger::Instance().error("Mesh::from_lua no gb_vtxVar_pos key found@ " + mapper.GetData());
 		return;
 	}
 		
@@ -36,7 +36,7 @@ void Mesh::from_lua(const gb::utils::luatable_mapper & mapper)
 		_mpVtxVars.insert(std::pair<string, GLVar>(GB_RENDER_VTXVAR_IDX, mapper.get_integers_by_key(GB_RENDER_VTXVAR_IDX)));
 	else
 	{
-		logger::Instance().error("Mesh::from_lua no gb_vtxVar_idx key found@ " + mapper.GetFile());
+		logger::Instance().error("Mesh::from_lua no gb_vtxVar_idx key found@ " + mapper.GetData());
 		return;
 	}
 		

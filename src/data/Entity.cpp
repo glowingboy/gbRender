@@ -28,7 +28,7 @@ void Entity::from_lua(const luatable_mapper& mapper)
 		_Name = mapper.get_string_by_key(GB_RENDER_DATA_ENTITY_KEY_NAME);
 	else
 	{
-		logger::Instance().error(string("Entity::from_lua broken entity mapper@ ") + mapper.GetFile());
+		logger::Instance().error(string("Entity::from_lua broken entity mapper@ ") + mapper.GetData());
 		return;
 	}
 

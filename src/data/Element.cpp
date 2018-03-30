@@ -24,7 +24,7 @@ void ElementAdapter::from_lua(const luatable_mapper& mapper)
 		_Type = (render::Element::Type)(mapper.get_integer_by_key(GB_RENDER_DATA_ELEMENT_KEY_TYPE));
 	else
 	{
-		logger::Instance().error(string("ElementAdapter::from_lua error@ ") + mapper.GetFile());
+		logger::Instance().error(string("ElementAdapter::from_lua error@ ") + mapper.GetData());
 		return;
 	}
 	if (_Type == render::Element::Type::Camera)
@@ -35,7 +35,7 @@ void ElementAdapter::from_lua(const luatable_mapper& mapper)
 		/*...*/;
 	else
 	{
-		logger::Instance().error(string("ElementAdapter::from_lua unkown type error@ ") + mapper.GetFile() + "type@ " + _Type);
+		logger::Instance().error(string("ElementAdapter::from_lua unkown type error@ ") + mapper.GetData() + "type@ " + (int)_Type);
 		return;
 	}
 		

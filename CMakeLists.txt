@@ -31,7 +31,7 @@ gb_add_class(Transform src/data srcs)
 gb_add_class(Camera src/data srcs)
 gb_add_class(Render src/data srcs)
 gb_add_class(Material src/data srcs)
-
+gb_add_class(Shader src/data srcs)
 
 # file
 gb_add_class(FileNS src/file srcs)

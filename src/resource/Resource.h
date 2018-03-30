@@ -6,6 +6,8 @@
 #include <gbUtils/string.h>
 #include <gbUtils/luatable.h>
 
+#include "data/Shader.h"
+
 #define GB_RENDER_RESOURCE_CFG_KEY_RESROOT "ResRoot"
 #define GB_RENDER_RESOURCE_CFG_KEY_BASEFILES "BaseFiles"
 #define GB_RENDER_RESOURCE_CFG_KEY_DEFAULTRES "DefaultRes"
@@ -47,10 +49,11 @@ public:
 	{
 		assert(configFile != nullptr);
 
-		gb::utils::luatable_mapper mapper(configFile, _LuaStates[0]);
-		if (mapper.validate())
+		gb::utils::luatable_mapper mapper(_LuaStates[0]);
+		if (mapper.map_file(configFile))
 		{
 			_Res_Cfg cfg = mapper.get_table<_Res_Cfg>();
+			mapper.unmap();
 
 			SetResRoot(filesystem::Instance().get_absolute_path(cfg.resRoot));
 
@@ -61,11 +64,12 @@ public:
 
 			_DefaultRes = filesystem::Instance().get_absolute_path(cfg.defaultRes);
 
-			gb::utils::luatable_mapper dmapper(_DefaultRes, _LuaStates[0]);
-			if (dmapper.validate())
+			if (mapper.map_file(_DefaultRes))
 			{
 				T r;
-				r.from_lua(dmapper);
+				r.from_lua(mapper);
+				mapper.unmap();
+
 				std::pair<mp_itr, bool> ret = _mpRes.insert(std::pair<const gb::utils::string, T>
 					(_DefaultRes, std::move(r)));
 
@@ -97,11 +101,13 @@ public:
 			return itr->second;
 		else
 		{
-			gb::utils::luatable_mapper mapper(resPath, _LuaStates[0]);
-			if (mapper.validate())
+			gb::utils::luatable_mapper mapper(_LuaStates[0]);
+			if (mapper.map_file(resPath))
 			{
 				T r;
 				r.from_lua(mapper);
+				mapper.unmap();
+
 				std::pair<mp_itr, bool> ret = _mpRes.insert(std::pair<const gb::utils::string, T>
 					(resPath, std::move(r)));
 				return ret.first->second;

@@ -7,7 +7,7 @@ GB_RENDER_NS_BEGIN
 class Element: public GBObject
 {
 public:
-	enum Type
+	enum class Type
 	{
 		Default = 0, 
 		Camera, Render, Mesh, Text
