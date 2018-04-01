@@ -1,17 +1,20 @@
-#GB_RENDER_SHADER_GL_SETTINGS_BEGIN
+GB_RENDER_DATA_SHADER_INFO_BEGIN
 return
    {
-
+      GLCfg =
+	 {},
+      VtxVars =
+	 {
+	    {
+	       Name = "gb_vtxVar_pos",
+	       Type = VtxVarStubType.Vec4,
+	       Count = 1, -- optional
+	       Divisor = 0, --optional
+	    }
+	 }
    }
-#GB_RENDER_SHADER_GL_SETTINGS_END
+GB_RENDER_DATA_SHADER_INFO_END
 
-#GB_RENDER_SHADER_VTXVAR_BEGIN
-return
-   {
-      
-   }
-#GB_RENDER_SHADER_VTXVAR_END
+GB_RENDER_DATA_SHADER_BEGIN
 
-#GB_RENDER_SHADER_BEGIN
-
-#GB_RENDER_SHADER_END
+GB_RENDER_DATA_SHADER_END

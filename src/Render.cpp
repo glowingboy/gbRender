@@ -44,7 +44,7 @@ Element::Type Render::GetType() const
 }
 void Render::SetMesh(const string & mesh)
 {
-	_Mesh = &(resource::Res<data::Mesh>::Instance().Get(mesh));
+	_Mesh = resource::Res<data::Mesh>::Instance().Get(mesh);
 
 	_originSBB = &(_Mesh->GetSphereBB());
 

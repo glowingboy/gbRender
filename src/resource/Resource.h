@@ -3,10 +3,11 @@
 #include "ResourceNS.h"
 #include <gbUtils/common.h>
 #include <unordered_map>
+#include <gbUtils/logger.h>
 #include <gbUtils/string.h>
 #include <gbUtils/luatable.h>
-
-#include "data/Shader.h"
+#include <algorithm>
+#include "../data/Shader.h"
 
 #define GB_RENDER_RESOURCE_CFG_KEY_RESROOT "ResRoot"
 #define GB_RENDER_RESOURCE_CFG_KEY_BASEFILES "BaseFiles"
@@ -15,9 +16,9 @@
 
 GB_RENDER_RESOURCE_NS_BEGIN
 
-struct _Res_Cfg
+struct _Res_cfg
 {
-	_Res_Cfg() :
+	_Res_cfg() :
 		resRoot("./")
 	{}
 	void from_lua(const gb::utils::luatable_mapper& mapper)
@@ -36,14 +37,19 @@ struct _Res_Cfg
 };
 
 template<typename T>
-class Res
+class _Res_base
 {
-    GB_SINGLETON_NO_CTORDCLR(Res);
-	Res():
+protected:
+	_Res_base() :
 		_Initialized(false)
 	{}
-public:
-
+	~_Res_base()
+	{
+		std::for_each(_mpRes.begin(), _mpRes.end(), [](std::pair<const gb::utils::string, const T*>& res)
+		{
+			GB_SAFE_DELETE(res.second);
+		});
+	}
 public:
 	bool Initialize(const char* configFile)
 	{
@@ -52,7 +58,7 @@ public:
 		gb::utils::luatable_mapper mapper(_LuaStates[0]);
 		if (mapper.map_file(configFile))
 		{
-			_Res_Cfg cfg = mapper.get_table<_Res_Cfg>();
+			_Res_cfg cfg = mapper.get_table<_Res_cfg>();
 			mapper.unmap();
 
 			SetResRoot(filesystem::Instance().get_absolute_path(cfg.resRoot));
@@ -64,17 +70,10 @@ public:
 
 			_DefaultRes = filesystem::Instance().get_absolute_path(cfg.defaultRes);
 
-			if (mapper.map_file(_DefaultRes))
+			const T* res = _load_res(_DefaultRes);
+			if (res)
 			{
-				T r;
-				r.from_lua(mapper);
-				mapper.unmap();
-
-				std::pair<mp_itr, bool> ret = _mpRes.insert(std::pair<const gb::utils::string, T>
-					(_DefaultRes, std::move(r)));
-
 				_Initialized = true;
-
 				return true;
 			}
 			else
@@ -89,7 +88,8 @@ public:
 		else
 			return false;
 	}
-    const T& Get(const char* resName)
+
+	const T* Get(const char* resName)
 	{
 		assert(resName != nullptr && _Initialized);
 
@@ -101,37 +101,81 @@ public:
 			return itr->second;
 		else
 		{
-			gb::utils::luatable_mapper mapper(_LuaStates[0]);
-			if (mapper.map_file(resPath))
-			{
-				T r;
-				r.from_lua(mapper);
-				mapper.unmap();
-
-				std::pair<mp_itr, bool> ret = _mpRes.insert(std::pair<const gb::utils::string, T>
-					(resPath, std::move(r)));
-				return ret.first->second;
-			}
+			const T* res = _load_res(resPath);
+			if (res != nullptr)
+				return res;
 			else
 			{
-				logger::Instance().warning(string
+				gb::utils::logger::Instance().warning(gb::utils::string
 				("gb::render::resource::Res::Get can't find specified res @")
 					+ resPath);
-				// TODO return a default res?
 				return _mpRes.at(_DefaultRes);
 			}
+
 		}
 	}
-
 private:
-    typedef typename std::unordered_map<const gb::utils::string, T>::const_iterator const_mp_itr;
-    typedef typename std::unordered_map<const gb::utils::string, T>::iterator mp_itr;
-    std::unordered_map<const gb::utils::string, T> _mpRes;
+	virtual const T* _load_res(const char* data) = 0;
+protected:
+	typedef typename std::unordered_map<const gb::utils::string, const T*>::const_iterator const_mp_itr;
+	typedef typename std::unordered_map<const gb::utils::string, const T*>::iterator mp_itr;
+	std::unordered_map<const gb::utils::string, const T*> _mpRes;
 
-	GB_PROPERTY(private, ResRoot, gb::utils::string);
-	GB_PROPERTY_R(private, LuaStates, gb::utils::luastate_mt);
-	GB_PROPERTY_R(private, Initialized, bool);
-	GB_PROPERTY_R(private, DefaultRes, gb::utils::string)
+	GB_PROPERTY(protected, ResRoot, gb::utils::string);
+	GB_PROPERTY_R(protected, LuaStates, gb::utils::luastate_mt);
+	GB_PROPERTY_R(protected, Initialized, bool);
+	GB_PROPERTY_R(protected, DefaultRes, gb::utils::string)
 };
 
+
+template<typename T>
+class Res : public _Res_base<T>
+{
+	GB_SINGLETON(Res);
+private:
+	virtual const T* _load_res(const char* data) override
+	{
+		gb::utils::luatable_mapper mapper(_LuaStates[0]);
+		if (mapper.map_file(data))
+		{
+			T* r = new T;
+			r->from_lua(mapper);
+			mapper.unmap();
+
+			std::pair<mp_itr, bool> ret = _mpRes.insert(std::make_pair(data, r));
+			assert(ret.second);
+			return r;
+		}
+		else
+			return nullptr;
+	}
+};
+
+//specialization for Shader
+template <>
+class Res <gb::render::data::Shader> : public _Res_base<gb::render::data::Shader>
+{
+	GB_SINGLETON(Res);
+private:
+	virtual const  gb::render::data::Shader* _load_res(const char* data) override
+	{
+		gb::utils::luatable_mapper mapper(_LuaStates[0]);
+
+		gb::render::data::Shader* r = new gb::render::data::Shader;
+		if (r->from_lua(mapper, data))
+		{
+			std::pair<mp_itr, bool> ret = _mpRes.insert(std::make_pair(data, r));
+
+			assert(ret.second);
+
+			return r;
+		}
+		else
+		{
+			GB_SAFE_DELETE(r);
+			return nullptr;
+		}
+
+	}
+};
 GB_RENDER_RESOURCE_NS_END

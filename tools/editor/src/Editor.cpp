@@ -12,14 +12,20 @@ int main(int argc, char** argv)
 	//entity_ls.dofile(filesystem::Instance().get_absolute_path("../resource/ElementType.lua"));
 	//entity_ls.dofile(filesystem::Instance().get_absolute_path("../resource/RenderQueue.lua"));
 
-	if (!resource::Res<data::Entity>::Instance().Initialize(filesystem::Instance().get_absolute_path("../resource/Entity/Config.lua")))
+	if (!resource::Res<data::Shader>::Instance().Initialize(filesystem::Instance().get_absolute_path("../resource/Shader/Config.lua")))
+		return -1;
+
+	if (!resource::Res<data::Material>::Instance().Initialize(filesystem::Instance().get_absolute_path("../resource/Material/Config.lua")))
 		return -1;
 
 	if (!resource::Res<data::Mesh>::Instance().Initialize(filesystem::Instance().get_absolute_path("../resource/Mesh/Config.lua")))
 		return -1;
 
-	resource::Res<data::Mesh>::Instance().SetResRoot(filesystem::Instance().get_absolute_path("../tools/editor/resource/"));
+	if (!resource::Res<data::Entity>::Instance().Initialize(filesystem::Instance().get_absolute_path("../resource/Entity/Config.lua")))
+		return -1;
 
+
+	
 
 	if(!Director::Instance().Ready(Director::Argument("scene_0.lua", vec2<uint32>(640, 480))))
 		return 1;

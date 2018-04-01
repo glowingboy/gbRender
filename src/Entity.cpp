@@ -21,44 +21,33 @@ Entity::~Entity()
 	});
 }
 
-template<typename DataEntity>
-typename std::enable_if<data::Entity::is_entity<typename gb::rm_cv_ref<DataEntity>::type>::value, void>
-::type Entity::Instantiate(DataEntity && dEntity)
+void Entity::Instantiate(const data::Entity* dEntity)
 {
-	_instantiate(std::forward<DataEntity>(dEntity));
+	_instantiate(dEntity);
 
 	//self Start
 	this->Start();
 }
 
-template void Entity::Instantiate<const data::Entity & >(const data::Entity & dEntity);
-template void Entity::Instantiate<data::Entity &&>(data::Entity && dEntity);
-
-template<typename DataEntity>
-typename std::enable_if<data::Entity::is_entity<typename gb::rm_cv_ref<DataEntity>::type>::value, void>
-::type Entity::_instantiate(DataEntity && dEntity)
+void Entity::_instantiate(const data::Entity* dEntity)
 {
 
-	_Name = std::forward<DataEntity>(dEntity).GetName();
+	_Name = dEntity->GetName();
 
-	_Transform = dEntity.GetTransform();
+	_Transform = dEntity->GetTransform();
 
 	//elements instantiate 
-	std::for_each(dEntity.GetElements().begin(), dEntity.GetElements().end(), [this](std::conditional
-		<std::is_const<std::remove_reference<DataEntity>::type>::value, const std::pair<const Element::Type, data::Element*>, std::pair<const Element::Type, data::Element*>>
-		::type & dE)
+	std::for_each(dEntity->GetElements().begin(), dEntity->GetElements().end(), [this](const std::pair<const Element::Type, data::Element*> & dE)
 	{
 		Element* ele = dE.second->Instantiate(this);
 		ele->Awake();
 		_Elements.insert(std::pair<const Element::Type, Element*>(ele->GetType(), ele));
 	});
 	//children instantiate
-	std::for_each(dEntity.GetChildren().begin(), dEntity.GetChildren().end(), [this](std::conditional
-		<std::is_const<std::remove_reference<DataEntity>::type>::value, const std::pair<const string, data::Entity*>, std::pair<const string, data::Entity*>>
-		::type & dE)
+	std::for_each(dEntity->GetChildren().begin(), dEntity->GetChildren().end(), [this](const std::pair<const string, data::Entity*>& dE)
 	{
 		Entity* e = new Entity(this);
-		e->_instantiate(std::forward<DataEntity>(*(dE.second)));
+		e->_instantiate(dE.second);
 		_Children.insert(std::pair<const string, Entity*>(e->GetName(), e));
 	});
 

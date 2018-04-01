@@ -2,6 +2,7 @@
 #include "Element.h"
 #include <gbUtils/string.h>
 #include "data/Mesh.h"
+#include "data/Material.h"
 GB_RENDER_NS_BEGIN
 
 class Render : public Element
