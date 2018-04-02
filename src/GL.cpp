@@ -2,6 +2,8 @@
 #include <glad/src/glad.c>
 #include <gbUtils/string.h>
 #include <gbUtils/logger.h>
+#include "data/Shader.h"
+
 using namespace gb::render;
 using gb::utils::string;
 using gb::utils::logger;
@@ -10,6 +12,20 @@ using gb::utils::logger;
 #pragma comment(lib,"opengl32.lib")
 #pragma comment(lib,"glu32.lib")
 #endif
+
+const data::Shader* GL::_currentShader = nullptr;
+
+void GL::applyShader(const data::Shader* shader)
+{
+	if (_currentShader != shader)
+	{
+		_currentShader = shader;
+
+		_currentShader->Use();
+
+		//gl settings
+	}
+}
 void APIENTRY GL::_glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity,
 	GLsizei length, const GLchar *message, void *userParam)
 {

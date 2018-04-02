@@ -1,0 +1,71 @@
+GB_RENDER_DATA_SHADER_INFO_BEGIN
+return
+{
+	VtxVars =
+		{
+			{
+				Name = "gb_vtxVar_pos",
+				Type = slType.Vec4
+			},
+			{
+				Name = "gb_vtxVar_uv",
+				Type = slType.Vec2
+			},
+			{
+				Name = "texIdx",
+				Type = slType.UInt,
+				Divisor = 1
+			}
+		},
+	UniformVars =
+	   {
+	      {
+		 Name = "cameraTexs",
+		 Type = slType.Int
+	      }
+	   }
+}
+GB_RENDER_DATA_SHADER_INFO_END
+
+GB_RENDER_DATA_SHADER_VERT_BEGIN
+#version 450 core
+
+in vec3 gb_vtxVar_pos;
+in vec2 gb_vtxVar_uv;
+int uint texIdx;
+
+out vtxData
+{
+	vec2 uv;
+	uint texIdx;
+}outData;
+
+void main()
+{
+	gl_Position = vec4(gb_vtxVar_pos, 1.0f);
+	outData.uv = gb_vtxVar_uv;
+	outData.texIdx = texIdx;
+}
+
+GB_RENDER_DATA_SHADER_VERT_END
+
+GB_RENDER_DATA_SHADER_FRAG_BEGIN
+#version 450 core
+
+in vtxData
+{
+	vec2 uv;
+	uint texIdx;
+}inData;
+
+out vec4 color;
+
+uniform	sampler2DArray cameraTexs;
+
+void main()
+{
+	color = texture(cameraTexs, vec3(inData.uv, inData.texIdx));
+}
+
+GB_RENDER_DATA_SHADER_FRAG_END
+

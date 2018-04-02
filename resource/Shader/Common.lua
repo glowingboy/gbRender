@@ -1,4 +1,4 @@
-VtxVarStubType =
+slType =
    {
       Reserved = 0,
       Int = 1,

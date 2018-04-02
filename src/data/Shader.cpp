@@ -22,132 +22,135 @@ void VtxVarStub::from_lua(const gb::utils::luatable_mapper& mapper)
 
 	if (mapper.has_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_TYPE))
 	{
-		type = (VtxVarStubType)(mapper.get_integer_by_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_TYPE));
+		type = (slType)(mapper.get_integer_by_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_TYPE));
 	}
 	else
 		logger::Instance().error("VtxVarStub::from_lua no Type found mapper@" + mapper.GetData());
 
-	//optonal
+	//optional
 	if (mapper.has_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_COUNT))
 		count = mapper.get_integer_by_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_COUNT);
 
 
 	if (mapper.has_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_DIVISOR))
 		divisor = mapper.get_integer_by_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_DIVISOR);
+
+	byteSize = typeSize(type) * typeCount(type) * count;
 }
 
-GLint VtxVarStub::componentCount(const VtxVarStubType type)
+GLint VtxVarStub::componentCount(const slType type)
 {
-	if (type == VtxVarStubType::Int)
+	if (type == slType::Int)
 		return 1;
-	else if (type == VtxVarStubType::UInt)
+	else if (type == slType::UInt)
 		return 1;
-	else if (type == VtxVarStubType::Float)
+	else if (type == slType::Float)
 		return 1;
-	else if (type == VtxVarStubType::Vec2)
+	else if (type == slType::Vec2)
 		return 2;
-	else if (type == VtxVarStubType::Vec3)
+	else if (type == slType::Vec3)
 		return 3;
-	else if (type == VtxVarStubType::Vec4)
+	else if (type == slType::Vec4)
 		return 4;
-	else if (type == VtxVarStubType::Mat4)
+	else if (type == slType::Mat4)
 		return 4;
-	else if (type == VtxVarStubType::Handleui64)
+	else if (type == slType::Handleui64)
 		return 1;
 
 	assert(false);
 	return 0;
 }
 
-GLenum VtxVarStub::glType(const VtxVarStubType type)
+GLenum VtxVarStub::glType(const slType type)
 {
-	if (type == VtxVarStubType::Int)
+	if (type == slType::Int)
 		return GL_INT;
-	else if (type == VtxVarStubType::UInt)
+	else if (type == slType::UInt)
 		return GL_UNSIGNED_INT;
-	else if (type == VtxVarStubType::Float)
+	else if (type == slType::Float)
 		return GL_FLOAT;
-	else if (type == VtxVarStubType::Vec2)
+	else if (type == slType::Vec2)
 		return GL_FLOAT;
-	else if (type == VtxVarStubType::Vec3)
+	else if (type == slType::Vec3)
 		return GL_FLOAT;
-	else if (type == VtxVarStubType::Vec4)
+	else if (type == slType::Vec4)
 		return GL_FLOAT;
-	else if (type == VtxVarStubType::Mat4)
+	else if (type == slType::Mat4)
 		return GL_FLOAT;
-	else if (type == VtxVarStubType::Handleui64)
+	else if (type == slType::Handleui64)
 		return GL_UNSIGNED_INT64_ARB;
 
 	assert(false);
 	return 0;
 }
 
-std::uint32_t VtxVarStub::typeCount(const VtxVarStubType type)
+std::uint32_t VtxVarStub::typeCount(const slType type)
 {
-	if (type == VtxVarStubType::Int)
+	if (type == slType::Int)
 		return 1;
-	else if (type == VtxVarStubType::UInt)
+	else if (type == slType::UInt)
 		return 1;
-	else if (type == VtxVarStubType::Float)
+	else if (type == slType::Float)
 		return 1;
-	else if (type == VtxVarStubType::Vec2)
+	else if (type == slType::Vec2)
 		return 1;
-	else if (type == VtxVarStubType::Vec3)
+	else if (type == slType::Vec3)
 		return 1;
-	else if (type == VtxVarStubType::Vec4)
+	else if (type == slType::Vec4)
 		return 1;
-	else if (type == VtxVarStubType::Mat4)
+	else if (type == slType::Mat4)
 		return 4;
-	else if (type == VtxVarStubType::Handleui64)
+	else if (type == slType::Handleui64)
 		return 1;
 
 	assert(false);
 	return 0;
 }
 
-std::size_t VtxVarStub::typeSize(const VtxVarStubType type)
+std::size_t VtxVarStub::typeSize(const slType type)
 {
 	size_t size = 0;
-	if (type == VtxVarStubType::Int)
+	if (type == slType::Int)
 		size = sizeof(int);
-	else if (type == VtxVarStubType::UInt)
+	else if (type == slType::UInt)
 		size = sizeof(unsigned int);
-	else if (type == VtxVarStubType::Float)
+	else if (type == slType::Float)
 		size = sizeof(float);
-	else if (type == VtxVarStubType::Vec2)
+	else if (type == slType::Vec2)
 		size = 2 * sizeof(float);
-	else if (type == VtxVarStubType::Vec3)
+	else if (type == slType::Vec3)
 		size = 3 * sizeof(float);
-	else if (type == VtxVarStubType::Vec4)
+	else if (type == slType::Vec4)
 		size = 4 * sizeof(float);
-	else if (type == VtxVarStubType::Mat4)
+	else if (type == slType::Mat4)
 		size = 4 * sizeof(float);
-	else if (type == VtxVarStubType::Handleui64)
+	else if (type == slType::Handleui64)
 		size = sizeof(GLuint64);
 	return size;
 }
 
-std::size_t VtxVarStub::byteSize(const VtxVarStubType type)
-{
-	size_t trueTypeSize = 0;
-	if (type == VtxVarStubType::Int)
-		trueTypeSize = sizeof(int);
-	else if (type == VtxVarStubType::UInt)
-		trueTypeSize = sizeof(unsigned int);
-	else if (type == VtxVarStubType::Float)
-		trueTypeSize = sizeof(float);
-	else if (type == VtxVarStubType::Vec2)
-		trueTypeSize = sizeof(float);
-	else if (type == VtxVarStubType::Vec3)
-		trueTypeSize = sizeof(float);
-	else if (type == VtxVarStubType::Vec4)
-		trueTypeSize = sizeof(float);
-	else if (type == VtxVarStubType::Mat4)
-		trueTypeSize = sizeof(float);
-	else if (type == VtxVarStubType::Handleui64)
-		trueTypeSize = sizeof(GLuint64);
-	return trueTypeSize * componentCount(type) * ;
-}
+//std::size_t VtxVarStub::byteSize(const VtxVarStubType type)
+//{
+//	size_t trueTypeSize = 0;
+//	if (type == VtxVarStubType::Int)
+//		trueTypeSize = sizeof(int);
+//	else if (type == VtxVarStubType::UInt)
+//		trueTypeSize = sizeof(unsigned int);
+//	else if (type == VtxVarStubType::Float)
+//		trueTypeSize = sizeof(float);
+//	else if (type == VtxVarStubType::Vec2)
+//		trueTypeSize = sizeof(float);
+//	else if (type == VtxVarStubType::Vec3)
+//		trueTypeSize = sizeof(float);
+//	else if (type == VtxVarStubType::Vec4)
+//		trueTypeSize = sizeof(float);
+//	else if (type == VtxVarStubType::Mat4)
+//		trueTypeSize = sizeof(float);
+//	else if (type == VtxVarStubType::Handleui64)
+//		trueTypeSize = sizeof(GLuint64);
+//	return trueTypeSize * componentCount(type) * typesize;
+//}
+
 VtxVarStubInfo VtxVarStub::genInfo(const GLsizei stride, const GLsizei offset) const
 {
 	VtxVarStubInfo info;
@@ -160,6 +163,7 @@ VtxVarStubInfo VtxVarStub::genInfo(const GLsizei stride, const GLsizei offset) c
 	info.count = count * typeCount(type);
 	info.typeSize = typeSize(type);
 	info.divisor = divisor;
+	info.name = std::move(name);
 
 	if (detailedType != GL_DOUBLE)
 	{
@@ -202,69 +206,101 @@ bool Shader::from_lua(luatable_mapper & mapper, const char* shaderName)
 	string s(buffer);
 
 	const std::map<const std::string, std::string> blocks = s.extract_blocks(_blockDelimiter);
+	std::map<const std::string, std::string>::const_iterator info = blocks.find(GB_RENDER_DATA_SHADER_INFO_END);
+	std::map<const std::string, std::string>::const_iterator vert = blocks.find(GB_RENDER_DATA_SHADER_VERT_END);
+	std::map<const std::string, std::string>::const_iterator frag = blocks.find(GB_RENDER_DATA_SHADER_FRAG_END);
 
-	std::map<const std::string, std::string>::const_iterator citr = blocks.find(GB_RENDER_DATA_SHADER_INFO_END);
-	std::map<gb::utils::string, VtxVarStub> mpVtxVarStubs[2];
-	if (citr != blocks.cend())
+	if (info != blocks.cend() && vert != blocks.cend() && frag != blocks.cend())
 	{
-		mapper.map_string(citr->second.c_str());
-		if (mapper.has_key(GB_RENDER_DATA_SHADER_INFO_KEY_VTXVARS))
+		if (!_compile(vert->second.c_str(), frag->second.c_str()))
 		{
-			mapper.for_each_in([&mapper, &mpVtxVarStubs](const std::size_t idx)
-			{
-				VtxVarStub stub = mapper.get_table_by_idx<VtxVarStub>(idx);
-				if (stub.divisor != 0)
-					mpVtxVarStubs[0].insert(std::make_pair(std::move(stub.name), stub));
-				else
-					mpVtxVarStubs[1].insert(std::make_pair(std::move(stub.name), stub));
-
-			}, GB_RENDER_DATA_SHADER_INFO_KEY_VTXVARS);
-		}
-		else
-		{
-			logger::Instance().error(string("Shader::from_lua no VtxVars Found shaderName@ ") + shaderName);
+			logger::Instance().error(string("shader compiled error shaderName@ ") + shaderName);
 			return false;
 		}
-	}
-	else
-	{
-		logger::Instance().error(string("Shader::from_lua no GB_RENDER_DATA_SHADER_INFO block found shaderName@") + shaderName);
-		return false;
-	}
 
-	if (_compile(mapper.get_string_by_key(GB_RENDER_DATA_SHADER_VERT_END), mapper.get_string_by_key(GB_RENDER_DATA_SHADER_FRAG_END)))
-	{
-		for (std::uint8_t i = 0; i < 2; i++)
+
+		if (mapper.map_string(info->second.c_str()))
 		{
-			std::map<gb::utils::string, VtxVarStub>& stub = mpVtxVarStubs[i];
+			std::vector<VtxVarStub> vtxVarStubs[2];
+			GLsizei strides[2] = { 0 };
 
-			GLsizei stride = 0;
-			std::for_each(stub.begin(), stub.end(), [this](std::pair<gb::utils::string, VtxVarStub> & s)
+			//VtxVars
+			if (mapper.has_key(GB_RENDER_DATA_SHADER_INFO_KEY_VTXVARS))
 			{
-				VtxVarStub& vs = s.second;
+				mapper.for_each_in([&mapper, &vtxVarStubs, &strides, this](const std::size_t idx)
+				{
+					VtxVarStub stub = mapper.get_table_by_idx<VtxVarStub>(idx);
+					stub.index = GetVtxAttribLocation(stub.name);
+					if (stub.divisor != 0)
+					{
+						vtxVarStubs[0].push_back(stub);
+						strides[0] += stub.byteSize;
+					}
+					else
+					{
+						vtxVarStubs[1].push_back(stub);
+						strides[1] += stub.byteSize;
+					}
 
-				vs.index = GetVtxAttribLocation(s.first);
 
-				stride += 
-			});
+				}, GB_RENDER_DATA_SHADER_INFO_KEY_VTXVARS);
+			}
+			else
+			{
+				logger::Instance().error(string("Shader::from_lua no VtxVars Found shaderName@ ") + shaderName);
+				return false;
+			}
+
+			//UniformVars
+
+			//GLCfg
 		}
+		
+
+		mapper.checkout_table_by_key(GB_RENDER_DATA_SHADER_INFO_KEY_GLCFG, _GLCfg);
+		
+
+		if (_compile(vert->second.c_str(), frag->second.c_str()))
+		{
+			for (std::uint8_t i = 0; i < 2; i++)
+			{
+				std::vector<VtxVarStub>& stub = vtxVarStubs[i];
+				const GLsizei stride = strides[i];
+				std::vector<VtxVarStubInfo>& info = _vtxVarInfos[i];
+				GLsizei offset = 0;
+				std::for_each(stub.begin(), stub.end(), [this, &offset, &stride, &info](VtxVarStub & vs)
+				{
+					info.push_back(vs.genInfo(GetVtxAttribLocation(vs.name), stride, offset));
+
+					offset += vs.byteSize;
+				});
+			}
+		}
+		else
+			return false;
+
 	}
 	else
+	{
+		logger::Instance().error(string("Shader::from_lua shader incomplete, missing one or more blocks of {info, vert, frag} shaderName@ ") + shaderName);
 		return false;
+	}
+	
+
+	
 
 	return true;
 }
 
-void Shader::VtxPointerSetup()
+void Shader::VtxPointerSetup() const
 {
 	for (std::uint8_t i = 0; i < 2; i++)
 	{
-		const std::unordered_map<gb::utils::string, VtxVarStubInfo>& info = _vtxVarInfos[i];
+		const std::vector<VtxVarStubInfo>& info = _vtxVarInfos[i];
 
 		std::for_each(info.begin(), info.end(),
-			[](const std::pair<string, VtxVarStubInfo>& vtxInfo)
+			[](const VtxVarStubInfo& info)
 		{
-			const VtxVarStubInfo& info = vtxInfo.second;
 
 			const GLuint baseIndex = info.index;
 			const GLint size = info.size;
@@ -295,6 +331,10 @@ void Shader::VtxPointerSetup()
 
 }
 
+void Shader::Use() const
+{
+	glUseProgram(_programObj);
+}
 
 bool Shader::_compile(const char* vert, const char* frag)
 {
@@ -375,7 +415,7 @@ GLint Shader::_checkShaderLink(GLuint program)
 	return result;
 }
 
-GLint Shader::GetVtxAttribLocation(const char* name)
+GLint Shader::GetVtxAttribLocation(const char* name) const
 {
 	GLint location = glGetAttribLocation(_programObj, name);
 	if (location != -1)
@@ -386,4 +426,53 @@ GLint Shader::GetVtxAttribLocation(const char* name)
 		return -1;
 	}
 	
+}
+
+void GLCfg::Blend::from_lua(const gb::utils::luatable_mapper& mapper)
+{
+	mapper.checkout_boolean_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_BLEND_ENABLED, enabled);
+	if (enabled)
+	{
+		mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_BLEND_SFACTOR, gb_cast<lua_Integer>(sfactor));
+
+		mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_BLEND_DFACTOR, gb_cast<lua_Integer>(dfactor));
+	}
+}
+
+void GLCfg::DepthTest::from_lua(const gb::utils::luatable_mapper& mapper)
+{
+	mapper.checkout_boolean_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_DEPTHTEST_ENABLED, enabled);
+
+	if (enabled)
+	{
+		mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_DEPTHTEST_FUNC, gb_cast<lua_Integer>(func));
+	}
+}
+
+void GLCfg::AlphaTest::from_lua(const gb::utils::luatable_mapper& mapper)
+{
+	mapper.checkout_boolean_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_ALPHATEST_ENABLED, enabled);
+
+	if (enabled)
+	{
+		mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_ALPHATEST_FUNC, gb_cast<lua_Integer>(func));
+
+		mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_ALPHATEST_REF, gb_cast<lua_Integer>(ref));
+	}
+}
+
+GLCfg::GLCfg():
+	blend{false, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA},
+	depthTest{ true, GL_LEQUAL },
+	alphaTest{ false, GL_GREATER, 0.0f },
+	polygonMode(GL_FILL)
+{}
+
+void GLCfg::from_lua(const gb::utils::luatable_mapper& mapper)
+{
+	mapper.checkout_table_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_BLEND, blend);
+	mapper.checkout_table_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_DEPTHTEST, depthTest);
+	mapper.checkout_table_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_ALPHATEST, alphaTest);
+	mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_POLYGONMODE, gb_cast<lua_Integer>(polygonMode));
+
 }

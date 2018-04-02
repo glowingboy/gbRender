@@ -24,9 +24,6 @@ int main(int argc, char** argv)
 	if (!resource::Res<data::Entity>::Instance().Initialize(filesystem::Instance().get_absolute_path("../resource/Entity/Config.lua")))
 		return -1;
 
-
-	
-
 	if(!Director::Instance().Ready(Director::Argument("scene_0.lua", vec2<uint32>(640, 480))))
 		return 1;
 	Director::Instance().Action();
