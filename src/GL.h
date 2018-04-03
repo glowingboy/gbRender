@@ -20,7 +20,7 @@ class GL
 		GLsizei length, const GLchar *message, void *userParam);
 
 public:
-	void applyShader(const data::Shader* shader);
+	static void applyShader(const data::Shader* shader);
 
 private:
 	static const data::Shader* _currentShader;

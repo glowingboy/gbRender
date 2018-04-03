@@ -6,6 +6,7 @@
 #include <gbUtils/luatable.h>
 #include "../GL.h"
 #include <type_traits>
+#include <unordered_map>
 
 #define GB_RENDER_DATA_SHADER_INFO_BEGIN "GB_RENDER_DATA_SHADER_INFO_BEGIN"
 #define GB_RENDER_DATA_SHADER_INFO_END "GB_RENDER_DATA_SHADER_INFO_END"
@@ -22,10 +23,23 @@
 
 GB_RENDER_DATA_NS_BEGIN
 
-enum class slType : int
+struct slType
 {
-	Reserved = 0,
-	Int, UInt, Float, Vec2, Vec3, Vec4, Mat4, Handleui64
+	static constexpr std::uint8_t Reserved = 0u;
+	static constexpr std::uint8_t Int = 1u;
+	static constexpr std::uint8_t UInt = 2u;
+	static constexpr std::uint8_t Float = 3u;
+	static constexpr std::uint8_t Vec2 = 4u;
+	static constexpr std::uint8_t Vec3 = 5u;
+	static constexpr std::uint8_t Vec4 = 6u;
+	static constexpr std::uint8_t Mat4 = 7u;
+	static constexpr std::uint8_t Handleui64 = 8u;
+
+	static GLint componentCount(const std::uint8_t type);
+	static GLenum glType(const std::uint8_t type);
+	static std::uint32_t typeCount(const std::uint8_t type);
+	static std::size_t typeSize(const std::uint8_t type);
+
 };
 
 
@@ -43,12 +57,20 @@ enum class VtxVarBriefType : int
 struct VtxVarStubInfo
 {
 	GLuint index;
+
+	//component count
 	GLint size;
+
 	GLenum type;
 	GLsizei stride;
 	GLsizei offset;
+
+	//array count
 	std::uint32_t count;
+
+	//mat4 typeSize = typeSize(vec4)
 	std::uint32_t typeSize;
+
 	GLuint divisor;
 	gb::utils::string name;
 
@@ -58,7 +80,7 @@ struct VtxVarStubInfo
 struct VtxVarStub
 {
 	VtxVarStub();
-	slType type;
+	std::uint8_t sl_type;
 	std::uint32_t count;
 	std::uint32_t divisor;
 	gb::utils::string name;
@@ -66,20 +88,51 @@ struct VtxVarStub
 	std::size_t byteSize;
 
 	void from_lua(const gb::utils::luatable_mapper& mapper);
-	static GLint componentCount(const slType type);
-	static GLenum glType(const slType type);
-	static std::uint32_t typeCount(const slType type);
-	static std::size_t typeSize(const slType type);
+
 	//static std::size_t byteSize(const VtxVarStubType type);
 
 	VtxVarStubInfo genInfo(const GLsizei stride, const GLsizei offset) const;
 };
 
+
+struct UniformVar
+{
+	UniformVar(const GLint index_, const std::size_t typeSize, const GLsizei count_, const std::uint8_t sl_type);
+	~UniformVar();
+	UniformVar(UniformVar && other);
+	bool SetData(const void* data_, const std::size_t size);
+	void Update() const;
+	GLint index;
+	std::size_t byteSize;
+	GLsizei count;
+	void* data;
+
+	
+private:
+	typedef void(*setter)(const GLint location, const GLsizei count, const void* value);
+
+	setter _setter;
+};
+
+#define GB_RENDER_DATA_SHADER_UNIFORMVARSTUB_KEY_NAME "Name"
+#define GB_RENDER_DATA_SHADER_UNIFORMVARSTUB_KEY_TYPE "Type"
+#define GB_RENDER_DATA_SHADER_UNIFORMVARSTUB_KEY_COUNT "Count"
+
 struct UniformVarStub
 {
+	UniformVarStub();
+	
+	void from_lua(const gb::utils::luatable_mapper& mapper);
+	UniformVar genUniformVar() const;
 	gb::utils::string name;
+	GLint index;
+	std::uint8_t sl_type;
+	GLsizei count;
 
+	std::size_t typeSize;
 };
+
+
 
 #define GB_RENDER_DATA_SHADER_GLCFG_KEY_BLEND "Blend"
 #define GB_RENDER_DATA_SHADER_GLCFG_KEY_BLEND_ENABLED "Enabled"
@@ -109,7 +162,7 @@ struct GLCfg
 		GLenum sfactor;
 		GLenum dfactor;
 	}blend;
-	
+
 	struct DepthTest
 	{
 		void from_lua(const gb::utils::luatable_mapper& mapper);
@@ -132,14 +185,29 @@ struct GLCfg
 class Shader
 {
 public:
-	
+
 public:
 	bool from_lua(gb::utils::luatable_mapper & mapper, const char* shaderName);
 	void Use() const;
 	void VtxPointerSetup() const;
 
 	GLint GetVtxAttribLocation(const char* name) const;
-	
+	GLint GetUniformLocation(const char* name) const;
+	std::unordered_map<gb::utils::string, UniformVar> GenUniformVars() const;
+	const std::vector<VtxVarStubInfo>& GetVtxVarInfo(std::uint8_t idx) const;
+
+#define _GB_RENDER_DATA_SHADER_SET_UNIFORM_DCLR_(type) \
+	static void SetUniform1##type(const GLint location, const GLsizei count, const void* value); \
+	static void SetUniform2##type(const GLint location, const GLsizei count, const void* value); \
+	static void SetUniform3##type(const GLint location, const GLsizei count, const void* value); \
+	static void SetUniform4##type(const GLint location, const GLsizei count, const void* value); \
+
+	_GB_RENDER_DATA_SHADER_SET_UNIFORM_DCLR_(f);
+	_GB_RENDER_DATA_SHADER_SET_UNIFORM_DCLR_(i);
+	_GB_RENDER_DATA_SHADER_SET_UNIFORM_DCLR_(ui);
+
+
+	static void SetUniformMatrix4f(const GLint location, const GLsizei count, const void* value);
 
 private:
 	GB_PROPERTY_R(private, Name, gb::utils::string);
@@ -149,6 +217,8 @@ private:
 	std::vector<VtxVarStubInfo> _vtxVarInfos[2];
 
 	GB_PROPERTY_R(private, GLCfg, GLCfg);
+
+	std::vector<UniformVarStub> _uniformVarSubs;
 private:
 	bool _compile(const char* vert, const char* frag);
 	static GLint _checkShaderCompile(GLuint shader);

@@ -18,10 +18,10 @@
 
 GB_RENDER_NS_BEGIN
 
-class GLVar
+struct GLVar
 {
 public:
-    GLVar(const uint8 unitSize, const size_t capacity);
+    GLVar(const uint8 unitSize, const std::size_t capacity);
 	GLVar(GLVar && o);
 	GLVar(const GLVar & o);
 	template <typename T>
@@ -30,7 +30,7 @@ public:
 		_count(vec.size()),
 		_capacity(_count)
 	{
-		const size_t size = _unitSize * _capacity;
+		const std::size_t size = _unitSize * _capacity;
 		_data = new char[size];
 
 		std::memcpy(_data, vec.data(), size);
@@ -38,14 +38,14 @@ public:
     
     ~GLVar();
 public:
-    void append(void* data, const size_t count);
+    void append(void* data, const std::size_t count);
     const char* data() const;
     uint8 unitSize() const;
-    size_t count() const;
+    std::size_t count() const;
 private:
     uint8 _unitSize;
-    size_t _count;
-    size_t _capacity;
+	std::size_t _count;
+	std::size_t _capacity;
     
     char* _data;
 };

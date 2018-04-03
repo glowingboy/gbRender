@@ -32,6 +32,7 @@ GB_RENDER_CLASS Director
 	friend class Camera;
 	friend class Render;
 
+	~Director();
 public:
 	struct Argument
 	{
@@ -66,6 +67,11 @@ private:
 	std::queue<GLuint> _cameraFBOIndices;
 
 	GB_PROPERTY(private, ClearColor, gb::physics::vec4F);
+
+	GLInstancedDraw _screenDraw;
+	data::Material* _screenMat;
+	std::uint8_t _instVar[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];
+
 public:
 	typedef gb::physics::octree<Entity*, Entity::octreeSBBContain, Entity::octreeSBBAPG, gb::physics::Float> octreeEntity;
 

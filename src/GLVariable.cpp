@@ -2,7 +2,7 @@
 
 using namespace gb::render;
 
-GLVar::GLVar(const uint8 unitSize, const size_t capacity):
+GLVar::GLVar(const uint8 unitSize, const std::size_t capacity):
     _unitSize(unitSize),
     _count(0),
     _capacity(capacity)
@@ -24,7 +24,7 @@ GLVar::GLVar(const GLVar & o):
 	_count(o._count),
 	_capacity(o._count)
 {
-	const size_t size = _unitSize * _capacity;
+	const std::size_t size = _unitSize * _capacity;
 	_data = new char[size];
 
 	std::memcpy(_data, o._data, size);
@@ -36,7 +36,7 @@ GLVar::~GLVar()
     _data = nullptr;
 }
 
-void GLVar::append(void* data, const size_t count)
+void GLVar::append(void* data, const std::size_t count)
 {
     const std::size_t oldSize = _count * _unitSize;
     _count += count;
@@ -69,7 +69,7 @@ uint8 GLVar::unitSize() const
 {
     return _unitSize;
 }
-size_t GLVar::count() const
+std::size_t GLVar::count() const
 {
     return _count;
 }

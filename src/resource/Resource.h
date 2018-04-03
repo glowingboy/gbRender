@@ -45,7 +45,7 @@ protected:
 	{}
 	~_Res_base()
 	{
-		std::for_each(_mpRes.begin(), _mpRes.end(), [](std::pair<const gb::utils::string, const T*>& res)
+		std::for_each(_mpRes.begin(), _mpRes.end(), [](std::pair<const gb::utils::string, T*>& res)
 		{
 			GB_SAFE_DELETE(res.second);
 		});
@@ -70,7 +70,7 @@ public:
 
 			_DefaultRes = filesystem::Instance().get_absolute_path(cfg.defaultRes);
 
-			const T* res = _load_res(_DefaultRes);
+			T* res = _load_res(_DefaultRes);
 			if (res)
 			{
 				_Initialized = true;
@@ -89,7 +89,7 @@ public:
 			return false;
 	}
 
-	const T* Get(const char* resName)
+	T* Get(const char* resName)
 	{
 		assert(resName != nullptr && _Initialized);
 
@@ -101,7 +101,7 @@ public:
 			return itr->second;
 		else
 		{
-			const T* res = _load_res(resPath);
+			T* res = _load_res(resPath);
 			if (res != nullptr)
 				return res;
 			else
@@ -115,11 +115,11 @@ public:
 		}
 	}
 private:
-	virtual const T* _load_res(const char* data) = 0;
+	virtual T* _load_res(const char* data) = 0;
 protected:
-	typedef typename std::unordered_map<const gb::utils::string, const T*>::const_iterator const_mp_itr;
-	typedef typename std::unordered_map<const gb::utils::string, const T*>::iterator mp_itr;
-	std::unordered_map<const gb::utils::string, const T*> _mpRes;
+	typedef typename std::unordered_map<const gb::utils::string, T*>::const_iterator const_mp_itr;
+	typedef typename std::unordered_map<const gb::utils::string, T*>::iterator mp_itr;
+	std::unordered_map<const gb::utils::string, T*> _mpRes;
 
 	GB_PROPERTY(protected, ResRoot, gb::utils::string);
 	GB_PROPERTY_R(protected, LuaStates, gb::utils::luastate_mt);
@@ -133,7 +133,7 @@ class Res : public _Res_base<T>
 {
 	GB_SINGLETON(Res);
 private:
-	virtual const T* _load_res(const char* data) override
+	virtual T* _load_res(const char* data) override
 	{
 		gb::utils::luatable_mapper mapper(_LuaStates[0]);
 		if (mapper.map_file(data))
@@ -157,7 +157,7 @@ class Res <gb::render::data::Shader> : public _Res_base<gb::render::data::Shader
 {
 	GB_SINGLETON(Res);
 private:
-	virtual const  gb::render::data::Shader* _load_res(const char* data) override
+	virtual  gb::render::data::Shader* _load_res(const char* data) override
 	{
 		gb::utils::luatable_mapper mapper(_LuaStates[0]);
 

@@ -2,6 +2,7 @@
 #include "Type.h"
 #include "Element.h"
 #include <gbPhysics/camera.h>
+#include "GLDraw.h"
 
 #define GB_RENDER_CAMERA_DEFAULT_INTERESTTAG 0xffffffffu
 

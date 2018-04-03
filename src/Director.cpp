@@ -25,12 +25,23 @@ Director::Director():
 	_frameBuffers{0},
 	_cameraTextures{0},
 	_cameraDepthBuffers{0},
-	_ClearColor{0, 0, 0, 0}
+	_ClearColor{0, 0, 0, 0},
+	_instVar{0}
 {
 	for (std::uint8_t i = 0; i < GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT; i++)
 	{
 		_cameraFBOIndices.push(i);
 	}
+}
+
+Director::~Director()
+{
+	glDeleteFramebuffers(GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT, _frameBuffers);
+
+	glDeleteTextures(1, &_cameraTextures);
+
+	glDeleteRenderbuffers(GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT, _cameraDepthBuffers);
+
 }
 bool Director::Ready(const Argument& arg)
 {
@@ -78,6 +89,55 @@ bool Director::Ready(const Argument& arg)
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	//draw setup
+	_screenMat = resource::Res<data::Material>::Instance().Get("MultiCamera.lua");
+	if (_screenMat == nullptr)
+	{
+		logger::Instance().error("Director::Ready _screenMat nullptr");
+		return false;
+	}
+	int a;
+	_screenMat->SetUniform("cameraTexs", &a, 1);
+	
+	const data::Mesh* square = resource::Res<data::Mesh>::Instance().Get("square.lua");
+	if (square != nullptr)
+	{
+		GLBuffer::CtorParam drawParam[3];
+
+		//1 vtx
+		GLBuffer::CtorParam& vtxParam = drawParam[0];
+		vtxParam.type = GLBuffer::Type::Static;
+		vtxParam.size = square->GetVtxAttribByteSize();
+
+		//2 idx
+		GLBuffer::CtorParam& idxParam = drawParam[1];
+		idxParam.type = GLBuffer::Type::Static;
+		idxParam.size = square->GetIdxByteSize();
+
+		//inst
+		GLBuffer::CtorParam& instParam = drawParam[2];
+		instParam.type = GLBuffer::Type::Dynamic;
+		instParam.size = GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT;
+
+		_screenDraw.Initialize(drawParam);
+
+		//set data
+		//vtx
+		_screenDraw.GetVtxBuffer().SetData(_screenMat->GetShader()->GetVtxVarInfo(0), square->GetVtxVars());
+
+		//idx
+		const GLVar* idxVar = square->GetIdxVar();
+		if (idxVar == nullptr)
+		{
+			logger::Instance().error("Director::Ready idxVar nullptr");
+			return false;
+		}
+		_screenDraw.GetVtxBuffer().SetData(0, idxVar->data(), square->GetIdxByteSize());
+
+		_screenDraw.SetCount(idxVar->count());
+	}
+
+
 	return true;
 }
 
@@ -111,14 +171,30 @@ bool Director::_directing()
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	//camera shooting
-	std::for_each(_Cameras.begin(), _Cameras.end(), [this](const Camera* const cam)
+	std::uint8_t instCount = 0;
+	
+	std::for_each(_Cameras.begin(), _Cameras.end(), [this, &instCount](const Camera* const cam)
 	{
-		glBindFramebuffer(GL_FRAMEBUFFER, _frameBuffers[cam->GetFrameBufferIdx()]);
+		const std::uint8_t frameBufferIdx = cam->GetFrameBufferIdx();
+		_instVar[instCount] = frameBufferIdx;
+		instCount++;
+
+		glBindFramebuffer(GL_FRAMEBUFFER, _frameBuffers[frameBufferIdx]);
 		cam->Shoot();
 
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glViewport(0, 0, _ScreenSize.x, _ScreenSize.y);
 	});
+
+	//director draw
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glViewport(0, 0, _ScreenSize.x, _ScreenSize.y);
+	_screenDraw.GetInstBuffer().SetData(0, _instVar, instCount);
+	_screenDraw.SetInstanceCount(instCount);
+
+	GL::applyShader(_screenMat->GetShader());
+
+	_screenMat->Update();
+
+	_screenDraw.Draw();
 
 	return Device::Instance().Update();
 }

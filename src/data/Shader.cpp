@@ -22,7 +22,7 @@ void VtxVarStub::from_lua(const gb::utils::luatable_mapper& mapper)
 
 	if (mapper.has_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_TYPE))
 	{
-		type = (slType)(mapper.get_integer_by_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_TYPE));
+		sl_type = mapper.get_integer_by_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_TYPE);
 	}
 	else
 		logger::Instance().error("VtxVarStub::from_lua no Type found mapper@" + mapper.GetData());
@@ -35,10 +35,10 @@ void VtxVarStub::from_lua(const gb::utils::luatable_mapper& mapper)
 	if (mapper.has_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_DIVISOR))
 		divisor = mapper.get_integer_by_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_DIVISOR);
 
-	byteSize = typeSize(type) * typeCount(type) * count;
+	byteSize = slType::typeSize(sl_type) * slType::typeCount(sl_type) * count;
 }
 
-GLint VtxVarStub::componentCount(const slType type)
+GLint slType::componentCount(const std::uint8_t type)
 {
 	if (type == slType::Int)
 		return 1;
@@ -61,7 +61,7 @@ GLint VtxVarStub::componentCount(const slType type)
 	return 0;
 }
 
-GLenum VtxVarStub::glType(const slType type)
+GLenum slType::glType(const std::uint8_t type)
 {
 	if (type == slType::Int)
 		return GL_INT;
@@ -84,7 +84,7 @@ GLenum VtxVarStub::glType(const slType type)
 	return 0;
 }
 
-std::uint32_t VtxVarStub::typeCount(const slType type)
+std::uint32_t slType::typeCount(const std::uint8_t type)
 {
 	if (type == slType::Int)
 		return 1;
@@ -107,7 +107,7 @@ std::uint32_t VtxVarStub::typeCount(const slType type)
 	return 0;
 }
 
-std::size_t VtxVarStub::typeSize(const slType type)
+std::size_t slType::typeSize(const std::uint8_t type)
 {
 	size_t size = 0;
 	if (type == slType::Int)
@@ -155,13 +155,13 @@ VtxVarStubInfo VtxVarStub::genInfo(const GLsizei stride, const GLsizei offset) c
 {
 	VtxVarStubInfo info;
 	info.index = index;
-	info.size = componentCount(type);
-	const GLenum detailedType = glType(type);
+	info.size = slType::componentCount(sl_type);
+	const GLenum detailedType = slType::glType(sl_type);
 	info.type = detailedType;
 	info.stride = stride;
 	info.offset = offset;
-	info.count = count * typeCount(type);
-	info.typeSize = typeSize(type);
+	info.count = count * slType::typeCount(sl_type);
+	info.typeSize = slType::typeSize(sl_type);
 	info.divisor = divisor;
 	info.name = std::move(name);
 
@@ -181,6 +181,101 @@ VtxVarStubInfo VtxVarStub::genInfo(const GLsizei stride, const GLsizei offset) c
 	return info;
 }
 
+UniformVarStub::UniformVarStub():
+	index(-1),
+	typeSize(0),
+	count(1)
+{}
+
+
+
+void UniformVarStub::from_lua(const gb::utils::luatable_mapper& mapper)
+{
+	if (mapper.has_key(GB_RENDER_DATA_SHADER_UNIFORMVARSTUB_KEY_NAME))
+		name = mapper.get_string_by_key(GB_RENDER_DATA_SHADER_UNIFORMVARSTUB_KEY_NAME);
+	else
+	{
+		logger::Instance().error("UniformVarStub::from_lua no Key 'Name' found" + mapper.GetData());
+		return;
+	}
+		
+	if (mapper.has_key(GB_RENDER_DATA_SHADER_UNIFORMVARSTUB_KEY_TYPE))
+	{
+		sl_type = mapper.get_integer_by_key(GB_RENDER_DATA_SHADER_UNIFORMVARSTUB_KEY_TYPE);
+		typeSize = slType::typeSize(sl_type);
+	}
+	else
+	{
+		logger::Instance().error("UniformVarStub::from_lua no Key 'Name' found" + mapper.GetData());
+		return;
+	}
+
+	mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_UNIFORMVARSTUB_KEY_COUNT, count);
+}
+
+UniformVar UniformVarStub::genUniformVar() const
+{
+	return UniformVar(index, typeSize, count * slType::typeCount(sl_type), sl_type);
+}
+
+UniformVar::UniformVar(const GLint index_, const std::size_t typeSize, const GLsizei count_, const std::uint8_t sl_type) :
+	index(index_),
+	byteSize(typeSize * count_),
+	count(count_),
+	_setter(nullptr)
+{
+	data = new char[byteSize];
+
+	if (sl_type == slType::Float)
+		_setter = Shader::SetUniform1f;
+	else if (sl_type == slType::Int)
+		_setter = Shader::SetUniform1i;
+	else if (sl_type == slType::UInt)
+		_setter = Shader::SetUniform1ui;
+	else if (sl_type == slType::Vec2)
+		_setter = Shader::SetUniform2f;
+	else if (sl_type == slType::Vec3)
+		_setter = Shader::SetUniform3f;
+	else if (sl_type == slType::Vec4)
+		_setter = Shader::SetUniform4f;
+	else if (sl_type == slType::Mat4)
+		_setter = Shader::SetUniform1i;
+	else if (sl_type == slType::Int)
+		_setter = Shader::SetUniform1i;
+}
+UniformVar::~UniformVar()
+{
+	GB_SAFE_DELETE_ARRAY(data);
+}
+UniformVar::UniformVar(UniformVar && other):
+	index(other.index),
+	byteSize(other.byteSize),
+	count(other.count),
+	data(other.data)
+{
+	other.data = nullptr;
+}
+
+bool UniformVar::SetData(const void* data_, const std::size_t size)
+{
+	if (byteSize == size)
+	{
+		std::memcpy(data, data_, byteSize);
+		return true;
+	}
+	else
+		return false;
+}
+
+void UniformVar::Update() const
+{
+	if (_setter != nullptr)
+	{
+		_setter(index, count, data);
+	}
+	else
+		logger::Instance().error("UniformVar::Update _setter is nullptr");
+}
 const std::vector<std::string> Shader::_blockDelimiter
 {
 	{ 
@@ -204,6 +299,7 @@ bool Shader::from_lua(luatable_mapper & mapper, const char* shaderName)
 	char* buffer = new char[size + 1]{ '\0' };
 	f.read(buffer, size);
 	string s(buffer);
+	GB_SAFE_DELETE_ARRAY(buffer);
 
 	const std::map<const std::string, std::string> blocks = s.extract_blocks(_blockDelimiter);
 	std::map<const std::string, std::string>::const_iterator info = blocks.find(GB_RENDER_DATA_SHADER_INFO_END);
@@ -231,6 +327,7 @@ bool Shader::from_lua(luatable_mapper & mapper, const char* shaderName)
 				{
 					VtxVarStub stub = mapper.get_table_by_idx<VtxVarStub>(idx);
 					stub.index = GetVtxAttribLocation(stub.name);
+
 					if (stub.divisor != 0)
 					{
 						vtxVarStubs[0].push_back(stub);
@@ -244,6 +341,20 @@ bool Shader::from_lua(luatable_mapper & mapper, const char* shaderName)
 
 
 				}, GB_RENDER_DATA_SHADER_INFO_KEY_VTXVARS);
+
+				for (std::uint8_t i = 0; i < 2; i++)
+				{
+					std::vector<VtxVarStub>& stub = vtxVarStubs[i];
+					const GLsizei stride = strides[i];
+					std::vector<VtxVarStubInfo>& info = _vtxVarInfos[i];
+					GLsizei offset = 0;
+					std::for_each(stub.begin(), stub.end(), [this, &offset, &stride, &info](VtxVarStub & vs)
+					{
+						info.push_back(vs.genInfo(stride, offset));
+
+						offset += vs.byteSize;
+					});
+				}
 			}
 			else
 			{
@@ -252,6 +363,15 @@ bool Shader::from_lua(luatable_mapper & mapper, const char* shaderName)
 			}
 
 			//UniformVars
+			mapper.for_each_in([&mapper, &vtxVarStubs, &strides, this](const std::size_t idx)
+			{
+				UniformVarStub stub = mapper.get_table_by_idx<UniformVarStub>(idx);
+				stub.index = GetUniformLocation(stub.name);
+				
+				_uniformVarSubs.push_back(std::move(stub));
+
+			}, GB_RENDER_DATA_SHADER_INFO_KEY_UNIFORMVARS);
+
 
 			//GLCfg
 		}
@@ -262,19 +382,7 @@ bool Shader::from_lua(luatable_mapper & mapper, const char* shaderName)
 
 		if (_compile(vert->second.c_str(), frag->second.c_str()))
 		{
-			for (std::uint8_t i = 0; i < 2; i++)
-			{
-				std::vector<VtxVarStub>& stub = vtxVarStubs[i];
-				const GLsizei stride = strides[i];
-				std::vector<VtxVarStubInfo>& info = _vtxVarInfos[i];
-				GLsizei offset = 0;
-				std::for_each(stub.begin(), stub.end(), [this, &offset, &stride, &info](VtxVarStub & vs)
-				{
-					info.push_back(vs.genInfo(GetVtxAttribLocation(vs.name), stride, offset));
-
-					offset += vs.byteSize;
-				});
-			}
+			
 		}
 		else
 			return false;
@@ -308,7 +416,7 @@ void Shader::VtxPointerSetup() const
 			const GLsizei stride = info.stride;
 			const GLsizei offset = info.offset;
 			const std::uint32_t count = info.count;
-			const std::uint32_t typeSize = info.type;
+			const std::uint32_t typeSize = info.typeSize;
 			const VtxVarBriefType briefType = info.briefType;
 
 			for (std::uint32_t i = 0; i < count; i++)
@@ -417,6 +525,8 @@ GLint Shader::_checkShaderLink(GLuint program)
 
 GLint Shader::GetVtxAttribLocation(const char* name) const
 {
+	assert(name != nullptr);
+
 	GLint location = glGetAttribLocation(_programObj, name);
 	if (location != -1)
 		return location;
@@ -428,36 +538,101 @@ GLint Shader::GetVtxAttribLocation(const char* name) const
 	
 }
 
+GLint Shader::GetUniformLocation(const char* name) const
+{
+	assert(name != nullptr);
+
+	GLint location = glGetUniformLocation(_programObj, name);
+	if (location != -1)
+		return location;
+	else
+	{
+		logger::Instance().error("Shader::GetUniformLocation no specified uniform found name@ " + string(name));
+		return -1;
+	}
+}
+
+std::unordered_map<gb::utils::string, UniformVar> Shader::GenUniformVars() const
+{
+	std::unordered_map<gb::utils::string, UniformVar> ret;
+	std::for_each(_uniformVarSubs.begin(), _uniformVarSubs.end(), [&ret](const UniformVarStub& stub)
+	{
+		ret.insert(std::make_pair(stub.name, stub.genUniformVar()));
+	});
+
+	return ret;
+}
+
+const std::vector<VtxVarStubInfo>& Shader::GetVtxVarInfo(std::uint8_t idx) const
+{
+	assert(idx < 2);
+
+	return _vtxVarInfos[idx];
+}
+
+#define _GB_RENDER_DATA_SHADER_SET_UNIFORM_DEF_(type, valueType) \
+	void Shader::SetUniform1##type(const GLint location, const GLsizei count, const void* value) \
+	{ \
+		assert(location != -1); \
+		glUniform1##type##v(location, count, (valueType*)value); \
+	} \
+	void Shader::SetUniform2##type(const GLint location, const GLsizei count, const void* value) \
+	{ \
+		assert(location != -1); \
+		glUniform2##type##v(location, count, (valueType*)value); \
+	} \
+	void Shader::SetUniform3##type(const GLint location, const GLsizei count, const void* value) \
+	{ \
+		assert(location != -1); \
+		glUniform3##type##v(location, count, (valueType*)value); \
+	} \
+	void Shader::SetUniform4##type(const GLint location, const GLsizei count, const void* value) \
+	{ \
+		assert(location != -1); \
+		glUniform4##type##v(location, count, (valueType*)value); \
+	} 
+
+_GB_RENDER_DATA_SHADER_SET_UNIFORM_DEF_(f, GLfloat);
+_GB_RENDER_DATA_SHADER_SET_UNIFORM_DEF_(i, GLint);
+_GB_RENDER_DATA_SHADER_SET_UNIFORM_DEF_(ui, GLuint);
+
+void Shader::SetUniformMatrix4f(const GLint location, const GLsizei count, const void* value)
+{
+	assert(location != -1);
+	glUniformMatrix4fv(location, count, GL_FALSE, (GLfloat*)value);
+}
+
 void GLCfg::Blend::from_lua(const gb::utils::luatable_mapper& mapper)
 {
-	mapper.checkout_boolean_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_BLEND_ENABLED, enabled);
+	mapper.checkout_boolean_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_BLEND_ENABLED, &enabled);
 	if (enabled)
 	{
-		mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_BLEND_SFACTOR, gb_cast<lua_Integer>(sfactor));
+		mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_BLEND_SFACTOR, (lua_Integer*)&sfactor);
 
-		mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_BLEND_DFACTOR, gb_cast<lua_Integer>(dfactor));
+		mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_BLEND_DFACTOR, (lua_Integer*)&dfactor);
+
 	}
 }
 
 void GLCfg::DepthTest::from_lua(const gb::utils::luatable_mapper& mapper)
 {
-	mapper.checkout_boolean_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_DEPTHTEST_ENABLED, enabled);
+	mapper.checkout_boolean_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_DEPTHTEST_ENABLED, &enabled);
 
 	if (enabled)
 	{
-		mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_DEPTHTEST_FUNC, gb_cast<lua_Integer>(func));
+		mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_DEPTHTEST_FUNC, (lua_Integer*)&func);
 	}
 }
 
 void GLCfg::AlphaTest::from_lua(const gb::utils::luatable_mapper& mapper)
 {
-	mapper.checkout_boolean_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_ALPHATEST_ENABLED, enabled);
+	mapper.checkout_boolean_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_ALPHATEST_ENABLED, &enabled);
 
 	if (enabled)
 	{
-		mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_ALPHATEST_FUNC, gb_cast<lua_Integer>(func));
+		mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_ALPHATEST_FUNC, (lua_Integer*)&func);
 
-		mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_ALPHATEST_REF, gb_cast<lua_Integer>(ref));
+		mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_ALPHATEST_REF, (lua_Integer*)&ref);
 	}
 }
 
@@ -473,6 +648,6 @@ void GLCfg::from_lua(const gb::utils::luatable_mapper& mapper)
 	mapper.checkout_table_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_BLEND, blend);
 	mapper.checkout_table_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_DEPTHTEST, depthTest);
 	mapper.checkout_table_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_ALPHATEST, alphaTest);
-	mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_POLYGONMODE, gb_cast<lua_Integer>(polygonMode));
+	mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_POLYGONMODE, (lua_Integer*)&polygonMode);
 
 }
