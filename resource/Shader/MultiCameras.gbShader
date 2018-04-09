@@ -5,7 +5,7 @@ return
 		{
 			{
 				Name = "gb_vtxVar_pos",
-				Type = slType.Vec4
+				Type = slType.Vec3
 			},
 			{
 				Name = "gb_vtxVar_uv",
@@ -32,7 +32,7 @@ GB_RENDER_DATA_SHADER_VERT_BEGIN
 
 in vec3 gb_vtxVar_pos;
 in vec2 gb_vtxVar_uv;
-int uint texIdx;
+in uint texIdx;
 
 out vtxData
 {
@@ -55,7 +55,7 @@ GB_RENDER_DATA_SHADER_FRAG_BEGIN
 in vtxData
 {
 	vec2 uv;
-	uint texIdx;
+	flat uint texIdx;
 }inData;
 
 out vec4 color;

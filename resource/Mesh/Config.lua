@@ -1,7 +1,10 @@
 -- all file paths are relative to current work directory
+
+--package.path = package.path .. "../resource/Mesh/?.lua"
+
 return
    {
-      ResRoot = "../tools/editor/resource/",
+      ResRoot = "../resource/Mesh/",
       -- BaseFiles =
       -- 	 {
       -- 	 },

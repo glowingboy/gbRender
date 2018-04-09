@@ -6,9 +6,10 @@ using namespace gb::render;
 using namespace gb::utils;
 using namespace gb::physics;
 
-Director::Argument::Argument(const char* fileOfRootEntity, const gb::physics::vec2<gb::render::uint32>& sizeOfScreen):
+Director::Argument::Argument(const char* fileOfRootEntity, const gb::physics::vec2<gb::render::uint32>& sizeOfScreen, const std::map<gb::utils::string, gb::utils::string>& resCfg):
 	rootEntity(fileOfRootEntity),
-	screenSize(sizeOfScreen)
+	screenSize(sizeOfScreen),
+	resCfgs(resCfg)
 {
 
 }
@@ -51,6 +52,27 @@ bool Director::Ready(const Argument& arg)
 		return false;
 	}
 
+	const auto& resCfgs = arg.resCfgs;
+	auto itr = resCfgs.find(GB_RENDER_RESOURCE_CFG_SHADER);
+	if (itr != resCfgs.end())
+		if (!resource::Res<data::Shader>::Instance().Initialize(itr->second))
+			return false;
+
+	itr = resCfgs.find(GB_RENDER_RESOURCE_CFG_MATERIAL);
+	if (itr != resCfgs.end())
+		if (!resource::Res<data::Material>::Instance().Initialize(itr->second))
+			return false;
+
+	itr = resCfgs.find(GB_RENDER_RESOURCE_CFG_MESH);
+	if (itr != resCfgs.end())
+		if (!resource::Res<data::Mesh>::Instance().Initialize(itr->second))
+			return false;
+
+	itr = resCfgs.find(GB_RENDER_RESOURCE_CFG_ENTITY);
+	if (itr != resCfgs.end())
+		if (!resource::Res<data::Entity>::Instance().Initialize(itr->second))
+			return false;
+
 	_ScreenSize = arg.screenSize;
 	
 	if (arg.rootEntity.length() != 0)
@@ -61,6 +83,7 @@ bool Director::Ready(const Argument& arg)
 
 	//texture
 	glGenTextures(1, &_cameraTextures);
+	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, _cameraTextures);
 	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, _ScreenSize.x, _ScreenSize.y, GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT);
 	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -90,53 +113,52 @@ bool Director::Ready(const Argument& arg)
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	//draw setup
-	_screenMat = resource::Res<data::Material>::Instance().Get("MultiCamera.lua");
+	_screenMat = resource::Res<data::Material>::Instance().Get("MultiCameras.lua");
 	if (_screenMat == nullptr)
 	{
 		logger::Instance().error("Director::Ready _screenMat nullptr");
 		return false;
 	}
-	int a;
-	_screenMat->SetUniform("cameraTexs", &a, 1);
+
+	_screenMat->SetUniform("cameraTexs", 0, 1);
 	
-	const data::Mesh* square = resource::Res<data::Mesh>::Instance().Get("square.lua");
-	if (square != nullptr)
+	const data::Mesh* square = resource::Res<data::Mesh>::Instance().Get("Square.lua");
+	
+	GLBuffer::CtorParam drawParam[3];
+
+	//1 vtx
+	GLBuffer::CtorParam& vtxParam = drawParam[0];
+	vtxParam.type = GLBuffer::Type::Static;
+	vtxParam.size = square->GetVtxAttribByteSize();
+
+	//2 idx
+	GLBuffer::CtorParam& idxParam = drawParam[1];
+	idxParam.type = GLBuffer::Type::Static;
+	idxParam.size = square->GetIdxByteSize();
+
+	//inst
+	GLBuffer::CtorParam& instParam = drawParam[2];
+	instParam.type = GLBuffer::Type::Dynamic;
+	instParam.size = GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT * sizeof(std::uint32_t);
+
+	_screenDraw.Initialize(drawParam);
+
+	//set data
+	//vtx
+	_screenDraw.GetVtxBuffer().SetData(_screenMat->GetShader()->GetVtxVarInfo(0), square->GetVtxVars());
+
+	//idx
+	const GLVar* idxVar = square->GetIdxVar();
+	if (idxVar == nullptr)
 	{
-		GLBuffer::CtorParam drawParam[3];
-
-		//1 vtx
-		GLBuffer::CtorParam& vtxParam = drawParam[0];
-		vtxParam.type = GLBuffer::Type::Static;
-		vtxParam.size = square->GetVtxAttribByteSize();
-
-		//2 idx
-		GLBuffer::CtorParam& idxParam = drawParam[1];
-		idxParam.type = GLBuffer::Type::Static;
-		idxParam.size = square->GetIdxByteSize();
-
-		//inst
-		GLBuffer::CtorParam& instParam = drawParam[2];
-		instParam.type = GLBuffer::Type::Dynamic;
-		instParam.size = GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT;
-
-		_screenDraw.Initialize(drawParam);
-
-		//set data
-		//vtx
-		_screenDraw.GetVtxBuffer().SetData(_screenMat->GetShader()->GetVtxVarInfo(0), square->GetVtxVars());
-
-		//idx
-		const GLVar* idxVar = square->GetIdxVar();
-		if (idxVar == nullptr)
-		{
-			logger::Instance().error("Director::Ready idxVar nullptr");
-			return false;
-		}
-		_screenDraw.GetVtxBuffer().SetData(0, idxVar->data(), square->GetIdxByteSize());
-
-		_screenDraw.SetCount(idxVar->count());
+		logger::Instance().error("Director::Ready idxVar nullptr");
+		return false;
 	}
+	_screenDraw.GetIdxBuffer().SetData(0, idxVar->data(), square->GetIdxByteSize());
 
+	_screenDraw.SetCount(idxVar->count());
+
+	_screenDraw.VtxAttribPointerSetup(_screenMat->GetShader());
 
 	return true;
 }
@@ -187,12 +209,18 @@ bool Director::_directing()
 	//director draw
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, _ScreenSize.x, _ScreenSize.y);
-	_screenDraw.GetInstBuffer().SetData(0, _instVar, instCount);
+
+	static constexpr std::size_t uint32_size = sizeof(std::uint32_t);
+
+	_screenDraw.GetInstBuffer().SetData(0, _instVar, instCount * uint32_size);
 	_screenDraw.SetInstanceCount(instCount);
 
 	GL::applyShader(_screenMat->GetShader());
 
 	_screenMat->Update();
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D_ARRAY, _cameraTextures);
 
 	_screenDraw.Draw();
 
@@ -206,10 +234,13 @@ void Director::AddCamera(Camera * const cam)
 		logger::Instance().error("_cameraFBOIndices.size() == 0");
 		return;
 	}
-	_Cameras.insert(cam);
-
-	cam->_setFrameBufferIdx(_cameraFBOIndices.front());
-	_cameraFBOIndices.pop();
+	const auto ret = _Cameras.insert(cam);
+	if (ret.second)
+	{
+		cam->_setFrameBufferIdx(_cameraFBOIndices.front());
+		_cameraFBOIndices.pop();
+	}
+	
 }
 
 void Director::RemoveCamera(Camera* const cam)

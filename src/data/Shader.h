@@ -189,7 +189,8 @@ public:
 public:
 	bool from_lua(gb::utils::luatable_mapper & mapper, const char* shaderName);
 	void Use() const;
-	void VtxPointerSetup() const;
+	//0: vtx, 1: inst
+	void VtxPointerSetup(const std::uint8_t idx) const;
 
 	GLint GetVtxAttribLocation(const char* name) const;
 	GLint GetUniformLocation(const char* name) const;

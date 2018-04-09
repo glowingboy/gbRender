@@ -66,7 +66,7 @@ void Camera::Shoot() const
 
 
 	const Director::octreeEntity& renderEntities = Director::Instance().GetRenderEntities();
-	struct intersectMethod//TODO change to _Ele Type
+	struct intersectMethod//TODO change to _Ele Type?
 	{
 		bool operator()(const aabb<>& octanBB, const spherebb<>& q) const
 		{

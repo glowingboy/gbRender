@@ -36,10 +36,11 @@ GB_RENDER_CLASS Director
 public:
 	struct Argument
 	{
-		Argument(const char* fileOfRootEntity, const gb::physics::vec2<gb::render::uint32>& sizeOfScreen);
+		Argument(const char* fileOfRootEntity, const gb::physics::vec2<gb::render::uint32>& sizeOfScreen, const std::map<gb::utils::string, gb::utils::string>& resCfg);
 		Argument(Argument && other);
 		gb::utils::string rootEntity;
 		gb::physics::vec2<gb::render::uint32> screenSize;
+		std::map<gb::utils::string, gb::utils::string> resCfgs;
 	};
 	GB_SINGLETON_NO_CTORDEF(Director);
 public:
@@ -70,7 +71,7 @@ private:
 
 	GLInstancedDraw _screenDraw;
 	data::Material* _screenMat;
-	std::uint8_t _instVar[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];
+	std::uint32_t _instVar[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];
 
 public:
 	typedef gb::physics::octree<Entity*, Entity::octreeSBBContain, Entity::octreeSBBAPG, gb::physics::Float> octreeEntity;

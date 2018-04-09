@@ -43,11 +43,12 @@ private:
 class GLDraw
 {
 protected:
+
 	GLDraw();
 	//0: vtx, 1: idx
-	GLDraw(const GLBuffer::CtorParam (&bufParam)[2]);
+	GLDraw(const GLBuffer::CtorParam * bufParams);
 	~GLDraw();
-	void Initialize(const GLBuffer::CtorParam(&bufParam)[2]);
+	void Initialize(const GLBuffer::CtorParam * bufParams);
 
 	GB_PROPERTY_R(protected, VAO, GLuint);
 
@@ -55,6 +56,10 @@ protected:
 	GB_PROPERTY_R(protected, IdxBuffer, GLBuffer);
 };
 
+namespace data
+{
+	class Shader;
+}
 
 class GLInstancedDraw : public GLDraw
 {
@@ -63,6 +68,7 @@ public:
 	//0: vtx, 1: idx, 2: inst
 	GLInstancedDraw(const GLBuffer::CtorParam (&param) [3]);
 	void Initialize(const GLBuffer::CtorParam(&param)[3]);
+	void VtxAttribPointerSetup(const data::Shader* shader);
 	void Draw();
 private:
 	GB_PROPERTY_R(private, InstBuffer, GLBuffer);

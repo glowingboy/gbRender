@@ -9,6 +9,12 @@
 #include <algorithm>
 #include "../data/Shader.h"
 
+#define GB_RENDER_RESOURCE_CFG_SHADER "Shader"
+#define GB_RENDER_RESOURCE_CFG_MATERIAL "Material"
+#define GB_RENDER_RESOURCE_CFG_MESH "Mesh"
+#define GB_RENDER_RESOURCE_CFG_ENTITY "Entity"
+
+
 #define GB_RENDER_RESOURCE_CFG_KEY_RESROOT "ResRoot"
 #define GB_RENDER_RESOURCE_CFG_KEY_BASEFILES "BaseFiles"
 #define GB_RENDER_RESOURCE_CFG_KEY_DEFAULTRES "DefaultRes"

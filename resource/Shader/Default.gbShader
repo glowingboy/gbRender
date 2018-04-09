@@ -7,9 +7,14 @@ return
 	 {
 	    {
 	       Name = "gb_vtxVar_pos",
-	       Type = VtxVarStubType.Vec4,
+	       Type = slType.Vec3,
 	       Count = 1, -- optional
 	       Divisor = 0, --optional
+	    },
+	    {
+	       Name = "gb_instVar_mvp",
+	       Type = slType.Mat4,
+	       Divisor = 1
 	    }
 	 }
    }
@@ -18,12 +23,24 @@ GB_RENDER_DATA_SHADER_INFO_END
 GB_RENDER_DATA_SHADER_VERT_BEGIN
 #version 450 core
 
-out vec4 color;
+in vec3 gb_vtxVar_pos;
+in mat4 gb_instVar_mvp;
 
-//uniform sampler2DArray srcTex
+void main()
+{
+	gl_Position = gb_instVar_mvp * vec4(gb_vtxVar_pos, 1.0f);
+}
+
 GB_RENDER_DATA_SHADER_VERT_END
 
 GB_RENDER_DATA_SHADER_FRAG_BEGIN
+#version 450 core
 
+out vec4 color;
+
+void main()
+{
+	color = vec4(0.0f, 0.0f, 1.0f, 1.0f);
+}
 GB_RENDER_DATA_SHADER_FRAG_END
 

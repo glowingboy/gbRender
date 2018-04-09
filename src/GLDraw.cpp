@@ -129,7 +129,7 @@ void GLBuffer::SetData(const std::vector<data::VtxVarStubInfo>& rule, const std:
 	
 		}
 		else
-			logger::Instance().error("GLBuffer::SetData no var fouund in data name@" + info.name);
+			logger::Instance().error("GLBuffer::SetData no var found in data name@" + info.name);
 
 	});
 
@@ -143,10 +143,10 @@ GLDraw::GLDraw():
 	_VAO(0)
 {}
 
-GLDraw::GLDraw(const GLBuffer::CtorParam(&bufParam)[2]) :
+GLDraw::GLDraw(const GLBuffer::CtorParam * bufParams) :
 	_VAO(0),
-	_VtxBuffer(GL_ARRAY_BUFFER, bufParam[0]),
-	_IdxBuffer(GL_ELEMENT_ARRAY_BUFFER, bufParam[1])
+	_VtxBuffer(GL_ARRAY_BUFFER, bufParams[0]),
+	_IdxBuffer(GL_ELEMENT_ARRAY_BUFFER, bufParams[1])
 {
 	glGenVertexArrays(1, &_VAO);
 	glBindVertexArray(_VAO);
@@ -157,10 +157,10 @@ GLDraw::GLDraw(const GLBuffer::CtorParam(&bufParam)[2]) :
 	glBindVertexArray(0);
 }
 
-void GLDraw::Initialize(const GLBuffer::CtorParam(&bufParam)[2])
+void GLDraw::Initialize(const GLBuffer::CtorParam * bufParams)
 {
-	_VtxBuffer.Initialize(GL_ARRAY_BUFFER, bufParam[0]);
-	_IdxBuffer.Initialize(GL_ELEMENT_ARRAY_BUFFER, bufParam[1]);
+	_VtxBuffer.Initialize(GL_ARRAY_BUFFER, bufParams[0]);
+	_IdxBuffer.Initialize(GL_ELEMENT_ARRAY_BUFFER, bufParams[1]);
 
 	glGenVertexArrays(1, &_VAO);
 	glBindVertexArray(_VAO);
@@ -183,7 +183,7 @@ GLInstancedDraw::GLInstancedDraw():
 {}
 
 GLInstancedDraw::GLInstancedDraw(const GLBuffer::CtorParam(&param)[3]):
-	GLDraw(gb_cast<GLBuffer::CtorParam (&) [2]>( param)),
+	GLDraw(param),
 	_InstBuffer(GL_ELEMENT_ARRAY_BUFFER, param[2]),
 	_Mode(GL_TRIANGLES),
 	_Count(1),
@@ -191,7 +191,7 @@ GLInstancedDraw::GLInstancedDraw(const GLBuffer::CtorParam(&param)[3]):
 {
 	glBindVertexArray(_VAO);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _InstBuffer.GetBufferO());
+	glBindBuffer(GL_ARRAY_BUFFER, _InstBuffer.GetBufferO());
 
 	glBindVertexArray(0);
 
@@ -199,15 +199,28 @@ GLInstancedDraw::GLInstancedDraw(const GLBuffer::CtorParam(&param)[3]):
 
 void GLInstancedDraw::Initialize(const GLBuffer::CtorParam(&param)[3])
 {
-	GLDraw::Initialize(gb_cast<GLBuffer::CtorParam(&)[2]>(param));
+	GLDraw::Initialize(param);
 	_InstBuffer.Initialize(GL_ELEMENT_ARRAY_BUFFER, param[2]);
 
 	glBindVertexArray(_VAO);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _InstBuffer.GetBufferO());
+	glBindBuffer(GL_ARRAY_BUFFER, _InstBuffer.GetBufferO());
 
 	glBindVertexArray(0);
 
+}
+
+void GLInstancedDraw::VtxAttribPointerSetup(const data::Shader* shader)
+{
+	glBindVertexArray(_VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, _VtxBuffer.GetBufferO());
+	shader->VtxPointerSetup(0);
+	
+	glBindBuffer(GL_ARRAY_BUFFER, _InstBuffer.GetBufferO());
+	shader->VtxPointerSetup(1);
+
+	glBindVertexArray(0);
 }
 
 void GLInstancedDraw::Draw()
