@@ -9,9 +9,12 @@
 using namespace gb::render;
 using namespace gb::utils;
 using namespace gb;
+using namespace gb::physics;
+
 Render::Render(Entity* const owner):
 	Element(owner),
-	_Mesh(nullptr)
+	_Mesh(nullptr),
+	_instVar_mvp(nullptr)
 {
 	owner->_setRender(this);
 }
@@ -54,10 +57,39 @@ void Render::SetMesh(const string & mesh)
 }
 void Render::SetMaterial(const string & material)
 {
+	_Material = resource::Res<data::Material>::Instance().Get(material);
+
+	const std::vector<data::VtxVarStubInfo>& instVarStub = _Material->GetShader()->GetVtxVarInfo(1);
+
+	_InstVar.clear();
+
+	std::for_each(instVarStub.begin(), instVarStub.end(), [this](const data::VtxVarStubInfo& info)
+	{
+		auto iter = _InstVar.find(info.name);
+		if (iter == _InstVar.end())
+			_InstVar.insert(std::make_pair(info.name, GLVar(info)));
+	});
+
+	auto iter = _InstVar.find(GB_RENDER_INSTVAR_MVP);
+	if (iter != _InstVar.end())
+	{
+		_instVar_mvp = &(iter->second);
+
+		_instVar_mvp->set(&(_Owner->GetWorldTransformMatrix()));
+	}
+		
+	else
+		_instVar_mvp = nullptr;
 	logger::Instance().log("render::setmat @ " + material);
 }
 
 void Render::_onOwnerTransformChanged()
 {
-	_TransformedSphereBB = (*_originSBB) * _Owner->GetWorldTransformMatrix();
+	const mat4F& worldTransMat = _Owner->GetWorldTransformMatrix();
+	_TransformedSphereBB = (*_originSBB) * worldTransMat;
+
+	if (_instVar_mvp != nullptr)
+	{
+		_instVar_mvp->set(&worldTransMat);
+	}
 }

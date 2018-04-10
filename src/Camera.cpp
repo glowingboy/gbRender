@@ -12,8 +12,10 @@ Camera::Camera(Entity * const owner) :
 	_frustumSphereBB(_Frustum.sphereBB),
 	_transformedFSBB(_Frustum.sphereBB),
 	_projectionMatrix(_Frustum.projectionMatrix),
-	_screenSize(Director::Instance().GetScreenSize())
-{}
+	_screenSize(Director::Instance().GetScreenSize()),
+	_IsStatic(false)
+{
+}
 
 Element::Type Camera::GetType() const
 {
@@ -27,6 +29,23 @@ bool Camera::operator < (const Camera & o) const
 void Camera::Awake()
 {
 	Director::Instance().AddCamera(this);
+
+	GLBuffer::CtorParam param[4];
+
+	//1 vtx
+	param[0].type = GLBuffer::Type::Dynamic;
+	param[0].size = 50 * 1024 * 1024;
+	//2 idx
+	param[1].type = GLBuffer::Type::Dynamic;
+	param[1].size = 10 * 1024 * 1024;
+	//3 inst
+	param[2].type = GLBuffer::Type::Dynamic;
+	param[2].size = 10 * 1024 * 1024;
+	//5 indirect
+	param[3].type = GLBuffer::Type::Dynamic;
+	param[3].size = 50 * 1024;
+
+	_indirectDraw.Initialize(param);
 
 	GB_UTILS_CALLBACK_REG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, Camera::_onOwnerTransformChanged);
 
@@ -53,7 +72,20 @@ void Camera::SetRenderQueue(const uint32 rq)
 	Director::Instance().AddCamera(this);
 }
 
-void Camera::Shoot() const
+void Camera::SetIsStatic(const bool isStatic)
+{
+	//TODO
+	if (isStatic != _IsStatic)
+	{
+		if (!_IsStatic)
+		{
+			_indirectDraw.Release();
+		}
+	}
+
+}
+
+void Camera::Shoot()
 {
 	//viewport setup
 	glViewport((GLint)(_screenSize.x * _ViewPort.x),
@@ -75,13 +107,78 @@ void Camera::Shoot() const
 	};
 	auto ret = renderEntities.query_intersect<spherebb<>, intersectMethod>(_transformedFSBB);
 
-	std::for_each(ret.begin(), ret.end(), [this](Entity* e)
+	//1st classify according to renderQueue
+	//2nd classify according to shader
+	//3rd classify according to material
+
+	//classify according to renderQueue
+	std::unordered_map<std::uint32_t, std::vector<Render*>> renderQueueRenders;
+	std::for_each(ret.begin(), ret.end(), [this, &renderQueueRenders](Entity* e)
 	{
 		if (_InterestTag & e->GetTag())
 		{
+			Render* r = e->GetRender();
+			const std::uint32_t renderQueue = r->GetMaterial()->GetShader()->GetMisc().renderQueue;
 
+			auto iter = renderQueueRenders.find(renderQueue);
+			if (iter != renderQueueRenders.end())
+			{
+				iter->second.push_back(r);
+			}
+			else
+				renderQueueRenders.insert(std::make_pair(renderQueue, std::vector<Render*>{r}));
 		}
 	});
+
+	
+	std::for_each(renderQueueRenders.begin(), renderQueueRenders.end(), [this](std::pair<const std::uint32_t, std::vector<Render*>>& pr)
+	{
+		const std::vector<Render*>& renders = pr.second;
+		std::unordered_map<const data::Shader*, std::vector<Render*>> shaderRenders;
+		//classify according to shader
+		std::for_each(renders.begin(), renders.end(), [&shaderRenders](Render* r)
+		{
+			const data::Shader* s = r->GetMaterial()->GetShader();
+
+			auto iter = shaderRenders.find(s);
+			if (iter != shaderRenders.end())
+			{
+				iter->second.push_back(r);
+			}
+			else
+				shaderRenders.insert(std::make_pair(s, std::vector<Render*>{r}));
+		});
+
+
+		std::for_each(shaderRenders.begin(), shaderRenders.end(), [this](const std::pair<const data::Shader*, std::vector<Render*>>& sr)
+		{
+			const data::Shader* shader = sr.first;
+			GL::applyShader(shader);
+			_indirectDraw.VtxAttribPointerSetup(shader);
+
+			const std::vector<Render*>& vRs = sr.second;
+			std::unordered_map<data::Material*, std::vector<Render*>> materialRenders;
+			//classify according to material
+			std::for_each(vRs.begin(), vRs.end(), [&materialRenders](Render* r)
+			{
+				data::Material* m = r->GetMaterial();
+				auto iter = materialRenders.find(m);
+				if (iter != materialRenders.end())
+					iter->second.push_back(r);
+				else
+					materialRenders.insert(std::make_pair(m, std::vector<Render*>{r}));
+			});
+			
+			std::for_each(materialRenders.begin(), materialRenders.end(), [this](const std::pair<data::Material*, std::vector<Render*>>& mr)
+			{
+				mr.first->Update();
+				//dynamic draw
+				_indirectDraw.SetData(mr.second);
+				_indirectDraw.Draw();
+			});
+		});
+	});
+
 }
 
 void Camera::_onOwnerTransformChanged()

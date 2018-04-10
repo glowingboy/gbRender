@@ -55,8 +55,8 @@ private:
 	//void
 	bool _directing();
 private:
-	typedef std::set<const Camera *, gb::utils::less_ptr<Camera>>::iterator _camItr;
-	std::set<const Camera *, gb::utils::less_ptr<Camera>> _Cameras;
+	typedef std::set<Camera *, gb::utils::less_ptr<Camera>>::iterator _camItr;
+	std::set<Camera *, gb::utils::less_ptr<Camera>> _Cameras;
 	GB_PROPERTY_R(private, Root, Entity);
 	GB_PROPERTY_R(private, ScreenSize, gb::physics::vec2<gb::render::uint32>);
 	//GB_PROPERTY_R(private, RenderEntities, gb::physics::octree<Entity*>)

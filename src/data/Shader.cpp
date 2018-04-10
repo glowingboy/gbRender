@@ -377,6 +377,9 @@ bool Shader::from_lua(luatable_mapper & mapper, const char* shaderName)
 
 			//GLCfg
 			mapper.checkout_table_by_key(GB_RENDER_DATA_SHADER_INFO_KEY_GLCFG, _GLCfg);
+
+			//Misc
+			mapper.checkout_table_by_key(GB_RENDER_DATA_SHADER_INFO_KEY_MISC, _Misc);
 		}
 	}
 	else
@@ -638,4 +641,14 @@ void GLCfg::from_lua(const gb::utils::luatable_mapper& mapper)
 	mapper.checkout_table_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_ALPHATEST, alphaTest);
 	mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_POLYGONMODE, polygonMode);
 
+}
+
+Shader::Misc::Misc():
+	renderQueue(GB_RENDER_DATA_SHADER_RENDERQUEUE_OPAQUE)
+{
+}
+
+void Shader::Misc::from_lua(const gb::utils::luatable_mapper & mapper)
+{
+	mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_MISC_KEY_RENDERQUEUE, renderQueue);
 }

@@ -19,7 +19,7 @@ public:
 	GB_PROPERTY_R(private, SphereBB, gb::physics::spherebb<>);
 
 	GB_PROPERTY_R(private, VtxAttribByteSize, std::size_t);
-	GB_PROPERTY_R(private, IdxByteSize, std::size_t);
+
 };
 
 GB_RENDER_DATA_NS_END

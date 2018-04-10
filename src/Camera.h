@@ -6,11 +6,11 @@
 
 #define GB_RENDER_CAMERA_DEFAULT_INTERESTTAG 0xffffffffu
 
-#define GB_RENDER_CAMERA_RENDERQUEUE_BACKGROUND 0X00
-#define GB_RENDER_CAMERA_RENDERQUEUE_OPAQUE 0xf
-#define GB_RENDER_CAMERA_RENDERQUEUE_TRANSPARENT 0xff
-#define GB_RENDER_CAMERA_RENDERQUEUE_UI 0x8ff
-#define GB_RENDER_CAMERA_RENDERQUEUE_GIZMO 0xfff
+#define GB_RENDER_DATA_SHADER_RENDERQUEUE_BACKGROUND 0X00
+#define GB_RENDER_DATA_SHADER_RENDERQUEUE_OPAQUE 0xf
+#define GB_RENDER_DATA_SHADER_RENDERQUEUE_TRANSPARENT 0xff
+#define GB_RENDER_DATA_SHADER_RENDERQUEUE_UI 0x8ff
+#define GB_RENDER_DATA_SHADER_RENDERQUEUE_GIZMO 0xfff
 
 GB_RENDER_NS_BEGIN
 
@@ -26,9 +26,9 @@ public:
 	virtual Type GetType() const override;
 
 	bool operator < (const Camera & o) const;
-	void Shoot() const;
+	void Shoot();
 	void SetRenderQueue(const uint32 rq);
-
+	void SetIsStatic(const bool isStatic);
 private:
 	virtual void Awake() override;
 	virtual void Start() override;
@@ -58,7 +58,11 @@ private:
 
 	GB_PROPERTY(private, ClearColor, gb::physics::vec4F);
 
-private:
+	GLIndirectDraw _indirectDraw;
+
+	GB_PROPERTY_R(private, IsStatic, bool);
+
+	private:
 	void _onOwnerTransformChanged();
 };
 

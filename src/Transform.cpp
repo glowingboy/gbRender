@@ -6,7 +6,9 @@ using namespace gb::physics;
 Transform::Transform(Entity* owner):
 	_localPosition_Ref(_LocalTransMat[3]),
 	_owner(owner)
-{}
+{
+	_LocalTransMat = mat4F::make_identity();
+}
 
 
 void Transform::operator=(const render::data::Transform & dataTrans)
@@ -34,6 +36,11 @@ void Transform::_updateLocalMatrix()
 
 	each transform is based on local coordinate system(parent transformed coordinate system).
 	*/
+	vec4F position = _localPosition_Ref;
+
+	_LocalTransMat = mat4F::make_identity();
+
+	_localPosition_Ref = position;
 
 	_LocalTransMat *= scaleMat(_LocalScale);
 

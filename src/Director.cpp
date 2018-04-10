@@ -124,7 +124,7 @@ bool Director::Ready(const Argument& arg)
 	
 	const data::Mesh* square = resource::Res<data::Mesh>::Instance().Get("Square.lua");
 	
-	GLBuffer::CtorParam drawParam[3];
+	std::array<GLBuffer::CtorParam, 3> drawParam;
 
 	//1 vtx
 	GLBuffer::CtorParam& vtxParam = drawParam[0];
@@ -134,7 +134,8 @@ bool Director::Ready(const Argument& arg)
 	//2 idx
 	GLBuffer::CtorParam& idxParam = drawParam[1];
 	idxParam.type = GLBuffer::Type::Static;
-	idxParam.size = square->GetIdxByteSize();
+	const GLVar* idxVar = square->GetIdxVar();
+	idxParam.size = idxVar->byteSize();
 
 	//inst
 	GLBuffer::CtorParam& instParam = drawParam[2];
@@ -148,15 +149,14 @@ bool Director::Ready(const Argument& arg)
 	_screenDraw.GetVtxBuffer().SetData(_screenMat->GetShader()->GetVtxVarInfo(0), square->GetVtxVars());
 
 	//idx
-	const GLVar* idxVar = square->GetIdxVar();
 	if (idxVar == nullptr)
 	{
 		logger::Instance().error("Director::Ready idxVar nullptr");
 		return false;
 	}
-	_screenDraw.GetIdxBuffer().SetData(0, idxVar->data(), square->GetIdxByteSize());
+	_screenDraw.GetIdxBuffer().SetData(0, idxVar->data(), idxVar->byteSize());
 
-	_screenDraw.SetCount(idxVar->count());
+	//_screenDraw.SetCount(idxVar->count());
 
 	_screenDraw.VtxAttribPointerSetup(_screenMat->GetShader());
 
@@ -195,7 +195,7 @@ bool Director::_directing()
 	//camera shooting
 	std::uint8_t instCount = 0;
 	
-	std::for_each(_Cameras.begin(), _Cameras.end(), [this, &instCount](const Camera* const cam)
+	std::for_each(_Cameras.begin(), _Cameras.end(), [this, &instCount](Camera* cam)
 	{
 		const std::uint8_t frameBufferIdx = cam->GetFrameBufferIdx();
 		_instVar[instCount] = frameBufferIdx;
@@ -213,7 +213,7 @@ bool Director::_directing()
 	static constexpr std::size_t uint32_size = sizeof(std::uint32_t);
 
 	_screenDraw.GetInstBuffer().SetData(0, _instVar, instCount * uint32_size);
-	_screenDraw.SetInstanceCount(instCount);
+	//_screenDraw.SetInstanceCount(instCount);
 
 	GL::applyShader(_screenMat->GetShader());
 
@@ -222,7 +222,7 @@ bool Director::_directing()
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D_ARRAY, _cameraTextures);
 
-	_screenDraw.Draw();
+	_screenDraw.Draw(6, instCount);
 
 	return Device::Instance().Update();
 }

@@ -20,6 +20,14 @@
 #define GB_RENDER_DATA_SHADER_INFO_KEY_VTXVARS "VtxVars"
 #define GB_RENDER_DATA_SHADER_INFO_KEY_UNIFORMVARS "UniformVars"
 #define GB_RENDER_DATA_SHADER_INFO_KEY_GLCFG "GLCfg"
+#define GB_RENDER_DATA_SHADER_INFO_KEY_MISC "Misc"
+
+
+#define GB_RENDER_DATA_SHADER_RENDERQUEUE_BACKGROUND 0X00
+#define GB_RENDER_DATA_SHADER_RENDERQUEUE_OPAQUE 0xf
+#define GB_RENDER_DATA_SHADER_RENDERQUEUE_TRANSPARENT 0xff
+#define GB_RENDER_DATA_SHADER_RENDERQUEUE_UI 0x8ff
+#define GB_RENDER_DATA_SHADER_RENDERQUEUE_GIZMO 0xfff
 
 GB_RENDER_DATA_NS_BEGIN
 
@@ -185,7 +193,13 @@ struct GLCfg
 class Shader
 {
 public:
-
+	#define	GB_RENDER_DATA_SHADER_MISC_KEY_RENDERQUEUE "RenderQueue"
+	struct Misc
+	{
+		Misc();
+		void from_lua(const gb::utils::luatable_mapper& mapper);
+		std::uint32_t renderQueue;
+	};
 public:
 	bool from_lua(gb::utils::luatable_mapper & mapper, const char* shaderName);
 	void Use() const;
@@ -195,6 +209,7 @@ public:
 	GLint GetVtxAttribLocation(const char* name) const;
 	GLint GetUniformLocation(const char* name) const;
 	std::unordered_map<gb::utils::string, UniformVar> GenUniformVars() const;
+	//0: vtx, 1: inst
 	const std::vector<VtxVarStubInfo>& GetVtxVarInfo(std::uint8_t idx) const;
 
 #define _GB_RENDER_DATA_SHADER_SET_UNIFORM_DCLR_(type) \
@@ -220,6 +235,8 @@ private:
 	GB_PROPERTY_R(private, GLCfg, GLCfg);
 
 	std::vector<UniformVarStub> _uniformVarSubs;
+
+	GB_PROPERTY_R(private, Misc, Misc);
 private:
 	bool _compile(const char* vert, const char* frag);
 	static GLint _checkShaderCompile(GLuint shader);

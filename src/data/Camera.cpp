@@ -6,7 +6,7 @@ using namespace gb;
 using namespace gb::physics;
 Camera::Camera() :
 	Element(render::Element::Type::Camera),
-	_RenderQueue(GB_RENDER_CAMERA_RENDERQUEUE_OPAQUE)
+	_RenderQueue(GB_RENDER_DATA_SHADER_RENDERQUEUE_OPAQUE)
 {
 }
 void Camera::from_lua(const gb::utils::luatable_mapper & mapper)

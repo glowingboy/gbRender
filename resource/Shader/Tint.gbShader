@@ -1,0 +1,56 @@
+GB_RENDER_DATA_SHADER_INFO_BEGIN
+return
+   {
+      VtxVars =
+	 {
+	    {
+	       Name = "gb_vtxVar_pos",
+	       Type = slType.Vec3
+	    },
+	    {
+	       Name = "gb_instVar_mvp",
+	       Type = slType.Mat4,
+	       Divisor = 1
+	    }
+	 },
+      UniformVars =
+	 {
+	    {
+	       Name = "gb_uniformVar_tint",
+	       Type = slType.Vec4
+	    }
+	 },
+      Misc =
+	 {
+	    
+	 }
+   }
+GB_RENDER_DATA_SHADER_INFO_END
+
+GB_RENDER_DATA_SHADER_VERT_BEGIN
+#version 450 core
+
+in vec3 gb_vtxVar_pos;
+in mat4 gb_instVar_mvp;
+
+void main()
+{
+  gl_Position = gb_instVar_mvp * vec4(gb_vtxVar_pos, 1.0f);
+}
+
+GB_RENDER_DATA_SHADER_VERT_END
+
+
+GB_RENDER_DATA_SHADER_FRAG_BEGIN
+#version 450 core
+
+uniform vec4 gb_uniformVar_tint;
+
+out vec4 color
+
+void main()
+{
+  color = gb_uniformVar_tint;
+}
+
+GB_RENDER_DATA_SHADER_FRAG_END

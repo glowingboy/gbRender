@@ -4,6 +4,7 @@
 #include <cstring>
 #include <vector>
 #include "Type.h"
+#include "../data/Shader.h"
 // vertex variable
 #define GB_RENDER_VTXVAR_POS "gb_vtxVar_pos"
 #define GB_RENDER_VTXVAR_IDX "gb_vtxVar_idx"
@@ -14,7 +15,7 @@
 #define GB_RENDER_INSTVAR_MVP "gb_instVar_mvp"
 
 // uniform variable
-#define GB_RENDER_UNIVAR_LIGHTNESS "gb_uniVar_lightness"
+#define GB_RENDER_UNIFORMVAR_LIGHTNESS "gb_uniformVar_lightness"
 
 GB_RENDER_NS_BEGIN
 
@@ -30,24 +31,29 @@ public:
 		_count(vec.size()),
 		_capacity(_count)
 	{
-		const std::size_t size = _unitSize * _capacity;
-		_data = new char[size];
+		_byteSize = _unitSize * _capacity;
+		_data = new char[_byteSize];
 
-		std::memcpy(_data, vec.data(), size);
+		std::memcpy(_data, vec.data(), _byteSize);
 	}
     
+	GLVar(const gb::render::data::VtxVarStubInfo& info);
     ~GLVar();
 public:
-    void append(void* data, const std::size_t count);
+    void append(const void* data, const std::size_t count);
+	
+	void set(const void* data, const std::size_t idx = 0);
     const char* data() const;
     uint8 unitSize() const;
     std::size_t count() const;
+	std::size_t byteSize()const;
 private:
     uint8 _unitSize;
 	std::size_t _count;
 	std::size_t _capacity;
-    
     char* _data;
+
+	std::size_t _byteSize;
 };
 
 

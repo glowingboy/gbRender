@@ -14,7 +14,7 @@ return
 			      {
 				 Type = ElementType.Camera,
 				 RenderQueue = RenderQueue.UI,
-				 ClearColor = {0.0, 0.0, 1.0, 1.0}
+				 ClearColor = {0.0, 0.0, 0.3, 1.0}
 			      }
 			   }
 		     }  
@@ -31,7 +31,18 @@ return
 			      {
 				 Type = ElementType.Camera,
 				 RenderQueue = RenderQueue.Opaque,
-				 ClearColor = {1.0, 0.0, 0.0, 1.0}
+				 ClearColor = {0.3, 0.0, 0.0, 1.0}
+			      }
+			   }
+		     },
+		     {
+			Name = "test",
+			Elements =
+			   {
+			      {
+				 Type = ElementType.Render,
+				 Mesh = "Triangle.lua",
+				 Material = "Tint.gbShader"
 			      }
 			   }
 		     }

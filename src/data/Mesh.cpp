@@ -9,8 +9,7 @@ using namespace gb;
 
 Mesh::Mesh() :
 	_IdxVar(nullptr),
-	_VtxAttribByteSize(0),
-	_IdxByteSize(0)
+	_VtxAttribByteSize(0)
 {
 }
 
@@ -35,7 +34,7 @@ void Mesh::from_lua(const gb::utils::luatable_mapper & mapper)
 		auto itr = _VtxVars.insert(std::pair<const string, GLVar>(GB_RENDER_VTXVAR_POS, mapper.get_tables_by_key<_lua_vec<3>>(GB_RENDER_VTXVAR_POS)));
 
 		const GLVar& var = itr.first->second;
-		_VtxAttribByteSize += (var.count() * var.unitSize());
+		_VtxAttribByteSize += var.byteSize();
 	}
 		
 	else
@@ -52,7 +51,6 @@ void Mesh::from_lua(const gb::utils::luatable_mapper & mapper)
 
 		const GLVar& var = itr.first->second;
 		_IdxVar = &var;
-		_IdxByteSize = (var.count() * var.unitSize());
 	}
 	else
 	{
