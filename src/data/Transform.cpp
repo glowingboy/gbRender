@@ -3,7 +3,7 @@
 using namespace gb::utils;
 using namespace gb::render::data;
 using namespace gb;
-
+using namespace gb::physics;
 Transform::Transform():
 	scale(1.0f)
 {
@@ -11,11 +11,17 @@ Transform::Transform():
 }
 void Transform::from_lua(const gb::utils::luatable_mapper & mapper)
 {
-	scale = mapper.get_numbers_by_key(GB_RENDER_DATA_TRANSFORM_KEY_SCALE);
+	std::vector<float> ret = mapper.get_numbers_by_key(GB_RENDER_DATA_TRANSFORM_KEY_SCALE);
+	if (ret.size() == 3)
+		scale = ret;
 
-	rotation = mapper.get_numbers_by_key(GB_RENDER_DATA_TRANSFROM_KEY_ROTATION);
+	ret = mapper.get_numbers_by_key(GB_RENDER_DATA_TRANSFROM_KEY_ROTATION);
+	if (ret.size() == 3)
+		rotation = ret;
 
-	position = mapper.get_numbers_by_key(GB_RENDER_DATA_TRANSFROM_KEY_POSITION);
+	ret = mapper.get_numbers_by_key(GB_RENDER_DATA_TRANSFROM_KEY_POSITION);
+	if (ret.size() == 3)
+		position = ret;
 }
 
 //void Transform::operator=(const Transform & other)

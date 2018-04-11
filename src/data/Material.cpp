@@ -13,6 +13,11 @@ void Material::from_lua(const luatable_mapper& mapper)
 		_Shader = resource::Res<Shader>::Instance().Get(mapper.get_string_by_key(GB_RENDER_DATA_MATERIAL_KEY_SHADER));
 
 		_uniformVars = _Shader->GenUniformVars();
+
+		std::for_each(_uniformVars.begin(), _uniformVars.end(), [&mapper](std::pair<const string, UniformVar>& uniVar)
+		{
+			uniVar.second.GetFromMaterial(mapper, uniVar.first);
+		});
 	}
 	else
 	{

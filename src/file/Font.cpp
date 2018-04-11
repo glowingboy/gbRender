@@ -51,20 +51,20 @@ data::Font Font::ParseFromFile(const char* filePath)const
     uint32 buf_uint32 = 0;
     //glyph size
     fontFile.read(&buf_uint32, 4);
-    ret.SetGlyphSize(buf_uint32);
+	ret._GlyphSize = buf_uint32;
     //glyph count
     fontFile.read(&buf_uint32, 4);
     const uint32 count = buf_uint32;
 
     //glyphs
     glyph tmpGlyph;
-    memset(&tmpGlyph, 0, sizeof(data::glyph));
+    memset(&tmpGlyph, 0, sizeof(data::Glyph));
     uint8 data_glyph_offset = sizeof(uint32);//glyph::code
     for(uint32 i = 0; i < count; i++)
     {
 	fontFile.read(&tmpGlyph, glyph::size);
-	data::glyph gly(*(data::glyph*)((char*)&tmpGlyph + data_glyph_offset));
-	ret.InsertGlyph(tmpGlyph.code, gly);
+	data::Glyph gly(*(data::Glyph*)((char*)&tmpGlyph + data_glyph_offset));
+	ret._mpSprites.insert(std::make_pair(tmpGlyph.code, gly));
     }
 
     //texture
@@ -76,8 +76,10 @@ data::Font Font::ParseFromFile(const char* filePath)const
 
     char* tex_data = new char[width * height];
     fontFile.read(tex_data, width * height);
-	gb::physics::array_2d<uint8> texture;
-    texture.assign(height, width, (uint8*)tex_data);
-    ret.SetTexture(std::move(texture));
+
+	ret.data = tex_data;
+	ret.width = width;
+	ret.height = height;
+
     return ret;
 }

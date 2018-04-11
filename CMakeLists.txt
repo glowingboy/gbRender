@@ -32,6 +32,8 @@ gb_add_class(Camera src/data srcs)
 gb_add_class(Render src/data srcs)
 gb_add_class(Material src/data srcs)
 gb_add_class(Shader src/data srcs)
+gb_add_class(Atlas src srcs)
+gb_add_class(Font src srcs)
 
 # file
 gb_add_class(FileNS src/file srcs)
@@ -54,7 +56,9 @@ gb_add_class(Element src srcs)
 gb_add_class(Transform src srcs)
 gb_add_class(Camera src srcs)
 gb_add_class(Render src srcs)
-
+gb_add_class(Texture src srcs)
+gb_add_class(Sprite src srcs)
+gb_add_class(Text src srcs)
 # resource
 gb_add_class(Resource src/resource srcs)
 

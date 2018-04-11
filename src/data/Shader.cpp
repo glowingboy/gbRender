@@ -222,26 +222,52 @@ UniformVar::UniformVar(const GLint index_, const std::size_t typeSize, const GLs
 	index(index_),
 	byteSize(typeSize * count_),
 	count(count_),
-	_setter(nullptr)
+	_setter(nullptr),
+	_lua_getter(nullptr)
 {
 	data = new char[byteSize];
 
 	if (sl_type == slType::Float)
+	{
 		_setter = Shader::SetUniform1f;
+		_lua_getter = &UniformVar::_lua_getter_number;
+	}
 	else if (sl_type == slType::Int)
+	{
 		_setter = Shader::SetUniform1i;
+		_lua_getter = &UniformVar::_lua_getter_integer;
+	}
 	else if (sl_type == slType::UInt)
+	{
 		_setter = Shader::SetUniform1ui;
+		_lua_getter = &UniformVar::_lua_getter_integer;
+	}
 	else if (sl_type == slType::Vec2)
+	{
 		_setter = Shader::SetUniform2f;
+		_lua_getter = &UniformVar::_lua_getter_numbers;
+	}
 	else if (sl_type == slType::Vec3)
+	{
 		_setter = Shader::SetUniform3f;
+		_lua_getter = &UniformVar::_lua_getter_numbers;
+	}
 	else if (sl_type == slType::Vec4)
+	{
 		_setter = Shader::SetUniform4f;
+		_lua_getter = &UniformVar::_lua_getter_numbers;
+	}
 	else if (sl_type == slType::Mat4)
+	{
+		_setter = Shader::SetUniform4f;
+		_lua_getter = &UniformVar::_lua_getter_numbers;
+	}
+	else if (sl_type == slType::Handleui64)
+	{
 		_setter = Shader::SetUniform1i;
-	else if (sl_type == slType::Int)
-		_setter = Shader::SetUniform1i;
+		_lua_getter = &UniformVar::_lua_getter_integer;
+	}
+		
 }
 UniformVar::~UniformVar()
 {
@@ -252,7 +278,8 @@ UniformVar::UniformVar(UniformVar && other) :
 	byteSize(other.byteSize),
 	count(other.count),
 	data(other.data),
-	_setter(other._setter)
+	_setter(other._setter),
+	_lua_getter(other._lua_getter)
 {
 	other.data = nullptr;
 }
@@ -276,6 +303,42 @@ void UniformVar::Update() const
 	}
 	else
 		logger::Instance().error("UniformVar::Update _setter is nullptr");
+}
+void UniformVar::_lua_getter_integer(const gb::utils::luatable_mapper & mapper, const char * name)
+{
+	if (mapper.has_key(name))
+	{
+		lua_Integer ret = mapper.get_integer_by_key(name);
+		if (!SetData(&ret, sizeof(lua_Integer)))
+			logger::Instance().error(string("UniformVar::_lua_getter_integer name@ ") + name + ", mapper@ " + mapper.GetData());
+	}
+}
+void UniformVar::_lua_getter_integers(const gb::utils::luatable_mapper & mapper, const char * name)
+{
+	if (mapper.has_key(name))
+	{
+		std::vector<lua_Integer> ret = mapper.get_integers_by_key(name);
+		if(!SetData(ret.data(), sizeof(lua_Integer) * ret.size()))
+			logger::Instance().error(string("UniformVar::_lua_getter_integers name@ ") + name + ", mapper@ " + mapper.GetData());
+	}
+}
+void UniformVar::_lua_getter_number(const gb::utils::luatable_mapper & mapper, const char * name)
+{
+	if (mapper.has_key(name))
+	{
+		lua_Number ret = mapper.get_number_by_key(name);
+		if (!SetData(&ret, sizeof(lua_Number)))
+			logger::Instance().error(string("UniformVar::_lua_getter_number name@ ") + name + ", mapper@ " + mapper.GetData());
+	}
+}
+void UniformVar::_lua_getter_numbers(const gb::utils::luatable_mapper & mapper, const char * name)
+{
+	if (mapper.has_key(name))
+	{
+		std::vector<lua_Number> ret = mapper.get_numbers_by_key(name);
+		if (!SetData(ret.data(), sizeof(lua_Number) * ret.size()))
+			logger::Instance().error(string("UniformVar::_lua_getter_numbers name@ ") + name + ", mapper@ " + mapper.GetData());
+	}
 }
 const std::vector<std::string> Shader::_blockDelimiter
 {
@@ -391,9 +454,11 @@ bool Shader::from_lua(luatable_mapper & mapper, const char* shaderName)
 	return true;
 }
 
-void Shader::VtxPointerSetup(const std::uint8_t idx) const
+void Shader::VtxPointerSetup(const std::uint8_t idx, const GLuint vbo) const
 {
 	assert(idx < 2);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 	const std::vector<VtxVarStubInfo>& info = _vtxVarInfos[idx];
 
@@ -428,6 +493,8 @@ void Shader::VtxPointerSetup(const std::uint8_t idx) const
 			glVertexAttribDivisor(index, info.divisor);
 		}
 	});
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void Shader::Use() const

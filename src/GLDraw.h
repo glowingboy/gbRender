@@ -9,8 +9,11 @@
 
 GB_RENDER_NS_BEGIN
 
+class GLMultiIndirectDraw;
+
 class GLBuffer
 {
+	friend class GLMultiIndirectDraw;
 public:
 	enum class Type : int
 	{
@@ -82,7 +85,7 @@ private:
 
 class Render;
 
-class GLIndirectDraw : public GLInstancedDraw
+class GLMultiIndirectDraw : public GLInstancedDraw
 {
 public:
 	struct IndirectCommand
@@ -95,9 +98,9 @@ public:
 		GLuint  baseInstance;
 	};
 
-	GLIndirectDraw();
+	GLMultiIndirectDraw();
 
-	GLIndirectDraw(const GLBuffer::CtorParam(&param)[4]);
+	GLMultiIndirectDraw(const GLBuffer::CtorParam(&param)[4]);
 	void Initialize(const GLBuffer::CtorParam(&param)[4]);
 	void SetData(const std::vector<Render*> renders);
 	void Draw() const;
@@ -109,7 +112,8 @@ private:
 	//GB_PROPERTY_R(private, IndirectCmd, )
 
 private:
-	IndirectCommand * _pCmd;
+	//IndirectCommand * _pCmd;
+	std::size_t _cmdCount;
 };
 
 GB_RENDER_NS_END

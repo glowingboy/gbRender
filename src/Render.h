@@ -15,6 +15,8 @@ public:
 	void SetMesh(const gb::utils::string & mesh);
 	void SetMaterial(const gb::utils::string & material);
 	virtual Element::Type GetType() const override;
+
+	void SetInstVar(const char* name, const void* data);
 private:
 	virtual void Awake() override;
 	virtual void Start() override;
@@ -27,7 +29,7 @@ private:
 	GB_PROPERTY_R(private, TransformedSphereBB, gb::physics::spherebb<>);
 
 	GB_PROPERTY_R(private, InstVar, std::unordered_map <const gb::utils::string, GLVar>);
-	GLVar* _instVar_mvp;
+	//GLVar* _instVar_mvp;
 private:
 	void _onOwnerTransformChanged();
 };

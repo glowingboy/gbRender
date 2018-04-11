@@ -105,7 +105,7 @@ struct VtxVarStub
 
 struct UniformVar
 {
-	UniformVar(const GLint index_, const std::size_t typeSize, const GLsizei count_, const std::uint8_t sl_type);
+	UniformVar(const GLint index_, const std::size_t typeSize, const GLsizei count_, const std::uint8_t sl_type_);
 	~UniformVar();
 	UniformVar(UniformVar && other);
 	bool SetData(const void* data_, const std::size_t size);
@@ -115,11 +115,20 @@ struct UniformVar
 	GLsizei count;
 	void* data;
 
-	
+	inline void GetFromMaterial(const gb::utils::luatable_mapper& mapper, const char* name)
+	{
+		(this->*_lua_getter)(mapper, name);
+	}
 private:
 	typedef void(*setter)(const GLint location, const GLsizei count, const void* value);
-
+	typedef void(UniformVar::*lua_getter)(const gb::utils::luatable_mapper& mapper, const char* name);
+	//TODO lua_setter
+	void _lua_getter_integer(const gb::utils::luatable_mapper& mapper, const char* name);
+	void _lua_getter_integers(const gb::utils::luatable_mapper& mapper, const char* name);
+	void _lua_getter_number(const gb::utils::luatable_mapper& mapper, const char* name);
+	void _lua_getter_numbers(const gb::utils::luatable_mapper& mapper, const char* name);
 	setter _setter;
+	lua_getter _lua_getter;
 };
 
 #define GB_RENDER_DATA_SHADER_UNIFORMVARSTUB_KEY_NAME "Name"
@@ -204,7 +213,7 @@ public:
 	bool from_lua(gb::utils::luatable_mapper & mapper, const char* shaderName);
 	void Use() const;
 	//0: vtx, 1: inst
-	void VtxPointerSetup(const std::uint8_t idx) const;
+	void VtxPointerSetup(const std::uint8_t idx, const GLuint vbo) const;
 
 	GLint GetVtxAttribLocation(const char* name) const;
 	GLint GetUniformLocation(const char* name) const;

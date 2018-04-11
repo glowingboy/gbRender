@@ -40,7 +40,8 @@ private:
 	// bitfiled
 	GB_PROPERTY_R(private, InterestTag, uint32);
 
-	GB_PROPERTY_R(private, Frustum, gb::physics::frustum<gb::physics::Float>);
+	gb::physics::frustum<gb::physics::Float> _frustum;
+	
 	//const gb::physics::aabb<>& _frustumAABB;
 	//using spherebb rather than aabb, for the reason, when transforming frustumAABB 
 	//from camera space to world space, the frustumAABB will not be still an aabb,
@@ -58,10 +59,11 @@ private:
 
 	GB_PROPERTY(private, ClearColor, gb::physics::vec4F);
 
-	GLIndirectDraw _indirectDraw;
+	GLMultiIndirectDraw _multiIndirectDraw;
 
 	GB_PROPERTY_R(private, IsStatic, bool);
 
+	gb::physics::mat4F _projMatProductViewMat;
 	private:
 	void _onOwnerTransformChanged();
 };

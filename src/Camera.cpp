@@ -9,12 +9,14 @@ using namespace gb::utils;
 Camera::Camera(Entity * const owner) :
 	Element(owner),
 	_InterestTag(GB_RENDER_CAMERA_DEFAULT_INTERESTTAG),
-	_frustumSphereBB(_Frustum.sphereBB),
-	_transformedFSBB(_Frustum.sphereBB),
-	_projectionMatrix(_Frustum.projectionMatrix),
+	_frustumSphereBB(_frustum.sphereBB),
+	_transformedFSBB(_frustum.sphereBB),
+	_projectionMatrix(_frustum.projectionMatrix),
+	_ViewPort(0.0f, 0.0f, 1.0f, 1.0f),
 	_screenSize(Director::Instance().GetScreenSize()),
 	_IsStatic(false)
 {
+	_frustum.set(60.0f, ((float)_screenSize.x) / _screenSize.y, 10, 100);
 }
 
 Element::Type Camera::GetType() const
@@ -45,7 +47,7 @@ void Camera::Awake()
 	param[3].type = GLBuffer::Type::Dynamic;
 	param[3].size = 50 * 1024;
 
-	_indirectDraw.Initialize(param);
+	_multiIndirectDraw.Initialize(param);
 
 	GB_UTILS_CALLBACK_REG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, Camera::_onOwnerTransformChanged);
 
@@ -79,7 +81,7 @@ void Camera::SetIsStatic(const bool isStatic)
 	{
 		if (!_IsStatic)
 		{
-			_indirectDraw.Release();
+			_multiIndirectDraw.Release();
 		}
 	}
 
@@ -87,15 +89,14 @@ void Camera::SetIsStatic(const bool isStatic)
 
 void Camera::Shoot()
 {
+	glClearColor(_ClearColor.r, _ClearColor.g, _ClearColor.b, _ClearColor.a);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	//viewport setup
 	glViewport((GLint)(_screenSize.x * _ViewPort.x),
 		(GLint)(_screenSize.y * _ViewPort.y),
 		(GLsizei)(_screenSize.x * _ViewPort.z),
 		(GLsizei)(_screenSize.y * _ViewPort.w));
-
-	glClearColor(_ClearColor.r, _ClearColor.g, _ClearColor.b, _ClearColor.a);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
 	const Director::octreeEntity& renderEntities = Director::Instance().GetRenderEntities();
 	struct intersectMethod//TODO change to _Ele Type?
@@ -118,6 +119,9 @@ void Camera::Shoot()
 		if (_InterestTag & e->GetTag())
 		{
 			Render* r = e->GetRender();
+
+			r->SetInstVar(GB_RENDER_INSTVAR_MVP, &(_projMatProductViewMat  * e->GetWorldTransformMatrix()));
+
 			const std::uint32_t renderQueue = r->GetMaterial()->GetShader()->GetMisc().renderQueue;
 
 			auto iter = renderQueueRenders.find(renderQueue);
@@ -154,7 +158,7 @@ void Camera::Shoot()
 		{
 			const data::Shader* shader = sr.first;
 			GL::applyShader(shader);
-			_indirectDraw.VtxAttribPointerSetup(shader);
+			_multiIndirectDraw.VtxAttribPointerSetup(shader);
 
 			const std::vector<Render*>& vRs = sr.second;
 			std::unordered_map<data::Material*, std::vector<Render*>> materialRenders;
@@ -173,8 +177,8 @@ void Camera::Shoot()
 			{
 				mr.first->Update();
 				//dynamic draw
-				_indirectDraw.SetData(mr.second);
-				_indirectDraw.Draw();
+				_multiIndirectDraw.SetData(mr.second);
+				_multiIndirectDraw.Draw();
 			});
 		});
 	});
@@ -185,7 +189,10 @@ void Camera::_onOwnerTransformChanged()
 {
 	logger::Instance().log("Camera::_onOwnerTransformChanged");
 
-	_transformedFSBB = _frustumSphereBB * _Owner->GetWorldTransformMatrix();
+	const mat4F& worldMat = _Owner->GetWorldTransformMatrix();
+	_transformedFSBB = _frustumSphereBB * worldMat;
+
+	_projMatProductViewMat = _projectionMatrix * worldMat;
 }
 
 void Camera::_setFrameBufferIdx(const std::uint8_t idx)

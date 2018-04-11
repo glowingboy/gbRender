@@ -188,7 +188,6 @@ bool Director::_directing()
 {
 	//clear
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//glViewport(0, 0, _ScreenSize.x, _ScreenSize.y);
 	glClearColor(_ClearColor.r, _ClearColor.g, _ClearColor.b, _ClearColor.a);
 	glClear(GL_COLOR_BUFFER_BIT);
 
@@ -213,7 +212,6 @@ bool Director::_directing()
 	static constexpr std::size_t uint32_size = sizeof(std::uint32_t);
 
 	_screenDraw.GetInstBuffer().SetData(0, _instVar, instCount * uint32_size);
-	//_screenDraw.SetInstanceCount(instCount);
 
 	GL::applyShader(_screenMat->GetShader());
 

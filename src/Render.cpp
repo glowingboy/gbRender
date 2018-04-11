@@ -13,8 +13,8 @@ using namespace gb::physics;
 
 Render::Render(Entity* const owner):
 	Element(owner),
-	_Mesh(nullptr),
-	_instVar_mvp(nullptr)
+	_Mesh(nullptr)
+	//_instVar_mvp(nullptr)
 {
 	owner->_setRender(this);
 }
@@ -45,6 +45,16 @@ Element::Type Render::GetType() const
 {
 	return Element::Type::Render;
 }
+void Render::SetInstVar(const char * name, const void * data)
+{
+	auto iter = _InstVar.find(name);
+	if (iter != _InstVar.end())
+		iter->second.set(data);
+	else
+	{
+		logger::Instance().warning(string("Render::SetInstVar unknown instVar name@ ") + name + "owner.name@ " + _Owner->GetName());
+	}
+}
 void Render::SetMesh(const string & mesh)
 {
 	_Mesh = resource::Res<data::Mesh>::Instance().Get(mesh);
@@ -70,16 +80,16 @@ void Render::SetMaterial(const string & material)
 			_InstVar.insert(std::make_pair(info.name, GLVar(info)));
 	});
 
-	auto iter = _InstVar.find(GB_RENDER_INSTVAR_MVP);
-	if (iter != _InstVar.end())
-	{
-		_instVar_mvp = &(iter->second);
+	//auto iter = _InstVar.find(GB_RENDER_INSTVAR_MVP);
+	//if (iter != _InstVar.end())
+	//{
+	//	_instVar_mvp = &(iter->second);
 
-		_instVar_mvp->set(&(_Owner->GetWorldTransformMatrix()));
-	}
-		
-	else
-		_instVar_mvp = nullptr;
+	//	_instVar_mvp->set(&(_Owner->GetWorldTransformMatrix()));
+	//}
+	//	
+	//else
+	//	_instVar_mvp = nullptr;
 	logger::Instance().log("render::setmat @ " + material);
 }
 
@@ -88,8 +98,8 @@ void Render::_onOwnerTransformChanged()
 	const mat4F& worldTransMat = _Owner->GetWorldTransformMatrix();
 	_TransformedSphereBB = (*_originSBB) * worldTransMat;
 
-	if (_instVar_mvp != nullptr)
-	{
-		_instVar_mvp->set(&worldTransMat);
-	}
+	//if (_instVar_mvp != nullptr)
+	//{
+	//	_instVar_mvp->set(&worldTransMat);
+	//}
 }

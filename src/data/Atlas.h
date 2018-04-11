@@ -3,9 +3,9 @@
 #include <unordered_map>
 GB_RENDER_DATA_NS_BEGIN
 
-struct sprite
+struct Sprite
     {
-	sprite():
+	Sprite():
 	    uv_b(0.0f),
 	    uv_l(0.0f),
 	    uv_t(0.0f),
@@ -22,7 +22,7 @@ struct sprite
     };
 
 template<typename Key, typename Sprite>
-class _atlas:public texture
+class _atlas:public Texture
 {
 public:
 
@@ -30,6 +30,6 @@ protected:
     std::unordered_map<Key, Sprite> _mpSprites;
 };
 
-typedef _atlas<std::string, sprite> Atlas;
+typedef _atlas<std::string, Sprite> Atlas;
 
 GB_RENDER_DATA_NS_END

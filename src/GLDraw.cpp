@@ -234,11 +234,9 @@ void GLInstancedDraw::VtxAttribPointerSetup(const data::Shader* shader)
 {
 	glBindVertexArray(_VAO);
 
-	glBindBuffer(GL_ARRAY_BUFFER, _VtxBuffer.GetBufferO());
-	shader->VtxPointerSetup(0);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, _InstBuffer.GetBufferO());
-	shader->VtxPointerSetup(1);
+	shader->VtxPointerSetup(0, _VtxBuffer.GetBufferO());
+
+	shader->VtxPointerSetup(1, _InstBuffer.GetBufferO());
 
 	glBindVertexArray(0);
 }
@@ -254,29 +252,27 @@ void GLInstancedDraw::Draw(const GLsizei count, const GLsizei instanceCount) con
 
 
 
-GLIndirectDraw::GLIndirectDraw()
+GLMultiIndirectDraw::GLMultiIndirectDraw():
+	_cmdCount(0)
 {
 }
 
-GLIndirectDraw::GLIndirectDraw(const GLBuffer::CtorParam(&param)[4]):
+GLMultiIndirectDraw::GLMultiIndirectDraw(const GLBuffer::CtorParam(&param)[4]):
 	GLInstancedDraw(param),
-	_IndirectCmdBuffer(GL_DRAW_INDIRECT_BUFFER, param[3])
+	_IndirectCmdBuffer(GL_DRAW_INDIRECT_BUFFER, param[3]),
+	_cmdCount(0)
 {
-	glBindVertexArray(_VAO);
 
-	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, _IndirectCmdBuffer.GetBufferO());
-
-	glBindVertexArray(0);
 }
 
-void GLIndirectDraw::Initialize(const GLBuffer::CtorParam(&param)[4])
+void GLMultiIndirectDraw::Initialize(const GLBuffer::CtorParam(&param)[4])
 {
 	GLInstancedDraw::Initialize(param);
 
 	_IndirectCmdBuffer.Initialize(GL_DRAW_INDIRECT_BUFFER, param[3]);
 }
 
-void GLIndirectDraw::SetData(const std::vector<Render*> renders)
+void GLMultiIndirectDraw::SetData(const std::vector<Render*> renders)
 {
 	if (renders.size() > 0)
 	{
@@ -302,22 +298,21 @@ void GLIndirectDraw::SetData(const std::vector<Render*> renders)
 		GLuint & baseVertex = cmd.baseVertex;
 		GLuint & baseInstance = cmd.baseInstance;
 
-		std::size_t cmdCount = 0;
-		std::for_each(meshRenders.begin(), meshRenders.end(), [this, &shader, &cmd, &count, &instanceCount, &firstIndex, &baseVertex, &baseInstance, &cmdCount](const std::pair<const data::Mesh*, std::vector<Render*>>& mr)
+		_cmdCount = 0;
+		std::for_each(meshRenders.begin(), meshRenders.end(), [this, &shader, &cmd, &count, &instanceCount, &firstIndex, &baseVertex, &baseInstance](const std::pair<const data::Mesh*, std::vector<Render*>>& mr)
 		{
 			const data::Mesh* m = mr.first;
 
 			//vtx
 			_VtxBuffer.SetData(shader->GetVtxVarInfo(0), m->GetVtxVars(), baseVertex);
-			baseVertex += m->GetVtxAttribByteSize();
-
+			
 			//idx
 			const GLVar* idxVar = m->GetIdxVar();
-			_IdxBuffer.SetData(firstIndex, idxVar, idxVar->byteSize());
-			firstIndex += idxVar->byteSize();
+			_IdxBuffer.SetData(firstIndex, idxVar->data(), idxVar->byteSize());
 			count = idxVar->count();
 
 			//inst
+			GLuint baseInstance_tmp = baseInstance;
 			const auto instVarInfo = shader->GetVtxVarInfo(1);
 			if (instVarInfo.size() > 0)
 			{
@@ -325,8 +320,8 @@ void GLIndirectDraw::SetData(const std::vector<Render*> renders)
 				const std::size_t stride = instVarInfo.begin()->stride;
 				for (std::size_t i = 0; i < vRs.size(); i++)
 				{
-					baseInstance += i * stride;
-					_InstBuffer.SetData(instVarInfo, vRs[i]->GetInstVar(), baseInstance);
+					baseInstance_tmp += i * stride;
+					_InstBuffer.SetData(instVarInfo, vRs[i]->GetInstVar(), baseInstance_tmp);
 				}
 
 				instanceCount = vRs.size();
@@ -334,28 +329,33 @@ void GLIndirectDraw::SetData(const std::vector<Render*> renders)
 
 			//indirect
 			static constexpr std::size_t IndirectCommand_size = sizeof(IndirectCommand);
-			_IndirectCmdBuffer.SetData(cmdCount * IndirectCommand_size, &cmd, IndirectCommand_size);
-			cmdCount++;
+			_IndirectCmdBuffer.SetData(_cmdCount * IndirectCommand_size, &cmd, IndirectCommand_size);
+			_cmdCount++;
 
+			baseVertex += m->GetVtxAttribByteSize();
+			firstIndex += idxVar->byteSize();
+			baseInstance = baseInstance_tmp;
 		});
 	}
 }
 
-void GLIndirectDraw::Release()
+void GLMultiIndirectDraw::Release()
 {
 	//TODO
 }
 
-void GLIndirectDraw::Draw() const
+void GLMultiIndirectDraw::Draw() const
 {
 	glBindVertexArray(_VAO);
 
-	glDrawElementsIndirect(_Mode, GL_UNSIGNED_INT, 0);
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, _IndirectCmdBuffer.GetBufferO());
+
+	glMultiDrawElementsIndirect(_Mode, GL_UNSIGNED_INT, 0, _cmdCount, 0);
 
 	glBindVertexArray(0);
 }
 
-GLIndirectDraw::IndirectCommand::IndirectCommand():
+GLMultiIndirectDraw::IndirectCommand::IndirectCommand():
 	count(0),
 	instanceCount(0),
 	firstIndex(0),
