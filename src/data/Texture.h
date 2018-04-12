@@ -7,6 +7,9 @@ GB_RENDER_DATA_NS_BEGIN
 
 struct Texture
 {
+	Texture();
+	Texture(Texture && other);
+	~Texture();
     uint32 width;
     uint32 height;
     void* data;

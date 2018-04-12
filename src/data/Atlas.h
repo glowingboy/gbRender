@@ -1,6 +1,8 @@
 #pragma once
 #include "Texture.h"
 #include <unordered_map>
+#include <gbUtils/logger.h>
+#include <gbUtils/string.h>
 GB_RENDER_DATA_NS_BEGIN
 
 struct Sprite
@@ -21,15 +23,33 @@ struct Sprite
 	uint32 height;
     };
 
-template<typename Key, typename Sprite>
+template<typename Key_t, typename Sprite_t>
 class _atlas:public Texture
 {
 public:
+	_atlas(){}
+	template <typename T>
+	_atlas(T && other) :
+		Texture(std::forward<T>(other)),
+		_mpSprites(std::forward<T>(other._mpSprites))
+	{
 
+	}
+	const Sprite_t& GetSprite(const Key_t key) const
+	{
+		auto iter = _mpSprites.find(key);
+		if (iter != _mpSprites.end())
+			return iter->second;
+		else
+		{
+			gb::utils::logger::Instance().error(gb::utils::string("_atlas::GetSprite specified sprite not found key@ ") + key);
+			return _mpSprites.begin()->second;
+		}
+	}
 protected:
-    std::unordered_map<Key, Sprite> _mpSprites;
+    std::unordered_map<Key_t, Sprite_t> _mpSprites;
 };
 
-typedef _atlas<std::string, Sprite> Atlas;
+typedef _atlas<gb::utils::string, Sprite> Atlas;
 
 GB_RENDER_DATA_NS_END

@@ -6,33 +6,42 @@
 
 GB_RENDER_NS_BEGIN
 
-class Render : public Element
+class BaseRender : public Element
 {
 public:
-	Render(Entity* const owner);
+	BaseRender(Entity* const owner);
 
 public:
-	void SetMesh(const gb::utils::string & mesh);
 	void SetMaterial(const gb::utils::string & material);
 	virtual Element::Type GetType() const override;
 
 	void SetInstVar(const char* name, const void* data);
-private:
+protected:
 	virtual void Awake() override;
 	virtual void Start() override;
 	virtual void End() override;
 
-	GB_PROPERTY_R(private, Mesh, const gb::render::data::Mesh*);
-	GB_PROPERTY_R(private, Material, gb::render::data::Material*);
+protected:
 
+	GB_PROPERTY_R(protected, Mesh, gb::render::data::Mesh*);
+	GB_PROPERTY_R(protected, Material, gb::render::data::Material*);
+protected:
 	const gb::physics::spherebb<>* _originSBB;
-	GB_PROPERTY_R(private, TransformedSphereBB, gb::physics::spherebb<>);
+	GB_PROPERTY_R(protected, TransformedSphereBB, gb::physics::spherebb<>);
 
-	GB_PROPERTY_R(private, InstVar, std::unordered_map <const gb::utils::string, GLVar>);
+	GB_PROPERTY_R(protected, InstVar, std::unordered_map <const gb::utils::string, GLVar>);
 	//GLVar* _instVar_mvp;
 private:
 	void _onOwnerTransformChanged();
 };
 
+class Render : public BaseRender
+{
+
+public:
+	Render(Entity* const owner);
+public:
+	void SetMesh(const gb::utils::string & mesh);
+};
 GB_RENDER_NS_END
 

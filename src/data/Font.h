@@ -27,6 +27,12 @@ class Font:public _atlas<gb::render::uint32, Glyph>
 {
 	friend class gb::render::file::Font;
 public:
+	Font();
+	template <typename T>
+	Font(T && other):
+		_atlas<gb::render::uint32, Glyph>(std::forward<T>(other)),
+		_GlyphSize(other._GlyphSize)
+	{}
 
 private:
 	GB_PROPERTY_R(private, GlyphSize, gb::render::uint32);

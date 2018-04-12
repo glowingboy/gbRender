@@ -27,7 +27,7 @@ GB_RENDER_NS_BEGIN
 GB_RENDER_CLASS Entity: public GBObject
 {
 	friend class gb::render::Director;
-	friend class gb::render::Render;
+	friend class gb::render::BaseRender;
 	friend class gb::render::Transform;
 private:
 	Entity(Entity* parent = nullptr);
@@ -54,7 +54,7 @@ private:
 	GB_PROPERTY_R(private, WorldTransformMatrix, gb::physics::mat4F);
 	GB_PROPERTY_R(private, Parent, Entity*);
 
-	GB_PROPERTY_R(private, Render, gb::render::Render*);
+	GB_PROPERTY_R(private, Render, gb::render::BaseRender*);
 
 	//bitfield
 	GB_PROPERTY_R(private, Tag, uint32);
@@ -65,7 +65,7 @@ private:
 
 private:
 	void _updateWorldTransform();
-	void _setRender(gb::render::Render* const render);
+	void _setRender(gb::render::BaseRender* const render);
 
 
 public:

@@ -11,7 +11,7 @@ using namespace gb::utils;
 using namespace gb;
 using namespace gb::physics;
 
-Render::Render(Entity* const owner):
+BaseRender::BaseRender(Entity* const owner):
 	Element(owner),
 	_Mesh(nullptr)
 	//_instVar_mvp(nullptr)
@@ -19,33 +19,33 @@ Render::Render(Entity* const owner):
 	owner->_setRender(this);
 }
 
-void Render::Awake()
+void BaseRender::Awake()
 {
 	logger::Instance().log("render::awake @ " + _Owner->GetName());
 
 	Director::Instance().AddRenderEntity(_Owner);
 
-	GB_UTILS_CALLBACK_REG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, Render::_onOwnerTransformChanged);
+	GB_UTILS_CALLBACK_REG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, BaseRender::_onOwnerTransformChanged);
 }
 
-void Render::Start()
+void BaseRender::Start()
 {
 	logger::Instance().log("render::start @ " + _Owner->GetName());
 }
 
-void Render::End()
+void BaseRender::End()
 {
 	logger::Instance().log("render::End @ " + _Owner->GetName());
 
 	Director::Instance().RemoveRenderEntity(_Owner);
-	GB_UTILS_CALLBACK_UNREG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, Render::_onOwnerTransformChanged);
+	GB_UTILS_CALLBACK_UNREG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, BaseRender::_onOwnerTransformChanged);
 }
 
-Element::Type Render::GetType() const
+Element::Type BaseRender::GetType() const
 {
 	return Element::Type::Render;
 }
-void Render::SetInstVar(const char * name, const void * data)
+void BaseRender::SetInstVar(const char * name, const void * data)
 {
 	auto iter = _InstVar.find(name);
 	if (iter != _InstVar.end())
@@ -55,17 +55,8 @@ void Render::SetInstVar(const char * name, const void * data)
 		logger::Instance().warning(string("Render::SetInstVar unknown instVar name@ ") + name + "owner.name@ " + _Owner->GetName());
 	}
 }
-void Render::SetMesh(const string & mesh)
-{
-	_Mesh = resource::Res<data::Mesh>::Instance().Get(mesh);
 
-	_originSBB = &(_Mesh->GetSphereBB());
-
-	_TransformedSphereBB = (*_originSBB) * _Owner->GetWorldTransformMatrix();
-
-	logger::Instance().log("render::setMesh @ " + mesh);
-}
-void Render::SetMaterial(const string & material)
+void BaseRender::SetMaterial(const string & material)
 {
 	_Material = resource::Res<data::Material>::Instance().Get(material);
 
@@ -93,7 +84,7 @@ void Render::SetMaterial(const string & material)
 	logger::Instance().log("render::setmat @ " + material);
 }
 
-void Render::_onOwnerTransformChanged()
+void BaseRender::_onOwnerTransformChanged()
 {
 	const mat4F& worldTransMat = _Owner->GetWorldTransformMatrix();
 	_TransformedSphereBB = (*_originSBB) * worldTransMat;
@@ -102,4 +93,21 @@ void Render::_onOwnerTransformChanged()
 	//{
 	//	_instVar_mvp->set(&worldTransMat);
 	//}
+}
+
+
+Render::Render(Entity * const owner):
+	BaseRender(owner)
+{
+}
+
+void Render::SetMesh(const gb::utils::string & mesh)
+{
+	_Mesh = resource::Res<data::Mesh>::Instance().Get(mesh);
+
+	_originSBB = &(_Mesh->GetSphereBB());
+
+	_TransformedSphereBB = (*_originSBB) * _Owner->GetWorldTransformMatrix();
+
+	logger::Instance().log("render::setMesh @ " + mesh);
 }

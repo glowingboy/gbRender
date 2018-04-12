@@ -113,12 +113,12 @@ void Camera::Shoot()
 	//3rd classify according to material
 
 	//classify according to renderQueue
-	std::unordered_map<std::uint32_t, std::vector<Render*>> renderQueueRenders;
+	std::unordered_map<std::uint32_t, std::vector<BaseRender*>> renderQueueRenders;
 	std::for_each(ret.begin(), ret.end(), [this, &renderQueueRenders](Entity* e)
 	{
 		if (_InterestTag & e->GetTag())
 		{
-			Render* r = e->GetRender();
+			BaseRender* r = e->GetRender();
 
 			r->SetInstVar(GB_RENDER_INSTVAR_MVP, &(_projMatProductViewMat  * e->GetWorldTransformMatrix()));
 
@@ -130,17 +130,17 @@ void Camera::Shoot()
 				iter->second.push_back(r);
 			}
 			else
-				renderQueueRenders.insert(std::make_pair(renderQueue, std::vector<Render*>{r}));
+				renderQueueRenders.insert(std::make_pair(renderQueue, std::vector<BaseRender*>{r}));
 		}
 	});
 
 	
-	std::for_each(renderQueueRenders.begin(), renderQueueRenders.end(), [this](std::pair<const std::uint32_t, std::vector<Render*>>& pr)
+	std::for_each(renderQueueRenders.begin(), renderQueueRenders.end(), [this](std::pair<const std::uint32_t, std::vector<BaseRender*>>& pr)
 	{
-		const std::vector<Render*>& renders = pr.second;
-		std::unordered_map<const data::Shader*, std::vector<Render*>> shaderRenders;
+		const std::vector<BaseRender*>& renders = pr.second;
+		std::unordered_map<const data::Shader*, std::vector<BaseRender*>> shaderRenders;
 		//classify according to shader
-		std::for_each(renders.begin(), renders.end(), [&shaderRenders](Render* r)
+		std::for_each(renders.begin(), renders.end(), [&shaderRenders](BaseRender* r)
 		{
 			const data::Shader* s = r->GetMaterial()->GetShader();
 
@@ -150,30 +150,30 @@ void Camera::Shoot()
 				iter->second.push_back(r);
 			}
 			else
-				shaderRenders.insert(std::make_pair(s, std::vector<Render*>{r}));
+				shaderRenders.insert(std::make_pair(s, std::vector<BaseRender*>{r}));
 		});
 
 
-		std::for_each(shaderRenders.begin(), shaderRenders.end(), [this](const std::pair<const data::Shader*, std::vector<Render*>>& sr)
+		std::for_each(shaderRenders.begin(), shaderRenders.end(), [this](const std::pair<const data::Shader*, std::vector<BaseRender*>>& sr)
 		{
 			const data::Shader* shader = sr.first;
 			GL::applyShader(shader);
 			_multiIndirectDraw.VtxAttribPointerSetup(shader);
 
-			const std::vector<Render*>& vRs = sr.second;
-			std::unordered_map<data::Material*, std::vector<Render*>> materialRenders;
+			const std::vector<BaseRender*>& vRs = sr.second;
+			std::unordered_map<data::Material*, std::vector<BaseRender*>> materialRenders;
 			//classify according to material
-			std::for_each(vRs.begin(), vRs.end(), [&materialRenders](Render* r)
+			std::for_each(vRs.begin(), vRs.end(), [&materialRenders](BaseRender* r)
 			{
 				data::Material* m = r->GetMaterial();
 				auto iter = materialRenders.find(m);
 				if (iter != materialRenders.end())
 					iter->second.push_back(r);
 				else
-					materialRenders.insert(std::make_pair(m, std::vector<Render*>{r}));
+					materialRenders.insert(std::make_pair(m, std::vector<BaseRender*>{r}));
 			});
 			
-			std::for_each(materialRenders.begin(), materialRenders.end(), [this](const std::pair<data::Material*, std::vector<Render*>>& mr)
+			std::for_each(materialRenders.begin(), materialRenders.end(), [this](const std::pair<data::Material*, std::vector<BaseRender*>>& mr)
 			{
 				mr.first->Update();
 				//dynamic draw

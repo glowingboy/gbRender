@@ -272,22 +272,22 @@ void GLMultiIndirectDraw::Initialize(const GLBuffer::CtorParam(&param)[4])
 	_IndirectCmdBuffer.Initialize(GL_DRAW_INDIRECT_BUFFER, param[3]);
 }
 
-void GLMultiIndirectDraw::SetData(const std::vector<Render*> renders)
+void GLMultiIndirectDraw::SetData(const std::vector<BaseRender*> renders)
 {
 	if (renders.size() > 0)
 	{
 		const data::Shader* shader = renders[0]->GetMaterial()->GetShader();
 
-		std::unordered_map<const data::Mesh*, std::vector<Render*>> meshRenders;
+		std::unordered_map<const data::Mesh*, std::vector<BaseRender*>> meshRenders;
 
-		std::for_each(renders.begin(), renders.end(), [&meshRenders](Render* r)
+		std::for_each(renders.begin(), renders.end(), [&meshRenders](BaseRender* r)
 		{
 			const data::Mesh* m = r->GetMesh();
 			auto iter = meshRenders.find(m);
 			if (iter != meshRenders.end())
 				iter->second.push_back(r);
 			else
-				meshRenders.insert(std::make_pair(m, std::vector<Render*>{r}));
+				meshRenders.insert(std::make_pair(m, std::vector<BaseRender*>{r}));
 		});
 
 		IndirectCommand cmd;
@@ -299,7 +299,7 @@ void GLMultiIndirectDraw::SetData(const std::vector<Render*> renders)
 		GLuint & baseInstance = cmd.baseInstance;
 
 		_cmdCount = 0;
-		std::for_each(meshRenders.begin(), meshRenders.end(), [this, &shader, &cmd, &count, &instanceCount, &firstIndex, &baseVertex, &baseInstance](const std::pair<const data::Mesh*, std::vector<Render*>>& mr)
+		std::for_each(meshRenders.begin(), meshRenders.end(), [this, &shader, &cmd, &count, &instanceCount, &firstIndex, &baseVertex, &baseInstance](const std::pair<const data::Mesh*, std::vector<BaseRender*>>& mr)
 		{
 			const data::Mesh* m = mr.first;
 
@@ -316,7 +316,7 @@ void GLMultiIndirectDraw::SetData(const std::vector<Render*> renders)
 			const auto instVarInfo = shader->GetVtxVarInfo(1);
 			if (instVarInfo.size() > 0)
 			{
-				const std::vector<Render*>& vRs = mr.second;
+				const std::vector<BaseRender*>& vRs = mr.second;
 				const std::size_t stride = instVarInfo.begin()->stride;
 				for (std::size_t i = 0; i < vRs.size(); i++)
 				{

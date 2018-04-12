@@ -75,7 +75,7 @@ public:
 			 const gb::physics::array_2d<uint8>& texture,
 			 const char* filePath)const;
 
-    data::Font ParseFromFile(const char* filePath)const;
+    data::Font* ParseFromFile(const char* filePath)const;
 };
 
 GB_RENDER_FILE_NS_END;

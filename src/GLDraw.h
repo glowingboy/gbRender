@@ -83,7 +83,7 @@ private:
 	GB_PROPERTY(protected, Mode, GLenum);
 };
 
-class Render;
+class BaseRender;
 
 class GLMultiIndirectDraw : public GLInstancedDraw
 {
@@ -102,7 +102,7 @@ public:
 
 	GLMultiIndirectDraw(const GLBuffer::CtorParam(&param)[4]);
 	void Initialize(const GLBuffer::CtorParam(&param)[4]);
-	void SetData(const std::vector<Render*> renders);
+	void SetData(const std::vector<BaseRender*> renders);
 	void Draw() const;
 	void Release();
 private:

@@ -8,6 +8,8 @@
 #include <gbUtils/luatable.h>
 #include <algorithm>
 #include "../data/Shader.h"
+#include "../data/Font.h"
+#include "../file/Font.h"
 
 #define GB_RENDER_RESOURCE_CFG_SHADER "Shader"
 #define GB_RENDER_RESOURCE_CFG_MATERIAL "Material"
@@ -184,4 +186,26 @@ private:
 
 	}
 };
+
+//Font
+template <>
+class Res <gb::render::data::Font> : public _Res_base<gb::render::data::Font>
+{
+	GB_SINGLETON(Res);
+private:
+	virtual  gb::render::data::Font* _load_res(const char* data) override
+	{
+		data::Font* font = gb::render::file::Font::Instance().ParseFromFile(data);
+		if (font != nullptr)
+		{
+			auto ret = _mpRes.insert(std::make_pair(data, font));
+
+			assert(ret.second);
+		}
+		else
+			return nullptr;
+	}
+
+};
+
 GB_RENDER_RESOURCE_NS_END

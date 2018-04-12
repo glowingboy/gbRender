@@ -30,7 +30,7 @@ GB_RENDER_NS_BEGIN
 GB_RENDER_CLASS Director
 {
 	friend class Camera;
-	friend class Render;
+	friend class BaseRender;
 
 	~Director();
 public:

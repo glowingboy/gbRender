@@ -2,14 +2,24 @@
 
 using namespace gb::render;
 
-GLVar::GLVar(const uint8 unitSize, const std::size_t capacity):
-    _unitSize(unitSize),
-    _count(0),
-    _capacity(capacity),
+
+GLVar::GLVar(const std::uint8_t unitSize):
+	_unitSize(unitSize),
+	_count(0),
+	_capacity(0),
 	_byteSize(0)
 {
-    _data = new char[unitSize * capacity];
 }
+
+GLVar::GLVar(const std::uint8_t unitSize, const std::size_t capacity) :
+	_unitSize(unitSize),
+	_count(0),
+	_capacity(capacity),
+	_byteSize(0)
+{
+	_data = new char[unitSize * capacity];
+}
+
 
 GLVar::GLVar(GLVar && o) :
 	_unitSize(o._unitSize),
@@ -44,8 +54,7 @@ GLVar::GLVar(const gb::render::data::VtxVarStubInfo & info):
 
 GLVar::~GLVar()
 {
-    delete _data;
-    _data = nullptr;
+	GB_SAFE_DELETE_ARRAY(_data);
 }
 
 void GLVar::append(const void* data, const std::size_t count)
@@ -98,4 +107,28 @@ std::size_t GLVar::count() const
 std::size_t GLVar::byteSize() const
 {
 	return _byteSize;
+}
+
+void GLVar::clear()
+{
+	GB_SAFE_DELETE_ARRAY(_data);
+
+	_count = 0;
+	_capacity = 0;
+}
+
+void GLVar::reserve(const std::size_t capacity)
+{
+	if (_capacity < capacity)
+	{
+		char* newData = new char[capacity * _unitSize] {0};
+		if (_data != nullptr)
+		{
+			std::memcpy(newData, _data, _count * _unitSize);
+			GB_SAFE_DELETE_ARRAY(_data);
+		}
+
+		_data = newData;
+		_capacity = capacity;
+	}
 }

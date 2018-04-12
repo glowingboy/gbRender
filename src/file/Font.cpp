@@ -37,13 +37,13 @@ void Font::SerializeToFile(const uint32_t glyphSize,
     fontFile.write(texture.data(), texture.row * texture.col);
 }
 
-data::Font Font::ParseFromFile(const char* filePath)const
+data::Font* Font::ParseFromFile(const char* filePath)const
 {
     assert(filePath != nullptr);
 
     utils::file fontFile(filesystem::Instance().get_absolute_path(filePath));
 
-    data::Font ret;
+    data::Font* ret = new data::Font;
     char* identifier = new char[strlen(GB_RENDER_FILE_FONT_IDENDIFIER) + 1]{'\0'};
     fontFile.read(identifier, strlen(GB_RENDER_FILE_FONT_IDENDIFIER));
     if(string(identifier) != GB_RENDER_FILE_FONT_IDENDIFIER)
@@ -51,7 +51,7 @@ data::Font Font::ParseFromFile(const char* filePath)const
     uint32 buf_uint32 = 0;
     //glyph size
     fontFile.read(&buf_uint32, 4);
-	ret._GlyphSize = buf_uint32;
+	ret->_GlyphSize = buf_uint32;
     //glyph count
     fontFile.read(&buf_uint32, 4);
     const uint32 count = buf_uint32;
@@ -64,7 +64,7 @@ data::Font Font::ParseFromFile(const char* filePath)const
     {
 	fontFile.read(&tmpGlyph, glyph::size);
 	data::Glyph gly(*(data::Glyph*)((char*)&tmpGlyph + data_glyph_offset));
-	ret._mpSprites.insert(std::make_pair(tmpGlyph.code, gly));
+	ret->_mpSprites.insert(std::make_pair(tmpGlyph.code, gly));
     }
 
     //texture
@@ -77,9 +77,10 @@ data::Font Font::ParseFromFile(const char* filePath)const
     char* tex_data = new char[width * height];
     fontFile.read(tex_data, width * height);
 
-	ret.data = tex_data;
-	ret.width = width;
-	ret.height = height;
+	ret->data = tex_data;
+	ret->width = width;
+	ret->height = height;
 
     return ret;
 }
+

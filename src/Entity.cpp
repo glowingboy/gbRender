@@ -129,7 +129,7 @@ void Entity::_updateWorldTransform()
 
 }
 
-void Entity::_setRender(gb::render::Render* const render)
+void Entity::_setRender(gb::render::BaseRender* const render)
 {
 	_Render = render;
 }
@@ -171,7 +171,7 @@ void Entity::_setRender(gb::render::Render* const render)
 
 bool Entity::octreeSBBContain::operator()(const Entity* entity, const gb::physics::aabb<>& o) const
 {
-	Render* render = entity->GetRender();
+	BaseRender* render = entity->GetRender();
 	if (render != nullptr)
 	{
 		return o.contain(render->GetTransformedSphereBB());
@@ -186,7 +186,7 @@ bool Entity::octreeSBBContain::operator()(const Entity* entity, const gb::physic
 static const vec3F __error__apg__('e', 'r', 'r');
 const vec3F & Entity::octreeSBBAPG::operator()(const Entity* entity) const
 {
-	Render* render = entity->GetRender();
+	BaseRender* render = entity->GetRender();
 	if (render != nullptr)
 	{
 		return render->GetTransformedSphereBB().centre;

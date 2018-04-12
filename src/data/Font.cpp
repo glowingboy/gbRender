@@ -1,4 +1,8 @@
 #include "Font.h"
 
-using gb::render::data::Font;
+using namespace gb::render::data;
 
+Font::Font():
+	_GlyphSize(0)
+{
+}
