@@ -1,8 +1,12 @@
 #include "Text.h"
 #include "resource/Resource.h"
+#include <gbPhysics/type.h>
+
 using namespace gb::render;
 using namespace gb::utils;
 using namespace gb;
+
+using namespace gb::physics;
 
 Text::Text(Entity* owner) :
 	BaseRender(owner),
@@ -52,8 +56,8 @@ void Text::SetText(const wchar_t * strText, const bool append)
 {
 	const size_t count = std::wcslen(strText);
 
-	std::int32_t xOffset = _penPos.x;
-	std::int32_t yOffset = _penPos.x;
+	std::int32_t& xOffset = _penPos.x;
+	std::int32_t& yOffset = _penPos.y;
 
 	if (!append)
 	{
@@ -79,7 +83,68 @@ void Text::SetText(const wchar_t * strText, const bool append)
 
 	for (std::size_t i = 0; i < count; i++)
 	{
-		//if == '\n'
-		_Font->GetSprite(strText[i]);
+		const std::uint32_t code = strText[i];
+		if (code == '\n')
+		{
+			yOffset -= (_pixelSize + _lineSpace);
+			xOffset = 0;
+		}
+		else
+		{
+			const data::Glyph& gly = _Font->GetSprite(strText[i]);
+
+			const float bottom = yOffset - std::floorf(gly.yDelta * _textScale);
+			const float right = xOffset + std::ceilf(gly.width * _textScale);
+			const float top = yOffset + std::ceilf(gly.height * _textScale);
+
+			/**
+				0--1    4--5
+				|  |----|  |
+				3--2 |  7--6
+				offsetX
+				triangle:0-1-2, 2-3-0, 4-5-6, 6-7-4
+			*/
+			
+			vec3F l_t(xOffset, top, 0.0f);
+			vec3F r_t(right, top, 0.0f);
+			vec3F r_b(right, bottom, 0.0f);
+			vec3F l_b(xOffset, bottom, 0.0f);
+
+			_vtxPos->append(&l_t, 1);
+			_vtxPos->append(&r_t, 1);
+			_vtxPos->append(&r_b, 1);
+			_vtxPos->append(&l_b, 1);
+
+			vec2F uv_l_t(gly.uv_l, gly.uv_t);
+			vec2F uv_r_t(gly.uv_r, gly.uv_t);
+			vec2F uv_r_b(gly.uv_r, gly.uv_b);
+			vec2F uv_l_b(gly.uv_l, gly.uv_b);
+
+			_vtxUV->append(&uv_l_t, 1);
+			_vtxUV->append(&uv_r_t, 1);
+			_vtxUV->append(&uv_r_b, 1);
+			_vtxUV->append(&uv_l_b, 1);
+
+			const std::uint32_t baseIdx = _text.size() * 4;
+
+			std::uint32_t tmp = baseIdx;
+			_vtxIdx->append(&tmp, 1);
+			tmp = baseIdx + 1;
+			_vtxIdx->append(&tmp, 1);
+			tmp = baseIdx + 2;
+			_vtxIdx->append(&tmp, 1);
+
+
+			_vtxIdx->append(&tmp, 1);
+			tmp = baseIdx + 3;
+			_vtxIdx->append(&tmp, 1);
+			tmp = baseIdx;
+			_vtxIdx->append(&baseIdx, 1);
+
+			xOffset += std::ceilf(gly.advanceX * _textScale);
+		}
+		
 	}
+
+	_Mesh->UpdateSphereBB();
 }

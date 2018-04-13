@@ -1,0 +1,4 @@
+return
+   {
+      Shader = "SDFText.gbShader"
+   }
