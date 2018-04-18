@@ -62,7 +62,8 @@ private:
 	//GB_PROPERTY_R(private, RenderEntities, gb::physics::octree<Entity*>)
 
 	GLuint _frameBuffers[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];
-	GLuint _cameraTextures;
+	//GLuint _cameraTextures;
+	data::Texture _cameraTextures;
 	GLuint _cameraDepthBuffers[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];
 	//GLuint _cameraTexIndices[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];
 	std::queue<GLuint> _cameraFBOIndices;

@@ -3,7 +3,7 @@
 using namespace gb::render;
 
 
-GLVar::GLVar(const std::uint8_t unitSize):
+GLVar::GLVar(const std::size_t unitSize):
 	_unitSize(unitSize),
 	_count(0),
 	_capacity(0),
@@ -11,7 +11,7 @@ GLVar::GLVar(const std::uint8_t unitSize):
 {
 }
 
-GLVar::GLVar(const std::uint8_t unitSize, const std::size_t capacity) :
+GLVar::GLVar(const std::size_t unitSize, const std::size_t capacity) :
 	_unitSize(unitSize),
 	_count(0),
 	_capacity(capacity),
@@ -95,7 +95,7 @@ const char* GLVar::data() const
 }
 
 
-uint8 GLVar::unitSize() const
+std::size_t GLVar::unitSize() const
 {
     return _unitSize;
 }

@@ -26,6 +26,20 @@ void Material::from_lua(const luatable_mapper& mapper)
 	}
 }
 
+void Material::SetTexture(const char * name, const UniformTextureVar* textures, const GLsizei count)
+{
+	assert(name != nullptr && textures != nullptr);
+
+	auto iter = _uniformVars.find(name);
+
+	if (iter != _uniformVars.cend())
+	{
+		iter->second.SetTextureObjs(textures, count);
+	}
+	else
+		logger::Instance().error(string("Material::SetTexture no specified texture uniform var found, name@ ") + name);
+}
+
 void Material::Update() const
 {
 	std::for_each(_uniformVars.cbegin(), _uniformVars.cend(), [](const std::pair<const gb::utils::string, UniformVar>& var)

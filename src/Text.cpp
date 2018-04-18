@@ -1,6 +1,7 @@
 #include "Text.h"
 #include "resource/Resource.h"
 #include <gbPhysics/type.h>
+#include "data\Text.h"
 
 using namespace gb::render;
 using namespace gb::utils;
@@ -14,26 +15,33 @@ Text::Text(Entity* owner) :
 	_vtxPos(nullptr),
 	_vtxUV(nullptr),
 	_vtxIdx(nullptr),
+	_pixelSize(GB_REDNER_TEXT_DEFAULT_SIZE),
 	_lineSpace(GB_RENDER_TEXT_DEFAULT_LINESPACE)
 {
 
-	SetSize(GB_REDNER_TEXT_DEFAULT_SIZE);
+	SetFont("FZSTK.gbFont");
 
+	//mesh
 	_Mesh = new data::Mesh;
 
 	_vtxPos = _Mesh->InitializeAVtxVar(GB_RENDER_VTXVAR_POS, 3 * sizeof(float));
 	_vtxUV = _Mesh->InitializeAVtxVar(GB_RENDER_VTXVAR_UV, 2 * sizeof(float));
 
 	_vtxIdx = _Mesh->InitializeAVtxVar(GB_RENDER_VTXVAR_IDX, sizeof(std::uint32_t));
+
+	//matrial
+	_Material = resource::Res<data::Material>::Instance().Get("SDFText");
+
+	data::UniformTextureVar texVar = { _Font->GetTarget(), _Font->GetTextureObj() };
+
+	_Material->SetTexture("font", &texVar);
 }
 
 void Text::SetFont(const char * font)
 {
 	_Font = resource::Res<data::Font>::Instance().Get(font);
-	if (_Font == nullptr)
-		logger::Instance().error(string("Text::SetFont font not found font@ ") + font);
 
-	SetText(_text.data());
+	SetSize(_pixelSize);
 }
 
 void Text::SetSize(const std::uint32_t pixelSize)
@@ -52,13 +60,9 @@ void Text::SetLineSpace(const std::uint32_t lineSpace)
 	SetText(_text.data());
 }
 
-void Text::SetText(const wchar_t * strText, const bool append)
+template <typename T>
+void Text::_setText(const T* szText, const std::size_t count, bool append)
 {
-	const size_t count = std::wcslen(strText);
-
-	std::int32_t& xOffset = _penPos.x;
-	std::int32_t& yOffset = _penPos.y;
-
 	if (!append)
 	{
 		_vtxPos->clear();
@@ -67,10 +71,22 @@ void Text::SetText(const wchar_t * strText, const bool append)
 
 		_text.clear();
 
-		xOffset = 0;
-		yOffset = -(_pixelSize + _lineSpace);
+		_penPos.x = 0;
+		_penPos.y = -1 * (_pixelSize + _lineSpace);
 	}
 
+	const size_t beginIdx = _text.size();
+
+	_text.reserve(beginIdx + count);
+
+	_text.insert(_text.end(), szText, szText + count);
+
+	_setText(_text.data() + beginIdx, count);
+}
+
+
+void Text::_setText(const wchar_t * strText, const std::size_t count)
+{
 	const std::size_t newPosCount = 4 * count;
 	const std::size_t newIdxCount = 6 * count;
 
@@ -78,7 +94,8 @@ void Text::SetText(const wchar_t * strText, const bool append)
 	_vtxUV->reserve(_vtxUV->count() + newPosCount);
 	_vtxIdx->reserve(_vtxIdx->count() + newIdxCount);
 
-	_text.insert(_text.end(), strText, strText + count + 1/*including ending '\0'*/);
+	std::int32_t& xOffset = _penPos.x;
+	std::int32_t& yOffset = _penPos.y;
 
 
 	for (std::size_t i = 0; i < count; i++)
@@ -98,13 +115,13 @@ void Text::SetText(const wchar_t * strText, const bool append)
 			const float top = yOffset + std::ceilf(gly.height * _textScale);
 
 			/**
-				0--1    4--5
-				|  |----|  |
-				3--2 |  7--6
-				offsetX
-				triangle:0-1-2, 2-3-0, 4-5-6, 6-7-4
+			0--1    4--5
+			|  |----|  |
+			3--2 |  7--6
+			offsetX
+			triangle:0-1-2, 2-3-0, 4-5-6, 6-7-4
 			*/
-			
+
 			vec3F l_t(xOffset, top, 0.0f);
 			vec3F r_t(right, top, 0.0f);
 			vec3F r_b(right, bottom, 0.0f);
@@ -141,10 +158,21 @@ void Text::SetText(const wchar_t * strText, const bool append)
 			tmp = baseIdx;
 			_vtxIdx->append(&baseIdx, 1);
 
-			xOffset += std::ceilf(gly.advanceX * _textScale);
+			xOffset += ((std::int32_t)std::ceilf(gly.advanceX * _textScale));
 		}
-		
+
 	}
 
 	_Mesh->UpdateSphereBB();
 }
+
+void Text::SetText(const char * szText, const bool append)
+{
+	_setText(szText, std::strlen(szText), append);
+}
+
+void Text::SetText(const wchar_t * szText, const bool append)
+{
+	_setText(szText, std::wcslen(szText), append);
+}
+

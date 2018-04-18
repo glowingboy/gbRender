@@ -22,8 +22,8 @@ GB_RENDER_NS_BEGIN
 struct GLVar
 {
 public:
-	GLVar(const std::uint8_t unitSize);
-    GLVar(const std::uint8_t unitSize, const std::size_t capacity);
+	GLVar(const std::size_t unitSize);
+    GLVar(const std::size_t unitSize, const std::size_t capacity);
 	GLVar(GLVar && o);
 	GLVar(const GLVar & o);
 	template <typename T>
@@ -45,14 +45,14 @@ public:
 	
 	void set(const void* data, const std::size_t idx = 0);
     const char* data() const;
-	std::uint8_t unitSize() const;
+	std::size_t unitSize() const;
     std::size_t count() const;
 	std::size_t byteSize()const;
 	void clear();
 	void reserve(const std::size_t capacity);
 	
 private:
-    uint8 _unitSize;
+    std::size_t _unitSize;
 	std::size_t _count;
 	std::size_t _capacity;
     char* _data;

@@ -2,8 +2,11 @@
 #include "FileNS.h"
 #include <gbUtils/common.h>
 #include <gbPhysics/type.h>
+#include <gbUtils/filesystem.h>
+#include <gbUtils/file.h>
+
 #include <vector>
-#include "../data/Font.h"
+
 /*
   font file format
 
@@ -18,6 +21,18 @@
 
 */
 
+
+namespace gb
+{
+	namespace render
+	{
+		namespace data
+		{
+			class Font;
+		}
+	}
+}
+
 GB_RENDER_FILE_NS_BEGIN;
 
 #define GB_RENDER_FILE_FONT_IDENDIFIER "gbFont"
@@ -27,55 +42,77 @@ GB_RENDER_FILE_NS_BEGIN;
  *@brief, has one more member(code) than data::glyph,
  *has same memory layout as data::glyph after this additonal member.
  */
-struct glyph
+struct Glyph
 {
-    uint32 code;
-    //data::glyph
-    float32 uv_b;
-    float32 uv_l;
-    float32 uv_t;
-    float32 uv_r;
-    uint32 width;
-    uint32 height;
-    uint32 advanceX;
-    uint32 yDelta;
-    static size_t size;
+	std::uint32_t code;
+	//data::glyph
+	float uv_b;
+	float uv_l;
+	float uv_t;
+	float uv_r;
+	std::uint32_t width;
+	std::uint32_t height;
+	std::uint32_t advanceX;
+	std::uint32_t yDelta;
 };
 
-struct glyph_ex:public glyph
+struct Glyph_ex :public Glyph
 {
-    glyph_ex(uint32 idx)
+	Glyph_ex(std::uint32_t idx)
 	{
-	    code = idx;
+		code = idx;
 	}
-    glyph_ex(glyph_ex&& other):
-	glyph(other),
-	sdf(std::move(other.sdf))
+	Glyph_ex(Glyph_ex&& other) :
+		Glyph(other),
+		sdf(std::move(other.sdf))
 	{}
-    void operator=(glyph_ex&& other)
+	void operator=(Glyph_ex&& other)
 	{
-	    glyph::operator=(other);
-	    sdf = std::move(other.sdf);
+		Glyph::operator=(other);
+		sdf = std::move(other.sdf);
 	}
-	    
-	gb::physics::array_2d<uint8>& data()
+
+	gb::physics::array_2d<std::uint8_t>& data()
 	{
-	    return sdf;
+		return sdf;
 	}
-	gb::physics::array_2d<uint8> sdf;
+	gb::physics::array_2d<std::uint8_t> sdf;
 };
 
 
 class Font
 {
-    GB_SINGLETON(Font);
+	GB_SINGLETON(Font);
 public:
-    void SerializeToFile(const uint32_t glyphSize,
-			 const std::vector<glyph_ex>& glyphs,
-			 const gb::physics::array_2d<uint8>& texture,
-			 const char* filePath)const;
+	inline void SerializeToFile(const std::uint32_t glyphSize,
+		const std::vector<Glyph_ex>& glyphs,
+		const gb::physics::array_2d<std::uint8_t>& texture,
+		const char* filePath)const
+	{
+		assert(glyphSize != 0 && glyphs.size() != 0 && filePath != nullptr);
 
-    data::Font* ParseFromFile(const char* filePath)const;
+		gb::utils::string path = gb::utils::filesystem::Instance().get_absolute_path(filePath);
+		path = path + "." + GB_RENDER_FILE_FONT_EXTENSION;
+		gb::utils::file fontFile(path, false);
+
+		fontFile.write(GB_RENDER_FILE_FONT_IDENDIFIER, strlen(GB_RENDER_FILE_FONT_IDENDIFIER));
+
+		fontFile.write(&glyphSize, 4);
+		const std::uint32_t count = glyphs.size();
+		fontFile.write(&count, 4);
+
+		std::for_each(glyphs.begin(), glyphs.end(), [&fontFile](const Glyph_ex& gly)
+		{
+			fontFile.write((const char*)&gly, sizeof(Glyph));
+		});
+
+		fontFile.write(&(texture.width), 4);
+		fontFile.write(&(texture.height), 4);
+
+		fontFile.write(texture.data(), texture.row * texture.col);
+	}
+
+	data::Font* ParseFromFile(const char* filePath)const;
 };
 
 GB_RENDER_FILE_NS_END;

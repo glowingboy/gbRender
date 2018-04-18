@@ -15,18 +15,19 @@ set(fontGen_srcs)
 
 gb_add_class(FontGen src fontGen_srcs)
 gb_add_class(FreetypeLoader src fontGen_srcs)
-gb_add_class(Font ../../src/file fontGen_srcs)
+# gb_add_class(Font ../../src/file fontGen_srcs)
 
 add_executable(fontGen
   ${fontGen_srcs}
 )
+set(other_lib)
+if(NOT CMAKE_CXX_COMPILER_ID STREQUAL MSVC_COMPILER_ID)
+  set(other_lib -lpng -lz -lharfbuzz -lptherad)
+endif()
 
 target_link_libraries(fontGen
   ${gbUtils_LIBRARIES}
   ${gbPhysics_LIBRARIES}
   ${libfreetype_LIBRARIES}
-  -lpng
-  -lz
-  -lharfbuzz
-  -lpthread
+  ${ohter_lib}
   )

@@ -2,9 +2,11 @@
 #include <algorithm>
 #include <gbUtils/file.h>
 #include <gbUtils/logger.h>
+#include "../resource/Resource.h"
 
 using namespace gb::render::data;
 using namespace gb::utils;
+using namespace gb;
 
 VtxVarStub::VtxVarStub() :
 	count{ 1 },
@@ -56,7 +58,8 @@ GLint slType::componentCount(const std::uint8_t type)
 		return 4;
 	else if (type == slType::Handleui64)
 		return 1;
-
+	else if (type == slType::Sampler)
+		return 1;
 	assert(false);
 	return 0;
 }
@@ -79,7 +82,8 @@ GLenum slType::glType(const std::uint8_t type)
 		return GL_FLOAT;
 	else if (type == slType::Handleui64)
 		return GL_UNSIGNED_INT64_ARB;
-
+	else if (type == slType::Sampler)
+		return GL_INT;
 	assert(false);
 	return 0;
 }
@@ -102,7 +106,8 @@ std::uint32_t slType::typeCount(const std::uint8_t type)
 		return 4;
 	else if (type == slType::Handleui64)
 		return 1;
-
+	else if (type == slType::Sampler)
+		return 1;
 	assert(false);
 	return 0;
 }
@@ -126,6 +131,8 @@ std::size_t slType::typeSize(const std::uint8_t type)
 		size = 4 * sizeof(float);
 	else if (type == slType::Handleui64)
 		size = sizeof(GLuint64);
+	else if (type == slType::Sampler)
+		size = sizeof(int);
 	return size;
 }
 
@@ -218,29 +225,30 @@ UniformVar UniformVarStub::genUniformVar() const
 	return UniformVar(index, typeSize, count * slType::typeCount(sl_type), sl_type);
 }
 
-UniformVar::UniformVar(const GLint index_, const std::size_t typeSize, const GLsizei count_, const std::uint8_t sl_type) :
+UniformVar::UniformVar(const GLint index_, const std::size_t typeSize, const std::size_t count_, const std::uint8_t sl_type) :
 	index(index_),
 	byteSize(typeSize * count_),
 	count(count_),
 	_setter(nullptr),
-	_lua_getter(nullptr)
+	_lua_getter(nullptr),
+	textureObjs(nullptr)
 {
 	data = new char[byteSize];
 
 	if (sl_type == slType::Float)
 	{
 		_setter = Shader::SetUniform1f;
-		_lua_getter = &UniformVar::_lua_getter_number;
+		_lua_getter = &UniformVar::_lua_getter_numbers;
 	}
 	else if (sl_type == slType::Int)
 	{
 		_setter = Shader::SetUniform1i;
-		_lua_getter = &UniformVar::_lua_getter_integer;
+		_lua_getter = &UniformVar::_lua_getter_integers;
 	}
 	else if (sl_type == slType::UInt)
 	{
 		_setter = Shader::SetUniform1ui;
-		_lua_getter = &UniformVar::_lua_getter_integer;
+		_lua_getter = &UniformVar::_lua_getter_integers;
 	}
 	else if (sl_type == slType::Vec2)
 	{
@@ -265,34 +273,46 @@ UniformVar::UniformVar(const GLint index_, const std::size_t typeSize, const GLs
 	else if (sl_type == slType::Handleui64)
 	{
 		_setter = Shader::SetUniform1i;
-		_lua_getter = &UniformVar::_lua_getter_integer;
+		_lua_getter = &UniformVar::_lua_getter_integers;
+	}
+	else if (sl_type == slType::Sampler)
+	{
+		_setter = Shader::SetUniform1i;
+		_lua_getter = &UniformVar::_lua_getter_samplers;
+		textureObjs = new UniformTextureVar{ {0} };
 	}
 		
 }
 UniformVar::~UniformVar()
 {
 	GB_SAFE_DELETE_ARRAY(data);
+	GB_SAFE_DELETE_ARRAY(textureObjs);
 }
 UniformVar::UniformVar(UniformVar && other) :
 	index(other.index),
 	byteSize(other.byteSize),
 	count(other.count),
 	data(other.data),
+	textureObjs(other.textureObjs),
 	_setter(other._setter),
 	_lua_getter(other._lua_getter)
 {
 	other.data = nullptr;
+	other.textureObjs = nullptr;
 }
 
-bool UniformVar::SetData(const void* data_, const std::size_t size)
+void UniformVar::SetData(const void* data_, const std::size_t size)
 {
-	if (byteSize == size)
-	{
-		std::memcpy(data, data_, byteSize);
-		return true;
-	}
-	else
-		return false;
+	const std::size_t minSize = byteSize > size ? size : byteSize;
+
+	std::memcpy(data, data_, minSize);
+}
+
+void UniformVar::SetTextureObjs(const UniformTextureVar* texObjs, const std::size_t count_)
+{
+	const std::size_t minCount = count > count_ ? count_ : count;
+
+	std::memcpy(textureObjs, texObjs, minCount * sizeof(UniformTextureVar));
 }
 
 void UniformVar::Update() const
@@ -300,46 +320,69 @@ void UniformVar::Update() const
 	if (_setter != nullptr)
 	{
 		_setter(index, count, data);
+
+		if (textureObjs != nullptr)
+		{
+			std::int32_t* texUnit = (std::int32_t*)data;
+			for (std::uint32_t i = 0; i < count; i++)
+			{
+				glActiveTexture(GL_TEXTURE0 + texUnit[i]);
+				const UniformTextureVar& texVar = textureObjs[i];
+				glBindTexture(texVar.target, texVar.obj);
+			}
+			
+		}
 	}
 	else
 		logger::Instance().error("UniformVar::Update _setter is nullptr");
 }
-void UniformVar::_lua_getter_integer(const gb::utils::luatable_mapper & mapper, const char * name)
-{
-	if (mapper.has_key(name))
-	{
-		lua_Integer ret = mapper.get_integer_by_key(name);
-		if (!SetData(&ret, sizeof(lua_Integer)))
-			logger::Instance().error(string("UniformVar::_lua_getter_integer name@ ") + name + ", mapper@ " + mapper.GetData());
-	}
-}
+//void UniformVar::_lua_getter_integer(const gb::utils::luatable_mapper & mapper, const char * name)
+//{
+//	if (mapper.has_key(name))
+//	{
+//		lua_Integer ret = mapper.get_integer_by_key(name);
+//		if (!SetData(&ret, sizeof(lua_Integer)))
+//			logger::Instance().error(string("UniformVar::_lua_getter_integer name@ ") + name + ", mapper@ " + mapper.GetData());
+//	}
+//}
 void UniformVar::_lua_getter_integers(const gb::utils::luatable_mapper & mapper, const char * name)
 {
 	if (mapper.has_key(name))
 	{
 		std::vector<lua_Integer> ret = mapper.get_integers_by_key(name);
-		if(!SetData(ret.data(), sizeof(lua_Integer) * ret.size()))
-			logger::Instance().error(string("UniformVar::_lua_getter_integers name@ ") + name + ", mapper@ " + mapper.GetData());
+		SetData(ret.data(), sizeof(lua_Integer) * ret.size());	
 	}
 }
-void UniformVar::_lua_getter_number(const gb::utils::luatable_mapper & mapper, const char * name)
-{
-	if (mapper.has_key(name))
-	{
-		lua_Number ret = mapper.get_number_by_key(name);
-		if (!SetData(&ret, sizeof(lua_Number)))
-			logger::Instance().error(string("UniformVar::_lua_getter_number name@ ") + name + ", mapper@ " + mapper.GetData());
-	}
-}
+//void UniformVar::_lua_getter_number(const gb::utils::luatable_mapper & mapper, const char * name)
+//{
+//	if (mapper.has_key(name))
+//	{
+//		lua_Number ret = mapper.get_number_by_key(name);
+//		if (!SetData(&ret, sizeof(lua_Number)))
+//			logger::Instance().error(string("UniformVar::_lua_getter_number name@ ") + name + ", mapper@ " + mapper.GetData());
+//	}
+//}
 void UniformVar::_lua_getter_numbers(const gb::utils::luatable_mapper & mapper, const char * name)
 {
 	if (mapper.has_key(name))
 	{
 		std::vector<lua_Number> ret = mapper.get_numbers_by_key(name);
-		if (!SetData(ret.data(), sizeof(lua_Number) * ret.size()))
-			logger::Instance().error(string("UniformVar::_lua_getter_numbers name@ ") + name + ", mapper@ " + mapper.GetData());
+		SetData(ret.data(), sizeof(lua_Number) * ret.size());
 	}
 }
+
+void UniformVar::_lua_getter_samplers(const gb::utils::luatable_mapper & mapper, const char * name)
+{
+	std::vector<string> ret = mapper.get_strings_by_key(name);
+	const std::size_t minCount = ret.size() > count ? count : ret.size();
+
+	for (std::size_t i = 0; i < minCount; i++)
+	{
+		Texture * tex = resource::Res<Texture>::Instance().Get(ret[i]);
+		textureObjs[i] = { tex->GetTarget(), tex->GetTextureObj() };
+	}
+}
+
 const std::vector<std::string> Shader::_blockDelimiter
 {
 	{
@@ -358,7 +401,7 @@ bool Shader::from_lua(luatable_mapper & mapper, const char* shaderName)
 
 	_Name = shaderName;
 
-	file f(shaderName);
+	utils::file f(shaderName);
 	const size_t size = f.size();
 	char* buffer = new char[size + 1]{ '\0' };
 	f.read(buffer, size);
@@ -612,10 +655,36 @@ GLint Shader::GetUniformLocation(const char* name) const
 
 std::unordered_map<gb::utils::string, UniformVar> Shader::GenUniformVars() const
 {
-	std::unordered_map<gb::utils::string, UniformVar> ret;
-	std::for_each(_uniformVarSubs.begin(), _uniformVarSubs.end(), [&ret](const UniformVarStub& stub)
+	auto _getMaxUnits = []()->GLint
 	{
-		ret.insert(std::make_pair(stub.name, stub.genUniformVar()));
+		GLint maxTexUnits = 0;
+		glGetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &maxTexUnits);
+		return maxTexUnits;
+	};
+	static const GLuint maxTexUnits = _getMaxUnits();
+
+	std::unordered_map<gb::utils::string, UniformVar> ret;
+
+	std::uint32_t baseTexUnit = 0;
+	std::for_each(_uniformVarSubs.begin(), _uniformVarSubs.end(), [&ret, &baseTexUnit](const UniformVarStub& stub)
+	{
+		auto var = ret.insert(std::make_pair(stub.name, stub.genUniformVar()));
+		UniformVar & uVar = var.first->second;
+		std::int32_t* texUnits = (std::int32_t*)uVar.data;
+		if (uVar.textureObjs != nullptr)
+		{
+			for (std::uint32_t i = 0; i < uVar.count; i++)
+			{
+				if (baseTexUnit <= maxTexUnits)
+				{
+					texUnits[i] = baseTexUnit;
+					baseTexUnit++;
+				}
+				else
+					assert(false);
+			
+			}	
+		}		
 	});
 
 	return ret;

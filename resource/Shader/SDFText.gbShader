@@ -1,0 +1,33 @@
+GB_RENDER_DATA_SHADER_INFO_BEGIN
+
+GB_RENDER_DATA_SHADER_INFO_END
+
+GB_RENDER_DATA_SHADER_VERT_BEGIN
+#version 450 core
+
+in vec3 gb_vtxVar_pos;
+in vec2 gb_vtxVar_uv;
+in mat4 gb_instVar_mvp;
+
+void main()
+{
+  glPosition = gb_instVar_mvp * vec4(gb_vtxVar_pos, 1.0f);
+  uv = gb_vtxVar_uv;
+}
+
+GB_RENDER_DAAT_SHADER_VERT_END
+
+GB_REDNER_DATA_SHADER_FRAG_BEGIN
+#version 450 core
+
+uniform sampler2D font;
+in vec2 uv;
+out vec4 color;
+
+void main()
+{
+  color = texture(font, uv);
+}
+
+GB_RENDER_DATA_SHADER_FRAG_END
+xc

@@ -21,7 +21,7 @@ return
 	   {
 	      {
 		 Name = "cameraTexs",
-		 Type = slType.Int
+		 Type = slType.Sampler
 	      }
 	   }
 }

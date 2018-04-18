@@ -9,39 +9,39 @@ using gb::utils::string;
 
 int main(int argc, char** argv)
 {
-    gb::utils::args arg;
+	gb::utils::args arg;
 
-    string srcFontFile, dstFontFile;
-    try
-    {
-	arg.parse(argc, argv);
+	string srcFontFile, dstFontFile;
+	try
+	{
+		arg.parse(argc, argv);
 
-	srcFontFile = arg.unnamed_arg(1);
-	dstFontFile = arg.unnamed_arg(2);
-    }
-    catch(const string& err)
-    {
-	logger::Instance().error("args::parse error: " + err);
-	return 1;
-    }
+		srcFontFile = arg.unnamed_arg(1);
+		dstFontFile = arg.unnamed_arg(2);
+	}
+	catch (const string& err)
+	{
+		logger::Instance().error("args::parse error: " + err);
+		return 1;
+	}
 
-    srcFontFile = gb::utils::filesystem::Instance().get_absolute_path(srcFontFile);
-    dstFontFile = gb::utils::filesystem::Instance().get_absolute_path(dstFontFile);
+	srcFontFile = gb::utils::filesystem::Instance().get_absolute_path(srcFontFile);
+	dstFontFile = gb::utils::filesystem::Instance().get_absolute_path(dstFontFile);
 
-    logger::Instance().log("\nsrcFontfile: " + srcFontFile + "\n" + "dstFontFile: " + dstFontFile);
+	logger::Instance().log("\nsrcFontfile: " + srcFontFile + "\n" + "dstFontFile: " + dstFontFile);
 
-    try
-    {
-	freetypeLoader::Instance().load2gbFont(srcFontFile, dstFontFile);
-    }
-    catch(string& err)
-    {
-	logger::Instance().error("freetypeLoader::load2gbfont error: " + err);
-	return 1;
-    }
+	try
+	{
+		freetypeLoader::Instance().load2gbFont(srcFontFile, dstFontFile);
+	}
+	catch (string& err)
+	{
+		logger::Instance().error("freetypeLoader::load2gbfont error: " + err);
+		return 1;
+	}
 
-    
 
-    return 0;
+
+	return 0;
 }
 

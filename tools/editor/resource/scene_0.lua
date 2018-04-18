@@ -50,6 +50,17 @@ return
 				 Material = "Tint.lua"
 			      }
 			   }
+		     },
+		     {
+			Name = "text",
+			Elements =
+			   {
+			      {
+				 Type = ElementType.Text,
+				 Material = "SDFText.lua",
+				 Text = "hello world!"
+			      }
+			   }
 		     }
 		  }
 	    }

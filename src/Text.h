@@ -16,9 +16,15 @@ public:
 	void SetFont(const char* font);
 	void SetSize(const std::uint32_t pixelSize);
 	void SetLineSpace(const std::uint32_t lineSpace);
-	void SetText(const wchar_t* strText, const bool append = false);
+
+	void SetText(const char* szText, const bool append = false);
+	void SetText(const wchar_t* szText, const bool append = false);
 	//void SetText(const std::uint32_t glyphCode);
 
+private:
+	template <typename T>
+	void _setText(const T* szText, const std::size_t count, bool append);
+	void _setText(const wchar_t* strText, const std::size_t count);
 private:
 	GB_PROPERTY_R(private, Font, const data::Font*);
 

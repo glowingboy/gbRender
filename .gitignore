@@ -38,3 +38,6 @@ resources/
 Win32/
 *Debug/
 *#*
+
+*.dir/
+resource/Font/

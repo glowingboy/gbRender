@@ -2,6 +2,7 @@
 
 #include "Render.h"
 #include "Camera.h"
+#include "Text.h"
 
 #include <gbUtils/logger.h>
 #include <gbUtils/string.h>
@@ -32,7 +33,7 @@ void ElementAdapter::from_lua(const luatable_mapper& mapper)
 	else if (_Type == render::Element::Type::Render)
 		_Element = new Render();
 	else if (_Type == render::Element::Type::Text)
-		/*...*/;
+		_Element = new Text();
 	else
 	{
 		logger::Instance().error(string("ElementAdapter::from_lua unkown type error@ ") + mapper.GetData() + "type@ " + (int)_Type);

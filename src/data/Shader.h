@@ -42,6 +42,7 @@ struct slType
 	static constexpr std::uint8_t Vec4 = 6u;
 	static constexpr std::uint8_t Mat4 = 7u;
 	static constexpr std::uint8_t Handleui64 = 8u;
+	static constexpr std::uint8_t Sampler = 9u;
 
 	static GLint componentCount(const std::uint8_t type);
 	static GLenum glType(const std::uint8_t type);
@@ -102,18 +103,26 @@ struct VtxVarStub
 	VtxVarStubInfo genInfo(const GLsizei stride, const GLsizei offset) const;
 };
 
+struct UniformTextureVar
+{
+	GLenum target;
+	GLuint obj;
+};
 
 struct UniformVar
 {
-	UniformVar(const GLint index_, const std::size_t typeSize, const GLsizei count_, const std::uint8_t sl_type_);
+	UniformVar(const GLint index_, const std::size_t typeSize, const std::size_t count_, const std::uint8_t sl_type_);
 	~UniformVar();
 	UniformVar(UniformVar && other);
-	bool SetData(const void* data_, const std::size_t size);
+	void SetData(const void* data_, const std::size_t size);
+	void SetTextureObjs(const UniformTextureVar* texObjs, const std::size_t count_);
 	void Update() const;
 	GLint index;
 	std::size_t byteSize;
-	GLsizei count;
+	std::size_t count;
 	void* data;
+
+	UniformTextureVar* textureObjs;
 
 	inline void GetFromMaterial(const gb::utils::luatable_mapper& mapper, const char* name)
 	{
@@ -123,10 +132,11 @@ private:
 	typedef void(*setter)(const GLint location, const GLsizei count, const void* value);
 	typedef void(UniformVar::*lua_getter)(const gb::utils::luatable_mapper& mapper, const char* name);
 	//TODO lua_setter
-	void _lua_getter_integer(const gb::utils::luatable_mapper& mapper, const char* name);
+	//void _lua_getter_integer(const gb::utils::luatable_mapper& mapper, const char* name);
 	void _lua_getter_integers(const gb::utils::luatable_mapper& mapper, const char* name);
-	void _lua_getter_number(const gb::utils::luatable_mapper& mapper, const char* name);
+	//void _lua_getter_number(const gb::utils::luatable_mapper& mapper, const char* name);
 	void _lua_getter_numbers(const gb::utils::luatable_mapper& mapper, const char* name);
+	void _lua_getter_samplers(const gb::utils::luatable_mapper& mapper, const char* name);
 	setter _setter;
 	lua_getter _lua_getter;
 };

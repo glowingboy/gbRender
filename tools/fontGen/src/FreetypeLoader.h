@@ -5,8 +5,8 @@
 #define GB_FREETYPE_SAMPLESCALE 64
 class freetypeLoader
 {
-    GB_SINGLETON(freetypeLoader);
+	GB_SINGLETON(freetypeLoader);
 
 public:
-    void load2gbFont(const char* szSrcFontName, const char* szDstFontName);
+	void load2gbFont(const char* szSrcFontName, const char* szDstFontName);
 };

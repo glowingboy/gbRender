@@ -19,6 +19,7 @@ int main(int argc, char** argv)
 			{ GB_RENDER_RESOURCE_CFG_MATERIAL, filesystem::Instance().get_absolute_path("../resource/Material/Config.lua") },
 			{ GB_RENDER_RESOURCE_CFG_MESH, filesystem::Instance().get_absolute_path("../resource/Mesh/Config.lua") },
 			{ GB_RENDER_RESOURCE_CFG_ENTITY, filesystem::Instance().get_absolute_path("../resource/Entity/Config.lua") },
+			{ GB_RENDER_RESOURCE_CFG_FONT, filesystem::Instance().get_absolute_path("../resource/Font/Config.lua")}
 		}
 	)))
 		return 1;

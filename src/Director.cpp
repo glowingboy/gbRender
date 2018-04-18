@@ -24,7 +24,7 @@ Director::Director():
 	_RenderEntities(aabb<>(vec3F(-(signed)GB_RENDER_DIRECTOR_SCENE_SIZE, -(signed)GB_RENDER_DIRECTOR_SCENE_SIZE, -(signed)GB_RENDER_DIRECTOR_SCENE_SIZE),
 		vec3F(GB_RENDER_DIRECTOR_SCENE_SIZE, GB_RENDER_DIRECTOR_SCENE_SIZE, GB_RENDER_DIRECTOR_SCENE_SIZE))),
 	_frameBuffers{0},
-	_cameraTextures{0},
+	//_cameraTextures{0},
 	_cameraDepthBuffers{0},
 	_ClearColor{0, 0, 0, 0},
 	_instVar{0}
@@ -39,7 +39,7 @@ Director::~Director()
 {
 	glDeleteFramebuffers(GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT, _frameBuffers);
 
-	glDeleteTextures(1, &_cameraTextures);
+	//glDeleteTextures(1, &_cameraTextures);
 
 	glDeleteRenderbuffers(GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT, _cameraDepthBuffers);
 
@@ -73,6 +73,11 @@ bool Director::Ready(const Argument& arg)
 		if (!resource::Res<data::Entity>::Instance().Initialize(itr->second))
 			return false;
 
+	itr = resCfgs.find(GB_RENDER_RESOURCE_CFG_FONT);
+	if(itr != resCfgs.end())
+		if (!resource::Res<data::Font>::Instance().Initialize(itr->second))
+			return false;
+
 	_ScreenSize = arg.screenSize;
 	
 	if (arg.rootEntity.length() != 0)
@@ -82,21 +87,34 @@ bool Director::Ready(const Argument& arg)
 	glGenFramebuffers(GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT, _frameBuffers);
 
 	//texture
-	glGenTextures(1, &_cameraTextures);
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, _cameraTextures);
-	glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, _ScreenSize.x, _ScreenSize.y, GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
+	data::Texture::ImageData imgData;
+	imgData.data = nullptr;
+	imgData.depth = GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT;
+	imgData.height = _ScreenSize.y;
+	imgData.internalFormat = GL_RGBA8;
+	imgData.levels = 1;
+	imgData.target = GL_TEXTURE_2D_ARRAY;
+	imgData.width = _ScreenSize.x;
+
+	_cameraTextures.SetData(imgData);
+
+	//glGenTextures(1, &_cameraTextures);
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D_ARRAY, _cameraTextures);
+	//glTexStorage3D(GL_TEXTURE_2D_ARRAY, 1, GL_RGBA8, _ScreenSize.x, _ScreenSize.y, GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT);
+	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glBindTexture(GL_TEXTURE_2D_ARRAY, 0);
 
 	//depth
 	glGenRenderbuffers(GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT, _cameraDepthBuffers);
 
+	const GLuint texObj = _cameraTextures.GetTextureObj();
+
 	for (std::uint8_t i = 0; i < GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT; i++)
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, _frameBuffers[i]);
-		glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, _cameraTextures, 0, i);
+		glFramebufferTextureLayer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texObj, 0, i);
 
 		//depth buffer
 		glBindRenderbuffer(GL_RENDERBUFFER, _cameraDepthBuffers[i]);
@@ -119,8 +137,11 @@ bool Director::Ready(const Argument& arg)
 		logger::Instance().error("Director::Ready _screenMat nullptr");
 		return false;
 	}
+	const int texUnit = 0;
 
-	_screenMat->SetUniform("cameraTexs", 0, 1);
+	data::UniformTextureVar texVar{ _cameraTextures.GetTarget(), _cameraTextures.GetTextureObj() };
+
+	_screenMat->SetTexture("cameraTexs", &texVar);
 	
 	const data::Mesh* square = resource::Res<data::Mesh>::Instance().Get("Square.lua");
 	
@@ -217,8 +238,8 @@ bool Director::_directing()
 
 	_screenMat->Update();
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D_ARRAY, _cameraTextures);
+	//glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D_ARRAY, _cameraTextures);
 
 	_screenDraw.Draw(6, instCount);
 

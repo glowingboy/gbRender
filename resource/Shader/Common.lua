@@ -8,5 +8,6 @@ slType =
       Vec3 = 5,
       Vec4 = 6,
       Mat4 = 7,
-      Handleui64 = 8
+      Handleui64 = 8,
+      Sampler = 9
    }

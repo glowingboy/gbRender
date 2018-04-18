@@ -15,6 +15,7 @@
 #define GB_RENDER_RESOURCE_CFG_MATERIAL "Material"
 #define GB_RENDER_RESOURCE_CFG_MESH "Mesh"
 #define GB_RENDER_RESOURCE_CFG_ENTITY "Entity"
+#define GB_RENDER_RESOURCE_CFG_FONT "Font"
 
 
 #define GB_RENDER_RESOURCE_CFG_KEY_RESROOT "ResRoot"
@@ -201,6 +202,8 @@ private:
 			auto ret = _mpRes.insert(std::make_pair(data, font));
 
 			assert(ret.second);
+
+			return ret.first->second;
 		}
 		else
 			return nullptr;
@@ -208,4 +211,17 @@ private:
 
 };
 
+//texture
+template <>
+class Res < gb::render::data::Texture> : public _Res_base<gb::render::data::Texture>
+{
+	GB_SINGLETON(Res);
+
+public:
+	virtual  gb::render::data::Texture* _load_res(const char* data) override
+	{
+		//TODO:
+		return nullptr;
+	}
+};
 GB_RENDER_RESOURCE_NS_END
