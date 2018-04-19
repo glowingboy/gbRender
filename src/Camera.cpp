@@ -49,7 +49,7 @@ void Camera::Awake()
 
 	_multiIndirectDraw.Initialize(param);
 
-	GB_UTILS_CALLBACK_REG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, Camera::_onOwnerTransformChanged);
+	GB_UTILS_MULTI_CALLBACK_REG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, Camera::_onOwnerTransformChanged);
 
 	//_Owner->GetCBs().RegisterCB(GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, (void*)&Camera::_onOwnerTransformChanged, std::bind(&(Camera::_onOwnerTransformChanged), this));
 
@@ -62,7 +62,7 @@ void Camera::Start()
 void Camera::End()
 {
 	Director::Instance().RemoveCamera(this);
-	GB_UTILS_CALLBACK_REG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, Camera::_onOwnerTransformChanged);
+	GB_UTILS_MULTI_CALLBACK_UNREG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, Camera::_onOwnerTransformChanged);
 }
 
 void Camera::SetRenderQueue(const uint32 rq)

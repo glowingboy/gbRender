@@ -61,7 +61,7 @@ private:
 
 	//std::unordered_map<uint32, std::unordered_map<std::uintptr_t, std::function<void(void)>>> _mpCBs;
 
-	GB_PROPERTY_R(private, CBs, gb::utils::callback<>);
+	GB_PROPERTY_R(private, CBs, gb::utils::multi_callback<>);
 
 private:
 	void _updateWorldTransform();

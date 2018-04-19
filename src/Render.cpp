@@ -13,7 +13,8 @@ using namespace gb::physics;
 
 BaseRender::BaseRender(Entity* const owner):
 	Element(owner),
-	_Mesh(nullptr)
+	_Mesh(nullptr),
+	_originSBB(nullptr)
 	//_instVar_mvp(nullptr)
 {
 	owner->_setRender(this);
@@ -25,7 +26,7 @@ void BaseRender::Awake()
 
 	Director::Instance().AddRenderEntity(_Owner);
 
-	GB_UTILS_CALLBACK_REG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, BaseRender::_onOwnerTransformChanged);
+	GB_UTILS_MULTI_CALLBACK_REG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, BaseRender::_onOwnerTransformChanged);
 }
 
 void BaseRender::Start()
@@ -38,7 +39,7 @@ void BaseRender::End()
 	logger::Instance().log("render::End @ " + _Owner->GetName());
 
 	Director::Instance().RemoveRenderEntity(_Owner);
-	GB_UTILS_CALLBACK_UNREG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, BaseRender::_onOwnerTransformChanged);
+	GB_UTILS_MULTI_CALLBACK_UNREG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, BaseRender::_onOwnerTransformChanged);
 }
 
 Element::Type BaseRender::GetType() const

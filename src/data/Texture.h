@@ -21,6 +21,8 @@ public:
 		std::uint32_t height;
 		std::uint32_t depth;
 		void* data;
+
+		GLint row_unpack_alignment;
 	};
 	Texture();
 	Texture(const Texture && o) = delete;

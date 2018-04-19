@@ -168,6 +168,7 @@ void freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFon
 				return;
 			ud.height = bbox.yMax - bbox.yMin;
 
+			ud.data.clear();
 			ud.data.reserve(ud.width * ud.height);
 
 			ftErr = FT_Outline_Render(ftLib, &(ftSlot->outline), &rp);

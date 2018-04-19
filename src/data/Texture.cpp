@@ -10,7 +10,8 @@ Texture::ImageData::ImageData():
 	type(0),
 	width(0),
 	height(0),
-	data(nullptr)
+	data(nullptr),
+	row_unpack_alignment(4)
 {
 }
 
@@ -40,17 +41,20 @@ void Texture::SetData(const ImageData & data)
 
 	glBindTexture(_Target, _TextureObj);
 
+	glPixelStorei(GL_UNPACK_ALIGNMENT, data.row_unpack_alignment);
+
 	if (_Target == GL_TEXTURE_2D)
 	{
 		glTexStorage2D(_Target, data.levels, data.internalFormat, data.width, data.height);
+		
 		if(data.data != nullptr)
-			glTexSubImage2D(_Target, data.levels, 0, 0, data.width, data.height, data.externalFormat, data.type, data.data);
+			glTexSubImage2D(_Target, data.levels - 1, 0, 0, data.width, data.height, data.externalFormat, data.type, data.data);
 	}
 	else if (_Target == GL_TEXTURE_2D_ARRAY)
 	{
 		glTexStorage3D(_Target, data.levels, data.internalFormat, data.width, data.height, data.depth);
 		if(data.data != nullptr)
-			glTexSubImage3D(_Target, data.levels, 0, 0, 0, data.width, data.height, data.depth, data.externalFormat, data.type, data.data);
+			glTexSubImage3D(_Target, data.levels - 1, 0, 0, 0, data.width, data.height, data.depth, data.externalFormat, data.type, data.data);
 	}
 
 

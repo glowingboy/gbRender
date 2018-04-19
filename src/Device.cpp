@@ -3,6 +3,9 @@
 #include "Director.h"
 #include <wglext.h>
 #include <gbUtils/logger.h>
+
+#include "Input.h"
+
 using namespace gb::render;
 using gb::utils::string;
 using gb::utils::logger;
@@ -96,31 +99,31 @@ LRESULT CALLBACK Device::_windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 		break;
 	case WM_KEYDOWN:
 		bShouldGetCursorPos = true;
-		//gbInput::SetKeyState(wParam, true);
+		Input::Instance().Process(wParam, true);
 		break;
 	case WM_LBUTTONDOWN:
 		bShouldGetCursorPos = true;
-		//gbInput::SetKeyState(VK_LBUTTON, true);
+		Input::Instance().Process(VK_LBUTTON, true);
 		break;
 	case WM_RBUTTONDOWN:
 		bShouldGetCursorPos = true;
-		//gbInput::SetKeyState(VK_RBUTTON, true);
+		Input::Instance().Process(VK_RBUTTON, true);
 		break;
 	case WM_KEYUP:
 		bShouldGetCursorPos = true;
-		//gbInput::SetKeyState(wParam, false);
+		Input::Instance().Process(wParam, false);
 		break;
 	case WM_LBUTTONUP:
 		bShouldGetCursorPos = true;
-		//gbInput::SetKeyState(VK_LBUTTON, false);
+		Input::Instance().Process(VK_LBUTTON, false);
 		break;
 	case WM_RBUTTONUP:
 		bShouldGetCursorPos = true;
-		//gbInput::SetKeyState(VK_RBUTTON, false);
+		Input::Instance().Process(VK_RBUTTON, false);
 		break;
 	case WM_MOUSEMOVE:
 		bShouldGetCursorPos = true;
-		//gbInput::SetKeyState(gb_MS_MOVE, true);
+		Input::Instance().Process(GB_RENDER_INPUT_MS_MOVE, true);
 		break;
 	case WM_DESTROY:
 		wglDeleteContext(_glContext);

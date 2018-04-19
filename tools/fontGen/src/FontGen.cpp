@@ -6,7 +6,7 @@
 
 using gb::utils::logger;
 using gb::utils::string;
-
+#include <type_traits>
 int main(int argc, char** argv)
 {
 	gb::utils::args arg;

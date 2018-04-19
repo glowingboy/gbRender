@@ -57,6 +57,7 @@ data::Font* Font::ParseFromFile(const char* filePath)const
 	imgData.target = GL_TEXTURE_2D;
 	imgData.type = GL_UNSIGNED_BYTE;
 	imgData.width = width;
+	imgData.row_unpack_alignment = 1;
 
 	ret->SetData(imgData);
 

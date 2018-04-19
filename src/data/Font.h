@@ -19,8 +19,8 @@ struct Glyph:public Sprite //has one(code) less than file::glyph
 	//unit: pixel
 	// uint16 width;
 	// uint16 height;
-	gb::render::uint32 advanceX;
-	gb::render::uint32 yDelta;
+	std::uint32_t advanceX;
+	std::int32_t yDelta;
 };
 
 class Font:public _atlas<gb::render::uint32, Glyph>

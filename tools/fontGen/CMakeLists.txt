@@ -26,8 +26,10 @@ if(NOT CMAKE_CXX_COMPILER_ID STREQUAL MSVC_COMPILER_ID)
 endif()
 
 target_link_libraries(fontGen
-  ${gbUtils_LIBRARIES}
-  ${gbPhysics_LIBRARIES}
+  optimized ${gbUtils_LIBRARIES}
+  debug ${gbUtils_LIBRARIES_d}
+  optimized ${gbPhysics_LIBRARIES}
+  debug ${gbPhysics_LIBRARIES_d}
   ${libfreetype_LIBRARIES}
   ${ohter_lib}
   )

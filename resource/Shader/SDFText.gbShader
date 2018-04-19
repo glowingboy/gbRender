@@ -1,5 +1,30 @@
 GB_RENDER_DATA_SHADER_INFO_BEGIN
-
+return
+   {
+      VtxVars =
+	 {
+	    {
+	       Name = "gb_vtxVar_pos",
+	       Type = slType.Vec3
+	    },
+	    {
+	       Name = "gb_vtxVar_uv",
+	       Type = slType.Vec2
+	    },
+	    {
+	       Name = "gb_instVar_mvp",
+	       Type = slType.Mat4,
+	       Divisor = 1
+	    }
+	 },
+      UniformVars =
+	 {
+	    {
+	       Name = "font",
+	       Type = slType.Sampler
+	    }
+	 }
+   }
 GB_RENDER_DATA_SHADER_INFO_END
 
 GB_RENDER_DATA_SHADER_VERT_BEGIN
@@ -9,15 +34,17 @@ in vec3 gb_vtxVar_pos;
 in vec2 gb_vtxVar_uv;
 in mat4 gb_instVar_mvp;
 
+out vec2 uv;
+
 void main()
 {
-  glPosition = gb_instVar_mvp * vec4(gb_vtxVar_pos, 1.0f);
+  gl_Position = gb_instVar_mvp * vec4(gb_vtxVar_pos, 1.0f);
   uv = gb_vtxVar_uv;
 }
 
-GB_RENDER_DAAT_SHADER_VERT_END
+GB_RENDER_DATA_SHADER_VERT_END
 
-GB_REDNER_DATA_SHADER_FRAG_BEGIN
+GB_RENDER_DATA_SHADER_FRAG_BEGIN
 #version 450 core
 
 uniform sampler2D font;
@@ -26,8 +53,8 @@ out vec4 color;
 
 void main()
 {
-  color = texture(font, uv);
+  color.r = texture(font, uv).r;
+  color.g = 1.0f;
 }
 
 GB_RENDER_DATA_SHADER_FRAG_END
-xc

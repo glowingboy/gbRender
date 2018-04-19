@@ -7,7 +7,9 @@ GLVar::GLVar(const std::size_t unitSize):
 	_unitSize(unitSize),
 	_count(0),
 	_capacity(0),
+	_data(nullptr),
 	_byteSize(0)
+	
 {
 }
 
