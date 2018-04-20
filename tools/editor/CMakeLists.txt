@@ -6,12 +6,21 @@ endif()
 
 include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/src)
 
-set(editor_srcs)
+set(srcs)
 
-gb_add_class(Editor src editor_srcs)
+gb_add_class(NS.h src srcs)
+gb_add_class(Editor src srcs)
+gb_add_class(Main src  srcs)
+
+# data
+gb_add_class(NS.h src/data srcs)
+gb_add_class(Main src/data srcs)
+
+
+include_directories(SYSTEM ${CMAKE_SOURCE_DIR}/src)
 
 add_executable(gbEditor
-  ${editor_srcs}
+  ${srcs}
   )
 
 

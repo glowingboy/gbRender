@@ -63,7 +63,7 @@ private:
 
 	GLuint _frameBuffers[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];
 	//GLuint _cameraTextures;
-	data::Texture _cameraTextures;
+	GLTexture _cameraTextures;
 	GLuint _cameraDepthBuffers[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];
 	//GLuint _cameraTexIndices[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];
 	std::queue<GLuint> _cameraFBOIndices;

@@ -32,11 +32,17 @@ Text::Text(Entity* owner) :
 	_vtxIdx = _Mesh->InitializeAVtxVar(GB_RENDER_VTXVAR_IDX, sizeof(std::uint32_t));
 
 	//matrial
-	_Material = resource::Res<data::Material>::Instance().Get("SDFText.lua");
+	SetMaterial("SDFText.lua");
+	//_Material = resource::Res<data::Material>::Instance().Get("SDFText.lua");
 
 	data::UniformTextureVar texVar = { _Font->GetTarget(), _Font->GetTextureObj() };
 
 	_Material->SetTexture("font", &texVar);
+}
+
+Text::~Text()
+{
+	GB_SAFE_DELETE(_Mesh);
 }
 
 void Text::SetFont(const char * font)

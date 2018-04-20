@@ -64,6 +64,16 @@ return
 				 Text = "hello world!"
 			      }
 			   }
+		     },
+		     {
+			Name = "texture",
+			Elements =
+			   {
+			      {
+				 Type = ElementType.Texture,
+				 Material = "SDFText.lua"
+			      }
+			   }
 		     }
 		  }
 	    }

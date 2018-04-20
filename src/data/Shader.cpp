@@ -378,7 +378,7 @@ void UniformVar::_lua_getter_samplers(const gb::utils::luatable_mapper & mapper,
 
 	for (std::size_t i = 0; i < minCount; i++)
 	{
-		Texture * tex = resource::Res<Texture>::Instance().Get(ret[i]);
+		GLTexture * tex = resource::Res<GLTexture>::Instance().Get(ret[i]);
 		textureObjs[i] = { tex->GetTarget(), tex->GetTextureObj() };
 	}
 }

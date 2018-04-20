@@ -1,8 +1,10 @@
 #pragma once
-#include "Texture.h"
+#include "../GLTexture.h"
 #include <unordered_map>
 #include <gbUtils/logger.h>
 #include <gbUtils/string.h>
+#include "DataNS.h"
+
 GB_RENDER_DATA_NS_BEGIN
 
 struct Sprite
@@ -15,22 +17,22 @@ struct Sprite
 	    width(0),
 	    height(0)
 	    {}
-	float32 uv_b;
-	float32 uv_l;
-	float32 uv_t;
-	float32 uv_r;
-	uint32 width;
-	uint32 height;
+	float uv_b;
+	float uv_l;
+	float uv_t;
+	float uv_r;
+	std::uint32_t width;
+	std::uint32_t height;
     };
 
 template<typename Key_t, typename Sprite_t>
-class _atlas:public Texture
+class _atlas:public gb::render::GLTexture
 {
 public:
 	_atlas(){}
 	template <typename T>
 	_atlas(T && other) :
-		Texture(std::forward<T>(other)),
+		gb::render::GLTexture(std::forward<T>(other)),
 		_mpSprites(std::forward<T>(other._mpSprites))
 	{
 

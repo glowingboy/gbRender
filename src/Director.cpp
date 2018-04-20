@@ -52,6 +52,8 @@ bool Director::Ready(const Argument& arg)
 		return false;
 	}
 
+	data::Element::Recipe::Instance().PreReg();
+
 	const auto& resCfgs = arg.resCfgs;
 	auto itr = resCfgs.find(GB_RENDER_RESOURCE_CFG_SHADER);
 	if (itr != resCfgs.end())
@@ -87,7 +89,7 @@ bool Director::Ready(const Argument& arg)
 	glGenFramebuffers(GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT, _frameBuffers);
 
 	//texture
-	data::Texture::ImageData imgData;
+	GLTexture::ImageData imgData;
 	imgData.data = nullptr;
 	imgData.depth = GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT;
 	imgData.height = _ScreenSize.y;

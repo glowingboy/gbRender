@@ -46,6 +46,7 @@ gb_add_class(Device src srcs)
 gb_add_class(GL src srcs)
 gb_add_class(GLVariable src srcs)
 gb_add_class(GLDraw src srcs)
+gb_add_class(GLTexture src srcs)
 gb_add_class(Input src srcs)
 # 
 gb_add_class(Director src srcs)

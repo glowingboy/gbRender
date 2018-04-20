@@ -6,6 +6,7 @@
 
 #include "../RenderNS.h"
 
+#include <unordered_map>
 
 namespace gb
 {
@@ -22,8 +23,24 @@ GB_RENDER_DATA_NS_BEGIN
 
 class ElementAdapter;
 
+
+#define GB_RENDER_DATA_ELEMENT_RECIPE_REG(type, element) \
+	Element::Recipe::Instance().Register(type, []()->Element* \
+{ \
+	return new element; \
+});
+
 class Element
 {
+public:
+	class Recipe
+	{
+		GB_SINGLETON(Recipe);
+	public:
+		void PreReg();
+		void Register(const std::uint32_t type, const std::function<Element*(void)>& func);
+		GB_PROPERTY_R(private, Contents, std::unordered_map<std::uint32_t, std::function<Element*(void)>>);
+	};
 	friend class ElementAdapter;
 public:
 	Element(const gb::render::Element::Type type);
@@ -42,7 +59,8 @@ public:
 	void from_lua(const gb::utils::luatable_mapper& mappper);
 	GB_PROPERTY_R(private, Element, Element*);
 private:
-	gb::render::Element::Type _Type;
+	std::uint32_t _Type;
 };
+
 
 GB_RENDER_DATA_NS_END

@@ -23,7 +23,7 @@ struct Glyph:public Sprite //has one(code) less than file::glyph
 	std::int32_t yDelta;
 };
 
-class Font:public _atlas<gb::render::uint32, Glyph>
+class Font:public _atlas<std::uint32_t, Glyph>
 {
 	friend class gb::render::file::Font;
 public:
@@ -35,7 +35,7 @@ public:
 	{}
 
 private:
-	GB_PROPERTY_R(private, GlyphSize, gb::render::uint32);
+	GB_PROPERTY_R(private, GlyphSize, std::uint32_t);
 };
 
 GB_RENDER_DATA_NS_END

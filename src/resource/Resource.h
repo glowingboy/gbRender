@@ -213,12 +213,12 @@ private:
 
 //texture
 template <>
-class Res < gb::render::data::Texture> : public _Res_base<gb::render::data::Texture>
+class Res < gb::render::GLTexture> : public _Res_base<gb::render::GLTexture>
 {
 	GB_SINGLETON(Res);
 
 public:
-	virtual  gb::render::data::Texture* _load_res(const char* data) override
+	virtual  gb::render::GLTexture* _load_res(const char* data) override
 	{
 		//TODO:
 		return nullptr;

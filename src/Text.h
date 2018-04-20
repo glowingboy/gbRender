@@ -13,6 +13,7 @@ class Text : public BaseRender
 {
 public:
 	Text(Entity* owner);
+	~Text();
 public:
 	void SetFont(const char* font);
 	void SetSize(const std::uint32_t pixelSize);

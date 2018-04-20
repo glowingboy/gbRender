@@ -1,69 +1,24 @@
 #include "Texture.h"
+#include "../Texture.h"
 
 using namespace gb::render::data;
-
-Texture::ImageData::ImageData():
-	target(0),
-	levels(0),
-	internalFormat(0),
-	externalFormat(0),
-	type(0),
-	width(0),
-	height(0),
-	data(nullptr),
-	row_unpack_alignment(4)
-{
-}
+using namespace gb;
 
 Texture::Texture():
-	_TextureObj(0)
+	Element(render::Element::Type::Texture)
 {}
 
-Texture::~Texture()
+gb::render::Element * Texture::Instantiate(gb::render::Entity * const owner) const
 {
-	glDeleteBuffers(1, &_TextureObj);
+	render::Texture* tex = new render::Texture(owner);
+	if (_Material.length() != 0)
+		tex->SetMaterial(_Material);
+
+	return tex;
 }
 
-
-void Texture::SetData(const ImageData & data)
+void Texture::from_lua(const gb::utils::luatable_mapper & mapper)
 {
-	if (data.target == 0)
-		return;
-
-	_Target = data.target;
-
-	if (_TextureObj != 0)
-		glDeleteBuffers(1, &_TextureObj);
-
-	_TextureObj = 0;
-
-	glGenTextures(1, &_TextureObj);
-
-	glBindTexture(_Target, _TextureObj);
-
-	glPixelStorei(GL_UNPACK_ALIGNMENT, data.row_unpack_alignment);
-
-	if (_Target == GL_TEXTURE_2D)
-	{
-		glTexStorage2D(_Target, data.levels, data.internalFormat, data.width, data.height);
-		
-		if(data.data != nullptr)
-			glTexSubImage2D(_Target, data.levels - 1, 0, 0, data.width, data.height, data.externalFormat, data.type, data.data);
-	}
-	else if (_Target == GL_TEXTURE_2D_ARRAY)
-	{
-		glTexStorage3D(_Target, data.levels, data.internalFormat, data.width, data.height, data.depth);
-		if(data.data != nullptr)
-			glTexSubImage3D(_Target, data.levels - 1, 0, 0, 0, data.width, data.height, data.depth, data.externalFormat, data.type, data.data);
-	}
-
-
-	glTexParameteri(_Target, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri(_Target, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	glTexParameteri(_Target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(_Target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	glBindTexture(_Target, 0);
-
+	if (mapper.has_key(GB_RENDER_DATA_TEXTURE_KEY_MATERIAL))
+		_Material = mapper.get_string_by_key(GB_RENDER_DATA_TEXTURE_KEY_MATERIAL);
 }

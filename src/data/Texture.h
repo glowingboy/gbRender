@@ -1,39 +1,20 @@
 #pragma once
-#include "DataNS.h"
-#include "../Type.h"
+
+#include "Element.h"
 #include <gbUtils/common.h>
-#include "../GL.h"
+
+#define GB_RENDER_DATA_TEXTURE_KEY_MATERIAL "Material"
 
 GB_RENDER_DATA_NS_BEGIN
 
-class Texture
+class Texture : public Element
 {
 public:
-	struct ImageData
-	{
-		ImageData();
-		GLenum target;
-		GLsizei levels;
-		GLenum internalFormat;
-		GLenum externalFormat;
-		GLenum type;
-		std::uint32_t width;
-		std::uint32_t height;
-		std::uint32_t depth;
-		void* data;
-
-		GLint row_unpack_alignment;
-	};
 	Texture();
-	Texture(const Texture && o) = delete;
-	~Texture();
-public:
-	void SetData(const ImageData& data);
-	//type
+	virtual gb::render::Element* Instantiate(gb::render::Entity* const owner) const;
+	virtual void from_lua(const gb::utils::luatable_mapper & mapper);
 
-protected:
-	GB_PROPERTY_R(protected, Target, GLenum);
-	GB_PROPERTY_R(protected, TextureObj, GLuint);
+	GB_PROPERTY_R(private, Material, gb::utils::string);
 };
 
 GB_RENDER_DATA_NS_END

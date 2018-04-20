@@ -1,9 +1,11 @@
-#include "../../../src/Director.h"
-
+#include <Director.h>
 using namespace gb::render;
 using namespace gb::physics;
 using namespace gb::utils;
 
+using namespace gb;
+
+#include "data/Element.h"
 
 int main(int argc, char** argv)
 {
@@ -12,6 +14,8 @@ int main(int argc, char** argv)
 	//entity_ls.dofile(filesystem::Instance().get_absolute_path("../resource/ElementType.lua"));
 	//entity_ls.dofile(filesystem::Instance().get_absolute_path("../resource/RenderQueue.lua"));
 
+	editor::data::ElementRecipe::Instance().Reg();
+	
 
 	if (!Director::Instance().Ready(Director::Argument("scene_0.lua", vec2<uint32>(640, 480), 
 		{

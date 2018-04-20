@@ -41,7 +41,7 @@ void Entity::_instantiate(const data::Entity* dEntity)
 	{
 		Element* ele = dE.second->Instantiate(this);
 		ele->Awake();
-		_Elements.insert(std::pair<const Element::Type, Element*>(ele->GetType(), ele));
+		_Elements.insert(std::pair<const std::uint32_t, Element*>(ele->GetType(), ele));
 	});
 	//children instantiate
 	std::for_each(dEntity->GetChildren().begin(), dEntity->GetChildren().end(), [this](const std::pair<const string, data::Entity*>& dE)
@@ -91,11 +91,11 @@ void Entity::End()
 
 void Entity::AddElement(Element* const ele)
 {
-	const Element::Type t = ele->GetType();
+	const std::uint32_t t = ele->GetType();
 
 	if (_Elements.find(t) != _Elements.end())
 	{
-		_Elements.insert(std::pair<const Element::Type, Element*>(t, ele));
+		_Elements.insert(std::pair<const std::uint32_t, Element*>(t, ele));
 	}
 	else
 		logger::Instance().warning("more than one count of same type Element @ " + Element::TypeToString(t));
