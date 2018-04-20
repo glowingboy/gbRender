@@ -11,6 +11,8 @@ GB_RENDER_NS_BEGIN
 
 class GLMultiIndirectDraw;
 
+class GLDraw;
+
 class GLBuffer
 {
 	friend class GLMultiIndirectDraw;
@@ -29,8 +31,8 @@ public:
 		void* data;
 	};
 
-	GLBuffer();
-	GLBuffer(const GLenum target, const CtorParam& param);
+	GLBuffer(const GL::Sync& sync);
+	GLBuffer(const GL::Sync& sync, const GLenum target, const CtorParam& param);
 	~GLBuffer();
 public:
 	void Initialize(const GLenum target, const CtorParam& param);
@@ -41,6 +43,8 @@ public:
 	GB_PROPERTY_R(protected, Size, GLsizeiptr);
 private:
 	char* _pData;
+
+	const GL::Sync& _sync;
 private:
 	void _initialize(const GLenum target, const void* data);
 };
@@ -54,11 +58,15 @@ protected:
 	GLDraw(const GLBuffer::CtorParam * bufParams);
 	~GLDraw();
 	void Initialize(const GLBuffer::CtorParam * bufParams);
+	void SetSync();
 
 	GB_PROPERTY_R(protected, VAO, GLuint);
 
 	GB_PROPERTY_R(protected, VtxBuffer, GLBuffer);
 	GB_PROPERTY_R(protected, IdxBuffer, GLBuffer);
+	GB_PROPERTY_R(protected, Sync, GL::Sync);
+protected:
+	bool _needSync;
 };
 
 namespace data
@@ -74,7 +82,8 @@ public:
 	GLInstancedDraw(const std::array<GLBuffer::CtorParam, 3>& param);
 	void Initialize(const std::array<GLBuffer::CtorParam, 3>& param);
 	void VtxAttribPointerSetup(const data::Shader* shader);
-	void Draw(const GLsizei count, const GLsizei instanceCount) const ;
+	void Draw(const GLsizei count, const GLsizei instanceCount);
+	
 protected:
 	GLInstancedDraw(const GLBuffer::CtorParam * const& param);//*& for decreasing rank when overload resolution happens (GLInstancedDraw(const GLBuffer::CtorParam (&param) [3]) has same rank)
 	void Initialize(const GLBuffer::CtorParam * const& param);
@@ -103,7 +112,7 @@ public:
 	GLMultiIndirectDraw(const GLBuffer::CtorParam(&param)[4]);
 	void Initialize(const GLBuffer::CtorParam(&param)[4]);
 	void SetData(const std::vector<BaseRender*> renders);
-	void Draw() const;
+	void Draw();
 	void Release();
 private:
 	//0: vtx, 1: idx, 2: inst, 3: indirectCmd

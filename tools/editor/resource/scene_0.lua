@@ -37,6 +37,9 @@ return
 			      {
 				 Type = ElementType.Camera,
 				 RenderQueue = RenderQueue.Opaque,
+			      },
+			      {
+				 Type = ElementType.FPVController
 			      }
 			   }
 		     },

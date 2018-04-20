@@ -3,7 +3,7 @@
 #include "Render.h"
 #include "Camera.h"
 #include "Text.h"
-
+#include "FPVController.h"
 #include <gbUtils/logger.h>
 #include <gbUtils/string.h>
 using namespace gb;
@@ -34,6 +34,8 @@ void ElementAdapter::from_lua(const luatable_mapper& mapper)
 		_Element = new Render();
 	else if (_Type == render::Element::Type::Text)
 		_Element = new Text();
+	else if (_Type == render::Element::Type::FPVController)
+		_Element = new FPVController();
 	else
 	{
 		logger::Instance().error(string("ElementAdapter::from_lua unkown type error@ ") + mapper.GetData() + "type@ " + (int)_Type);

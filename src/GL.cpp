@@ -80,3 +80,32 @@ void APIENTRY GL::_glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum s
 		logger::Instance().log(msgSrc + ", " + msgType + ", " + msgSeverity);
 	}
 }
+
+GL::Sync::Sync():
+	_sync(0)
+{}
+
+GL::Sync::~Sync()
+{
+	if (_sync != 0)
+		glDeleteSync(_sync);
+}
+void GL::Sync::Set()
+{
+	if (_sync != 0)
+		glDeleteSync(_sync);
+	_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+}
+
+void GL::Sync::Wait() const
+{
+	if (_sync)
+	{
+		while (true)
+		{
+			const GLenum waitReturn = glClientWaitSync(_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 1);
+			if (waitReturn == GL_ALREADY_SIGNALED || waitReturn == GL_CONDITION_SATISFIED)
+				break;
+		}
+	}
+}

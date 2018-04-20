@@ -15,15 +15,31 @@ namespace data
 }
 class GL
 {
-	friend class Device;
-	static void APIENTRY _glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity,
-		GLsizei length, const GLchar *message, void *userParam);
+public:
+	class Sync
+	{
+	public:
+		Sync();
+		~Sync();
+	public:
+		void Set();
+		void Wait() const;
+	private:
+		GLsync _sync;
+	};
 
+
+	friend class Device;
 public:
 	static void applyShader(const data::Shader* shader);
 
+	
 private:
 	static const data::Shader* _currentShader;
+
+private:
+	static void APIENTRY _glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity,
+		GLsizei length, const GLchar *message, void *userParam);
 };
 
 GB_RENDER_NS_END

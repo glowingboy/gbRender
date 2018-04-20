@@ -28,7 +28,7 @@ class Element
 public:
 	Element(const gb::render::Element::Type type);
 public:
-	virtual gb::render::Element* Instantiate(Entity* const owner) const = 0;
+	virtual gb::render::Element* Instantiate(gb::render::Entity* const owner) const = 0;
 	virtual void from_lua(const gb::utils::luatable_mapper & mapper) = 0;
 	GB_PROPERTY_R(protected, Type, gb::render::Element::Type);
 };

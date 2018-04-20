@@ -10,7 +10,7 @@ public:
 	enum class Type
 	{
 		Default = 0, 
-		Camera, Render, Mesh, Text
+		Camera, Render, Mesh, Text, FPVController
 	};
 	inline static gb::utils::string TypeToString(const Type t)
 	{

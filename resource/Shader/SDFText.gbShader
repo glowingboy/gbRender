@@ -54,7 +54,6 @@ out vec4 color;
 void main()
 {
   color.r = texture(font, uv).r;
-  color.g = 1.0f;
 }
 
 GB_RENDER_DATA_SHADER_FRAG_END

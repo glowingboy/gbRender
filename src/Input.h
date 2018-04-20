@@ -50,12 +50,11 @@ class Input
 
 
 public:
+	
 	void Process(const std::uint8_t code, const bool down);
 
 private:
-	gb::utils::callback<const char, const bool> _CBs;
-
-
+	GB_PROPERTY_R(private, CBs, gb::utils::callback<const char, const bool>);
 
 };
 

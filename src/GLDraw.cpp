@@ -13,17 +13,19 @@ GLBuffer::CtorParam::CtorParam():
 	data(nullptr)
 {}
 
-GLBuffer::GLBuffer():
+GLBuffer::GLBuffer(const GL::Sync& sync):
 	_Type(Type::Reserved),
 	_BufferO(0),
 	_Size(0),
-	_pData(0)
+	_pData(0),
+	_sync(sync)
 {}
 
-GLBuffer::GLBuffer(const GLenum target, const CtorParam& param):
+GLBuffer::GLBuffer(const GL::Sync& sync, const GLenum target, const CtorParam& param):
 	_Type(param.type),
 	_BufferO(0),
-	_Size(param.size)
+	_Size(param.size),
+	_sync(sync)
 {
 	_initialize(target, param.data);
 }
@@ -78,6 +80,8 @@ void GLBuffer::SetData(const std::size_t offset, const void* data, const std::si
 		}
 	}
 
+	_sync.Wait();
+
 	if (size <= (_Size - offset))
 		std::memcpy(_pData + offset, data, size);
 	else
@@ -108,6 +112,8 @@ void GLBuffer::SetData(const std::vector<data::VtxVarStubInfo>& rule, const std:
 
 		const std::size_t stride = rule.begin()->stride;
 
+		_sync.Wait();
+		
 		std::for_each(rule.cbegin(), rule.cend(), [this, &offset, &data, &stride](const data::VtxVarStubInfo& info)
 		{
 			auto iter = data.find(info.name);
@@ -151,13 +157,17 @@ void GLBuffer::SetData(const std::vector<data::VtxVarStubInfo>& rule, const std:
 	}
 }
 GLDraw::GLDraw():
-	_VAO(0)
+	_VAO(0),
+	_needSync(false),
+	_VtxBuffer(_Sync),
+	_IdxBuffer(_Sync)
 {}
 
 GLDraw::GLDraw(const GLBuffer::CtorParam * bufParams) :
 	_VAO(0),
-	_VtxBuffer(GL_ARRAY_BUFFER, bufParams[0]),
-	_IdxBuffer(GL_ELEMENT_ARRAY_BUFFER, bufParams[1])
+	_VtxBuffer(_Sync, GL_ARRAY_BUFFER, bufParams[0]),
+	_IdxBuffer(_Sync, GL_ELEMENT_ARRAY_BUFFER, bufParams[1]),
+	_needSync(false)
 {
 	glGenVertexArrays(1, &_VAO);
 	glBindVertexArray(_VAO);
@@ -166,6 +176,9 @@ GLDraw::GLDraw(const GLBuffer::CtorParam * bufParams) :
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _IdxBuffer.GetBufferO());
 
 	glBindVertexArray(0);
+
+	if (_VtxBuffer.GetType() == GLBuffer::Type::Dynamic || _IdxBuffer.GetType() == GLBuffer::Type::Dynamic)
+		_needSync = true;
 }
 
 void GLDraw::Initialize(const GLBuffer::CtorParam * bufParams)
@@ -180,6 +193,9 @@ void GLDraw::Initialize(const GLBuffer::CtorParam * bufParams)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, _IdxBuffer.GetBufferO());
 
 	glBindVertexArray(0);
+
+	if (_VtxBuffer.GetType() == GLBuffer::Type::Dynamic || _IdxBuffer.GetType() == GLBuffer::Type::Dynamic)
+		_needSync = true;
 }
 
 GLDraw::~GLDraw()
@@ -187,7 +203,13 @@ GLDraw::~GLDraw()
 	glDeleteVertexArrays(1, &_VAO);
 }
 
+void GLDraw::SetSync()
+{
+	if (_needSync)
+		_Sync.Set();
+}
 GLInstancedDraw::GLInstancedDraw():
+	_InstBuffer(_Sync),
 	_Mode(GL_TRIANGLES)
 	//_Count(1),
 	//_InstanceCount(1)
@@ -195,7 +217,7 @@ GLInstancedDraw::GLInstancedDraw():
 
 GLInstancedDraw::GLInstancedDraw(const GLBuffer::CtorParam * const & param) :
 	GLDraw(param),
-	_InstBuffer(GL_ELEMENT_ARRAY_BUFFER, param[2]),
+	_InstBuffer(_Sync, GL_ELEMENT_ARRAY_BUFFER, param[2]),
 	_Mode(GL_TRIANGLES)
 	//_Count(1),
 	//_InstanceCount(1)
@@ -205,6 +227,9 @@ GLInstancedDraw::GLInstancedDraw(const GLBuffer::CtorParam * const & param) :
 	glBindBuffer(GL_ARRAY_BUFFER, _InstBuffer.GetBufferO());
 
 	glBindVertexArray(0);
+
+	if (!_needSync && _InstBuffer.GetType() == GLBuffer::Type::Dynamic)
+		_needSync = true;
 
 }
 
@@ -218,6 +243,9 @@ void GLInstancedDraw::Initialize(const GLBuffer::CtorParam * const & param)
 	glBindBuffer(GL_ARRAY_BUFFER, _InstBuffer.GetBufferO());
 
 	glBindVertexArray(0);
+
+	if (!_needSync && _InstBuffer.GetType() == GLBuffer::Type::Dynamic)
+		_needSync = true;
 }
 
 GLInstancedDraw::GLInstancedDraw(const std::array<GLBuffer::CtorParam, 3>& param):
@@ -241,11 +269,13 @@ void GLInstancedDraw::VtxAttribPointerSetup(const data::Shader* shader)
 	glBindVertexArray(0);
 }
 
-void GLInstancedDraw::Draw(const GLsizei count, const GLsizei instanceCount) const
+void GLInstancedDraw::Draw(const GLsizei count, const GLsizei instanceCount)
 {
 	glBindVertexArray(_VAO);
 
+	
 	glDrawElementsInstanced(_Mode, count, GL_UNSIGNED_INT, 0, instanceCount);
+	SetSync();
 
 	glBindVertexArray(0);
 }
@@ -253,16 +283,18 @@ void GLInstancedDraw::Draw(const GLsizei count, const GLsizei instanceCount) con
 
 
 GLMultiIndirectDraw::GLMultiIndirectDraw():
+	_IndirectCmdBuffer(_Sync),
 	_cmdCount(0)
 {
 }
 
 GLMultiIndirectDraw::GLMultiIndirectDraw(const GLBuffer::CtorParam(&param)[4]):
 	GLInstancedDraw(param),
-	_IndirectCmdBuffer(GL_DRAW_INDIRECT_BUFFER, param[3]),
+	_IndirectCmdBuffer(_Sync, GL_DRAW_INDIRECT_BUFFER, param[3]),
 	_cmdCount(0)
 {
-
+	if (!_needSync && _IndirectCmdBuffer.GetType() == GLBuffer::Type::Dynamic)
+		_needSync = true;
 }
 
 void GLMultiIndirectDraw::Initialize(const GLBuffer::CtorParam(&param)[4])
@@ -270,6 +302,9 @@ void GLMultiIndirectDraw::Initialize(const GLBuffer::CtorParam(&param)[4])
 	GLInstancedDraw::Initialize(param);
 
 	_IndirectCmdBuffer.Initialize(GL_DRAW_INDIRECT_BUFFER, param[3]);
+
+	if (!_needSync && _IndirectCmdBuffer.GetType() == GLBuffer::Type::Dynamic)
+		_needSync = true;
 }
 
 void GLMultiIndirectDraw::SetData(const std::vector<BaseRender*> renders)
@@ -344,14 +379,14 @@ void GLMultiIndirectDraw::Release()
 	//TODO
 }
 
-void GLMultiIndirectDraw::Draw() const
+void GLMultiIndirectDraw::Draw()
 {
 	glBindVertexArray(_VAO);
 
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, _IndirectCmdBuffer.GetBufferO());
 
 	glMultiDrawElementsIndirect(_Mode, GL_UNSIGNED_INT, 0, _cmdCount, 0);
-
+	SetSync();
 	glBindVertexArray(0);
 }
 

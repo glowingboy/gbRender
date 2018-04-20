@@ -21,6 +21,18 @@ void Transform::operator=(const render::data::Transform & dataTrans)
 	_updateLocalMatrix();
 }
 
+void Transform::SetPosition(const gb::physics::vec3F & newPosition)
+{
+	_localPosition_Ref = newPosition;
+
+	_updateLocalMatrix();
+}
+
+const gb::physics::vec4F & Transform::GetLocalPosition() const
+{
+	return _localPosition_Ref;
+}
+
 void Transform::_updateLocalMatrix()
 {
 	/*
