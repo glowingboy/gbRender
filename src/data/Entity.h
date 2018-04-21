@@ -30,7 +30,7 @@ public:
 	GB_PROPERTY_R(private, Transform, Transform);
 
 	GB_PROPERTY_R(private, Children, std::unordered_multimap<const gb::utils::string, Entity*>);
-	GB_PROPERTY_R(private, Elements, std::map<const gb::render::Element::Type, Element*>);
+	GB_PROPERTY_R(private, Elements, std::map<const std::uint32_t, Element*>);
 };
 template <> struct Entity::is_entity<Entity> : std::true_type{};
 

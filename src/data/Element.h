@@ -25,7 +25,7 @@ class ElementAdapter;
 
 
 #define GB_RENDER_DATA_ELEMENT_RECIPE_REG(type, element) \
-	Element::Recipe::Instance().Register(type, []()->Element* \
+	gb::render::data::Element::Recipe::Instance().Register(type, []()->gb::render::data::Element* \
 { \
 	return new element; \
 });
@@ -43,11 +43,11 @@ public:
 	};
 	friend class ElementAdapter;
 public:
-	Element(const gb::render::Element::Type type);
+	Element(const std::uint32_t type);
 public:
-	virtual gb::render::Element* Instantiate(gb::render::Entity* const owner) const = 0;
+	virtual gb::render::Element* Instantiate(gb::render::Entity* owner) const = 0;
 	virtual void from_lua(const gb::utils::luatable_mapper & mapper) = 0;
-	GB_PROPERTY_R(protected, Type, gb::render::Element::Type);
+	GB_PROPERTY_R(protected, Type, std::uint32_t);
 };
 
 

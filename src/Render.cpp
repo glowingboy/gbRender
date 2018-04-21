@@ -42,7 +42,7 @@ void BaseRender::End()
 	GB_UTILS_MULTI_CALLBACK_UNREG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, BaseRender::_onOwnerTransformChanged);
 }
 
-Element::Type BaseRender::GetType() const
+std::uint32_t BaseRender::GetType() const
 {
 	return Element::Type::Render;
 }

@@ -23,7 +23,7 @@ class Camera: public Element
 public:
 	Camera(Entity * const owner);
 public:
-	virtual Type GetType() const override;
+	virtual std::uint32_t GetType() const override;
 
 	bool operator < (const Camera & o) const;
 	void Shoot();
@@ -40,7 +40,8 @@ private:
 	// bitfiled
 	GB_PROPERTY_R(private, InterestTag, uint32);
 
-	gb::physics::frustum<gb::physics::Float> _frustum;
+	GB_PROPERTY_R(private, Frustum, gb::physics::frustum<gb::physics::Float>);
+	//gb::physics::frustum<gb::physics::Float> _frustum;
 	
 	//const gb::physics::aabb<>& _frustumAABB;
 	//using spherebb rather than aabb, for the reason, when transforming frustumAABB 

@@ -194,7 +194,8 @@ void freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFon
 
 	for (FT_ULong i = startCode; i < endCode; i++)
 	{
-		loader.pushtask(concurrency_ti_tc<FT_ULong>::task(gen_sdf, i, GB_UTILS_CONCURRENCY_TASK_PRIORITY_MID));
+		loader.pushtask(concurrency_ti_tc<FT_ULong>::task(gen_sdf, L'บร', GB_UTILS_CONCURRENCY_TASK_PRIORITY_MID));
+		break;
 	}
 	loader.done();
 	logger::Instance().progress_done();

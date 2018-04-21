@@ -15,6 +15,13 @@ Entity::Entity(Entity* const parent):
 }
 Entity::~Entity()
 {
+	End();
+
+	std::for_each(_Elements.begin(), _Elements.end(), [](std::pair<const std::uint32_t, Element*> & ele)
+	{
+		GB_SAFE_DELETE(ele.second);
+	});
+
 	std::for_each(_Children.begin(), _Children.end(), [](std::pair<const string, Entity*>& e)
 	{
 		GB_SAFE_DELETE(e.second);
@@ -37,18 +44,18 @@ void Entity::_instantiate(const data::Entity* dEntity)
 	_Transform = dEntity->GetTransform();
 
 	//elements instantiate 
-	std::for_each(dEntity->GetElements().begin(), dEntity->GetElements().end(), [this](const std::pair<const Element::Type, data::Element*> & dE)
+	std::for_each(dEntity->GetElements().begin(), dEntity->GetElements().end(), [this](const std::pair<const std::uint32_t, data::Element*> & dE)
 	{
 		Element* ele = dE.second->Instantiate(this);
 		ele->Awake();
-		_Elements.insert(std::pair<const std::uint32_t, Element*>(ele->GetType(), ele));
+		_Elements.insert(std::make_pair(ele->GetType(), ele));
 	});
 	//children instantiate
 	std::for_each(dEntity->GetChildren().begin(), dEntity->GetChildren().end(), [this](const std::pair<const string, data::Entity*>& dE)
 	{
 		Entity* e = new Entity(this);
 		e->_instantiate(dE.second);
-		_Children.insert(std::pair<const string, Entity*>(e->GetName(), e));
+		_Children.insert(std::make_pair(e->GetName(), e));
 	});
 
 }
@@ -71,7 +78,7 @@ void Entity::Start()
 	logger::Instance().log(string("Start from ") + _Name);
 
 	//self elements Start
-	std::for_each(_Elements.begin(), _Elements.end(), [](std::pair<const Element::Type, Element*> & ele)
+	std::for_each(_Elements.begin(), _Elements.end(), [](std::pair<const std::uint32_t, Element*> & ele)
 	{
 		ele.second->Start();
 	});
@@ -87,21 +94,68 @@ void Entity::Start()
 void Entity::End()
 {
 	logger::Instance().log(string("End from ") + _Name);
-}
 
-void Entity::AddElement(Element* const ele)
-{
-	const std::uint32_t t = ele->GetType();
-
-	if (_Elements.find(t) != _Elements.end())
+	//self elements End
+	std::for_each(_Elements.begin(), _Elements.end(), [](std::pair<const std::uint32_t, Element*> & ele)
 	{
-		_Elements.insert(std::pair<const std::uint32_t, Element*>(t, ele));
-	}
-	else
-		logger::Instance().warning("more than one count of same type Element @ " + Element::TypeToString(t));
-	
+		ele.second->End();
+	});
 
+	//children End
+	std::for_each(_Children.begin(), _Children.end(), [](std::pair<const string, Entity*> & e)
+	{
+		e.second->End();
+	});
 }
+
+Entity * Entity::AddChild(const char * name)
+{
+	Entity* e = new Entity(this);
+	e->SetName(name);
+	_Children.insert(std::make_pair(e->GetName(), e));
+	return e;
+}
+
+void Entity::RemoveChild(Entity* entity)
+{
+	auto range = _Children.equal_range(entity->GetName());
+	
+	for (auto i = range.first; i != range.second; i++)
+	{
+		if (i->second == entity)
+		{
+			_Children.erase(i);
+			break;
+		}
+	}
+}
+void Entity::AddChild(Entity* entity)
+{
+	auto parent = entity->GetParent();
+	if (parent != nullptr)
+		parent->RemoveChild(entity);
+
+	_Children.insert(std::make_pair(entity->GetName(), entity));
+	
+	entity->_Parent = this;
+}
+
+void Entity::Destroy()
+{
+	delete this;
+}
+
+//void Entity::AddElement(Element* const ele)
+//{
+//	const std::uint32_t t = ele->GetType();
+//
+//	if (_Elements.find(t) != _Elements.end())
+//	{
+//		_Elements.insert(std::pair<const std::uint32_t, Element*>(t, ele));
+//	}
+//	else
+//		logger::Instance().warning("more than one count of same type Element @ " + Element::TypeToString(t));
+//}
 
 void Entity::_updateWorldTransform()
 {

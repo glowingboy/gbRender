@@ -12,7 +12,7 @@ using namespace gb;
 using namespace gb::render::data;
 using namespace gb::utils;
 
-Element::Element(const gb::render::Element::Type type):
+Element::Element(const std::uint32_t type):
 	_Type(type)
 {}
 
@@ -45,9 +45,9 @@ void ElementAdapter::from_lua(const luatable_mapper& mapper)
 		return;
 	}
 
-	const auto recipe = Element::Recipe::Instance().GetContents();
+	const auto& recipe = Element::Recipe::Instance().GetContents();
 
-	auto iter = recipe.find(_Type);
+	const auto iter = recipe.find(_Type);
 	if (iter != recipe.end())
 		_Element = iter->second();
 	else

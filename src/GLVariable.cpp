@@ -6,11 +6,12 @@ using namespace gb::render;
 GLVar::GLVar(const std::size_t unitSize):
 	_unitSize(unitSize),
 	_count(0),
-	_capacity(0),
+	_capacity(1),
 	_data(nullptr),
 	_byteSize(0)
 	
 {
+	_data = new char[unitSize * _capacity];
 }
 
 GLVar::GLVar(const std::size_t unitSize, const std::size_t capacity) :
@@ -70,7 +71,8 @@ void GLVar::append(const void* data, const std::size_t count)
 	}
     else
     {
-		_capacity = 2 * _count;
+		assert(_capacity != 0);
+		_capacity = 2 * _capacity;
 		char * newData = new char[ _capacity * _unitSize];
 
 		// old data

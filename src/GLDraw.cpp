@@ -348,7 +348,7 @@ void GLMultiIndirectDraw::SetData(const std::vector<BaseRender*> renders)
 
 			//inst
 			GLuint baseInstance_tmp = baseInstance;
-			const auto instVarInfo = shader->GetVtxVarInfo(1);
+			auto& instVarInfo = shader->GetVtxVarInfo(1);
 			if (instVarInfo.size() > 0)
 			{
 				const std::vector<BaseRender*>& vRs = mr.second;

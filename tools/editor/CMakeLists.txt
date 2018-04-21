@@ -13,6 +13,7 @@ gb_add_class(Editor src srcs)
 gb_add_class(Main src  srcs)
 
 # data
+gb_add_class(Element src/data srcs)
 gb_add_class(NS.h src/data srcs)
 gb_add_class(Main src/data srcs)
 

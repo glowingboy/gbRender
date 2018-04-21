@@ -23,25 +23,32 @@
 - AddElement
 **** Element
      Different element will contribute different feature to the Entity
-     (such as transform, render...)
+     (such as camera, render...)
 **** Start
 *** C++ Class Hierachy
     
     
 ** Calling Sequence
 *** Basic Rules
-**** Awake & Start
-     Awake \to Start
+**** Awake, Start& End
+     Awake \to Start \to End
 **** Entity & Element
      Element Awake 
      \to Entity Start \to Element Start
+     \to Entity End \to Element End
 **** Parent & Children
      Children Awake \to Parent Awake
      Parent Start \to Children Start
+     Parent End \to Children End
 **** Summary
 - Awake :: from bottom to top
 - Start :: from top to bottom
-**** Start
+- End :: from top to bottom
+**** NOTE!!!
+     Entity::AddChild can be invoked in either Element::Awake() or Element::Start() 
+     but not in Element::End() where the Entity::Start will never have a change to be called.
+     Entity::AddElement can only be invoked in Element::Awake(), 
+     otherwise the Entity::Start() will never be called.
      
      
 *** Description

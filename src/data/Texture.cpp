@@ -8,7 +8,7 @@ Texture::Texture():
 	Element(render::Element::Type::Texture)
 {}
 
-gb::render::Element * Texture::Instantiate(gb::render::Entity * const owner) const
+gb::render::Element * Texture::Instantiate(gb::render::Entity * owner) const
 {
 	render::Texture* tex = new render::Texture(owner);
 	if (_Material.length() != 0)

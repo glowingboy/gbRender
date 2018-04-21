@@ -9,7 +9,7 @@ FPVController::FPVController():
 {
 }
 
-gb::render::Element * FPVController::Instantiate(gb::render::Entity * const owner) const
+gb::render::Element * FPVController::Instantiate(gb::render::Entity * owner) const
 {
 	return new render::FPVController(owner);
 }

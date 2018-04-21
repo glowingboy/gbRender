@@ -8,3 +8,13 @@ ElementType =
       Text = 5,
       FPVController = 6
    }
+
+function ElementType:Register(types)
+   for k, v in pairs(types) do
+      if self[k] == nil then
+	 self[k] = v
+      else
+	 print("k already in ElementType, k@: " .. k)
+      end
+   end
+end

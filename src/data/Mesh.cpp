@@ -94,7 +94,7 @@ void Mesh::UpdateSphereBB()
 	const auto iter = _VtxVars.find(GB_RENDER_VTXVAR_POS);
 	if (iter != _VtxVars.end())
 	{
-		const auto pos = iter->second;
+		const auto& pos = iter->second;
 
 		_SphereBB = genSphereBB((vec3F*)(pos.data()), pos.count());
 	}

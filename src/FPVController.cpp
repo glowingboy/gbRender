@@ -32,9 +32,9 @@ void FPVController::End()
 	GB_UTILS_CALLBACK_UNREG(Input::Instance().GetCBs(), FPVController::OnInput);
 }
 
-Element::Type FPVController::GetType() const
+std::uint32_t FPVController::GetType() const
 {
-	return Element::Type();
+	return Element::Type::FPVController;
 }
 
 void FPVController::OnInput(const char code, const bool down)

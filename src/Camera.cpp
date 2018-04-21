@@ -9,17 +9,17 @@ using namespace gb::utils;
 Camera::Camera(Entity * const owner) :
 	Element(owner),
 	_InterestTag(GB_RENDER_CAMERA_DEFAULT_INTERESTTAG),
-	_frustumSphereBB(_frustum.sphereBB),
-	_transformedFSBB(_frustum.sphereBB),
-	_projectionMatrix(_frustum.projectionMatrix),
+	_frustumSphereBB(_Frustum.sphereBB),
+	_transformedFSBB(_Frustum.sphereBB),
+	_projectionMatrix(_Frustum.projectionMatrix),
 	_ViewPort(0.0f, 0.0f, 1.0f, 1.0f),
 	_screenSize(Director::Instance().GetScreenSize()),
 	_IsStatic(false)
 {
-	_frustum.set(60.0f, ((float)_screenSize.x) / _screenSize.y, 10, 100);
+	_Frustum.set(60.0f, ((float)_screenSize.x) / _screenSize.y, 10, 100);
 }
 
-Element::Type Camera::GetType() const
+std::uint32_t Camera::GetType() const
 {
 	return Element::Type::Camera;
 }

@@ -7,8 +7,10 @@ GB_EDITOR_DATA_NS_BEGIN
 class Main : public gb::render::data::Element
 {
 public:
-	virtual gb::render::Element* Instantiate(gb::render::Entity* const owner);
-	virtual void from_lua(const gb::utils::luatable_mapper & mapper);
+	Main();
+public:
+	virtual gb::render::Element* Instantiate(gb::render::Entity* owner) const override;
+	virtual void from_lua(const gb::utils::luatable_mapper & mapper) override;
 };
 
 GB_EDITOR_DATA_NS_END

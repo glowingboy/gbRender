@@ -13,7 +13,7 @@ public:
 
 public:
 	void SetMaterial(const gb::utils::string & material);
-	virtual Element::Type GetType() const override;
+	virtual std::uint32_t GetType() const override;
 
 	void SetInstVar(const char* name, const void* data);
 protected:

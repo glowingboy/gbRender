@@ -15,7 +15,7 @@ public:
 	virtual void Awake() override;
 	virtual void Start() override;
 	virtual void End() override;
-	virtual Element::Type GetType() const override;
+	virtual std::uint32_t GetType() const override;
 
 private:
 	void OnInput(const char code, const bool down);

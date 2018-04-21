@@ -25,6 +25,15 @@ return
 	       Children =
 		  {
 		     {
+			Name = "Main",
+			Elements =
+			   {
+			      {
+				 Type = ElementType.Main
+			      }
+			   }
+		     },
+		     {
 			Name = "CameraScene",
 			Transform =
 			   {
@@ -37,6 +46,10 @@ return
 			      {
 				 Type = ElementType.Camera,
 				 RenderQueue = RenderQueue.Opaque,
+				 Frustum =
+				    {
+				       60.0, 640.0 / 480.0, 0.1, 100
+				    }
 			      },
 			      {
 				 Type = ElementType.FPVController

@@ -5,7 +5,8 @@ return
       BaseFiles =
 	 {
 	    "../resource/Entity/ElementType.lua",
-	    "../resource/Entity/RenderQueue.lua"
+	    "../resource/Entity/RenderQueue.lua",
+	    "../tools/editor/resource/EditorElementType.lua"
 	 },
       DefaultRes = "../resource/Entity/Default.lua"
    }

@@ -36,7 +36,20 @@ public:
 	void Instantiate(const gb::render::data::Entity* dEntity);
 	void Instantiate(const char* entityFile);
 
-	void AddElement(Element* const ele);
+
+	Entity* AddChild(const char* name);
+	void AddChild(Entity* entity);
+	void RemoveChild(Entity* entity);
+	void Destroy();
+	//void AddElement(Element* ele);
+	template<typename element_t>
+	element_t* AddElement()
+	{
+		Element* ele = new element_t(this);
+		ele->Awake();
+		_Elements.insert(std::make_pair(ele->GetType(), ele));
+		return ele;
+	}
 
 	//void RegisterCB(const uint32 triggerKey, const std::uintptr_t cbAddr, const std::function<void(void)>& cb);
 	//void UnregisterCB(const uint32 triggerKey, const std::uintptr_t cbAddr);
