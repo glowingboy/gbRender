@@ -26,10 +26,10 @@ Text::Text(Entity* owner) :
 	_Mesh = new data::Mesh;
 	_originSBB = &(_Mesh->GetSphereBB());
 
-	_vtxPos = _Mesh->InitializeAVtxVar(GB_RENDER_VTXVAR_POS, 3 * sizeof(float));
+	_vtxPos = _Mesh->GetPosVar();
 	_vtxUV = _Mesh->InitializeAVtxVar(GB_RENDER_VTXVAR_UV, 2 * sizeof(float));
 
-	_vtxIdx = _Mesh->InitializeAVtxVar(GB_RENDER_VTXVAR_IDX, sizeof(std::uint32_t));
+	_vtxIdx = &(_Mesh->GetIdxVar());
 
 	//matrial
 	SetMaterial("SDFText.lua");

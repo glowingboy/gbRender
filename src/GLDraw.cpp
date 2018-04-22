@@ -342,9 +342,9 @@ void GLMultiIndirectDraw::SetData(const std::vector<BaseRender*> renders)
 			_VtxBuffer.SetData(shader->GetVtxVarInfo(0), m->GetVtxVars(), baseVertex);
 			
 			//idx
-			const GLVar* idxVar = m->GetIdxVar();
-			_IdxBuffer.SetData(firstIndex, idxVar->data(), idxVar->byteSize());
-			count = idxVar->count();
+			const GLVar& idxVar = m->GetIdxVar();
+			_IdxBuffer.SetData(firstIndex, idxVar.data(), idxVar.byteSize());
+			count = idxVar.count();
 
 			//inst
 			GLuint baseInstance_tmp = baseInstance;
@@ -355,8 +355,8 @@ void GLMultiIndirectDraw::SetData(const std::vector<BaseRender*> renders)
 				const std::size_t stride = instVarInfo.begin()->stride;
 				for (std::size_t i = 0; i < vRs.size(); i++)
 				{
-					baseInstance_tmp += i * stride;
 					_InstBuffer.SetData(instVarInfo, vRs[i]->GetInstVar(), baseInstance_tmp);
+					baseInstance_tmp += (i + 1)* stride;
 				}
 
 				instanceCount = vRs.size();
@@ -368,7 +368,7 @@ void GLMultiIndirectDraw::SetData(const std::vector<BaseRender*> renders)
 			_cmdCount++;
 
 			baseVertex += m->GetVtxAttribByteSize();
-			firstIndex += idxVar->byteSize();
+			firstIndex += idxVar.byteSize();
 			baseInstance = baseInstance_tmp;
 		});
 	}

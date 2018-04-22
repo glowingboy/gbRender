@@ -8,9 +8,14 @@ using namespace gb::physics;
 using namespace gb;
 
 Mesh::Mesh() :
-	_IdxVar(nullptr),
-	_VtxAttribByteSize(0)
+	_IdxVar(sizeof(std::uint32_t)),
+	_VtxVars{{ string(GB_RENDER_VTXVAR_POS) , GLVar(3 * sizeof(float))}},
+	_PosVar(nullptr)
 {
+	_PosVar = &(_VtxVars.at(GB_RENDER_VTXVAR_POS));
+
+	assert(0);//TODO: rvalue issue
+	_VtxVars.insert(std::make_pair(string("123"), GLVar(1)));
 }
 
 template<render::uint8 count>
@@ -31,10 +36,9 @@ void Mesh::from_lua(const gb::utils::luatable_mapper & mapper)
 	// pos
 	if (mapper.has_key(GB_RENDER_VTXVAR_POS))
 	{
-		auto itr = _VtxVars.insert(std::pair<const string, render::GLVar>(GB_RENDER_VTXVAR_POS, mapper.get_tables_by_key<_lua_vec<3>>(GB_RENDER_VTXVAR_POS)));
-
-		const render::GLVar& var = itr.first->second;
-		_VtxAttribByteSize += var.byteSize();
+		std::vector<_lua_vec<3>> pos;
+		mapper.checkout_tables_by_key(GB_RENDER_VTXVAR_POS, pos);
+		_PosVar->append(pos.data(), pos.size());
 	}
 	else
 	{
@@ -46,10 +50,8 @@ void Mesh::from_lua(const gb::utils::luatable_mapper & mapper)
 	//idx
 	if (mapper.has_key(GB_RENDER_VTXVAR_IDX))
 	{
-		auto itr = _VtxVars.insert(std::pair<string, render::GLVar>(GB_RENDER_VTXVAR_IDX, mapper.get_integers_by_key(GB_RENDER_VTXVAR_IDX)));
-
-		const render::GLVar& var = itr.first->second;
-		_IdxVar = &var;
+		std::vector<lua_Integer> idx = mapper.get_integers_by_key(GB_RENDER_VTXVAR_IDX);
+		_IdxVar.append(idx.data(), idx.size());
 	}
 	else
 	{
@@ -61,10 +63,7 @@ void Mesh::from_lua(const gb::utils::luatable_mapper & mapper)
 	//uv(optional)
 	if (mapper.has_key(GB_RENDER_VTXVAR_UV))
 	{
-		auto itr = _VtxVars.insert(std::pair<string, render::GLVar>(GB_RENDER_VTXVAR_UV, mapper.get_tables_by_key<_lua_vec<2>>(GB_RENDER_VTXVAR_UV)));
-
-		const render::GLVar& var = itr.first->second;
-		_VtxAttribByteSize += (var.count() * var.unitSize());
+		_VtxVars.insert(std::pair<string, render::GLVar>(GB_RENDER_VTXVAR_UV, mapper.get_tables_by_key<_lua_vec<2>>(GB_RENDER_VTXVAR_UV)));
 	}
 	_VtxVars.insert(std::pair<string, render::GLVar>(GB_RENDER_VTXVAR_UV, mapper.get_tables_by_key<_lua_vec<2>>(GB_RENDER_VTXVAR_UV)));
 
@@ -72,30 +71,24 @@ void Mesh::from_lua(const gb::utils::luatable_mapper & mapper)
 	UpdateSphereBB();
 }
 
+std::size_t Mesh::GetVtxAttribByteSize() const
+{
+	std::size_t ret = 0;
+	std::for_each(_VtxVars.begin(), _VtxVars.end(), [&ret](const std::pair<const string, render::GLVar>& vtxVar)
+	{
+		ret += vtxVar.second.byteSize();
+	});
+
+	return ret;
+}
 render::GLVar * Mesh::InitializeAVtxVar(const char * key, const std::size_t unitSize)
 {
-	auto iter = _VtxVars.find(key);
+	const auto ret = _VtxVars.insert(std::make_pair(key, render::GLVar(unitSize)));
 
-	if (iter == _VtxVars.end())
-	{
-		auto ret = _VtxVars.insert(std::make_pair(key, render::GLVar(unitSize)));
-
-		if (string(GB_RENDER_VTXVAR_IDX) == key)
-			_IdxVar = &(ret.first->second);
-
-		return &(ret.first->second);
-	}
-	else
-		return &(iter->second);
+	return &(ret.first->second);
 }
 
 void Mesh::UpdateSphereBB()
 {
-	const auto iter = _VtxVars.find(GB_RENDER_VTXVAR_POS);
-	if (iter != _VtxVars.end())
-	{
-		const auto& pos = iter->second;
-
-		_SphereBB = genSphereBB((vec3F*)(pos.data()), pos.count());
-	}
+	_SphereBB = genSphereBB((vec3F*)(_PosVar->data()), _PosVar->count());
 }

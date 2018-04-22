@@ -72,7 +72,8 @@ void APIENTRY GL::_glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum s
 	{
 		logger::Instance().error(string("OpenGL debug message, id@") + id + ", msg@" + message);
 		logger::Instance().error(msgSrc + ", " + msgType + ", " + msgSeverity);
-		assert(0);
+		//assert(0);
+		::system("pause");
 	}
 	else
 	{

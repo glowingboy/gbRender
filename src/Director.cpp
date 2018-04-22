@@ -157,8 +157,8 @@ bool Director::Ready(const Argument& arg)
 	//2 idx
 	GLBuffer::CtorParam& idxParam = drawParam[1];
 	idxParam.type = GLBuffer::Type::Static;
-	const GLVar* idxVar = square->GetIdxVar();
-	idxParam.size = idxVar->byteSize();
+	const GLVar& idxVar = square->GetIdxVar();
+	idxParam.size = idxVar.byteSize();
 
 	//inst
 	GLBuffer::CtorParam& instParam = drawParam[2];
@@ -172,12 +172,7 @@ bool Director::Ready(const Argument& arg)
 	_screenDraw.GetVtxBuffer().SetData(_screenMat->GetShader()->GetVtxVarInfo(0), square->GetVtxVars());
 
 	//idx
-	if (idxVar == nullptr)
-	{
-		logger::Instance().error("Director::Ready idxVar nullptr");
-		return false;
-	}
-	_screenDraw.GetIdxBuffer().SetData(0, idxVar->data(), idxVar->byteSize());
+	_screenDraw.GetIdxBuffer().SetData(0, idxVar.data(), idxVar.byteSize());
 
 	//_screenDraw.SetCount(idxVar->count());
 

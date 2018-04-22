@@ -15,7 +15,6 @@ int main(int argc, char** argv)
 	//entity_ls.dofile(filesystem::Instance().get_absolute_path("../resource/RenderQueue.lua"));
 
 	editor::data::ElementRecipe::Instance().Reg();
-	
 
 	if (!Director::Instance().Ready(Director::Argument("scene_0.lua", vec2<uint32>(640, 480), 
 		{
