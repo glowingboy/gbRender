@@ -9,13 +9,10 @@ using namespace gb;
 
 Mesh::Mesh() :
 	_IdxVar(sizeof(std::uint32_t)),
-	_VtxVars{{ string(GB_RENDER_VTXVAR_POS) , GLVar(3 * sizeof(float))}},
 	_PosVar(nullptr)
 {
-	_PosVar = &(_VtxVars.at(GB_RENDER_VTXVAR_POS));
-
-	assert(0);//TODO: rvalue issue
-	_VtxVars.insert(std::make_pair(string("123"), GLVar(1)));
+	const auto ret = _VtxVars.insert(std::make_pair(GB_RENDER_VTXVAR_POS, 3 * sizeof(float)));
+	_PosVar = &(ret.first->second);
 }
 
 template<render::uint8 count>

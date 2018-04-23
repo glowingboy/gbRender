@@ -90,7 +90,7 @@ void GLVar::append(const void* data, const std::size_t count)
 
 void GLVar::set(const void * data, const std::size_t idx)
 {
-	assert(data != nullptr & idx < _count);
+	assert(data != nullptr && idx < _count);
 	std::memcpy(_data + idx * _unitSize, data, _unitSize);
 }
 

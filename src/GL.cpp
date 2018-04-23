@@ -14,6 +14,7 @@ using gb::utils::logger;
 #endif
 
 const data::Shader* GL::_currentShader = nullptr;
+const data::GLCfg* GL::_curGLCfg = nullptr;
 
 void GL::applyShader(const data::Shader* shader)
 {
@@ -24,6 +25,10 @@ void GL::applyShader(const data::Shader* shader)
 		_currentShader->Use();
 
 		//gl settings
+		const data::GLCfg*  glCfg = &(_currentShader->GetGLCfg());
+		glCfg->applyFrom(_curGLCfg);
+
+		_curGLCfg = glCfg;
 	}
 }
 void APIENTRY GL::_glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity,

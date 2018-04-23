@@ -180,10 +180,15 @@ struct UniformVarStub
 struct GLCfg
 {
 	GLCfg();
+	void apply() const;
+	void applyFrom(const GLCfg * other) const;
+
 	void from_lua(const gb::utils::luatable_mapper& mapper);
 	struct Blend
 	{
 		void from_lua(const gb::utils::luatable_mapper& mapper);
+		void apply() const;
+		void applyFrom(const Blend& other) const;
 		bool enabled;
 
 		GLenum sfactor;
@@ -193,6 +198,8 @@ struct GLCfg
 	struct DepthTest
 	{
 		void from_lua(const gb::utils::luatable_mapper& mapper);
+		void apply() const;
+		void applyFrom(const DepthTest& other) const;
 		bool enabled;
 		GLenum func;
 	}depthTest;
@@ -200,6 +207,8 @@ struct GLCfg
 	struct AlphaTest
 	{
 		void from_lua(const gb::utils::luatable_mapper& mapper);
+		void apply() const;
+		void applyFrom(const AlphaTest& other) const;
 		bool enabled;
 
 		GLenum func;

@@ -12,6 +12,7 @@ class Device;
 namespace data
 {
 	class Shader;
+	struct GLCfg;
 }
 class GL
 {
@@ -36,7 +37,7 @@ public:
 	
 private:
 	static const data::Shader* _currentShader;
-
+	static const data::GLCfg* _curGLCfg;
 private:
 	static void APIENTRY _glDebugOutput(GLenum source, GLenum type, GLuint id, GLenum severity,
 		GLsizei length, const GLchar *message, void *userParam);
