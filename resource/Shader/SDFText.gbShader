@@ -62,7 +62,7 @@ void main()
 {
 	float r = texture(font, uv).r;
 	if(r < 0.5)
-		color.r = 1.0f;
+		color.r = 0.3f;
 }
 
 GB_RENDER_DATA_SHADER_FRAG_END

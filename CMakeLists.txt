@@ -62,7 +62,7 @@ gb_add_class(Texture src srcs)
 gb_add_class(Sprite src srcs)
 gb_add_class(Text src srcs)
 gb_add_class(FPVController src srcs)
-
+gb_add_class(EntityPicker src srcs)
 # resource
 gb_add_class(Resource src/resource srcs)
 

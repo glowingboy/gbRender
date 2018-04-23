@@ -363,8 +363,7 @@ void GLMultiIndirectDraw::SetData(const std::vector<BaseRender*> renders)
 			}
 
 			//indirect
-			static constexpr std::size_t IndirectCommand_size = sizeof(IndirectCommand);
-			_IndirectCmdBuffer.SetData(_cmdCount * IndirectCommand_size, &cmd, IndirectCommand_size);
+			_IndirectCmdBuffer.SetData(_cmdCount * sizeof(IndirectCommand), &cmd, sizeof(IndirectCommand));
 			_cmdCount++;
 
 			baseVertex += m->GetVtxAttribByteSize();
@@ -387,6 +386,7 @@ void GLMultiIndirectDraw::Draw()
 
 	glMultiDrawElementsIndirect(_Mode, GL_UNSIGNED_INT, 0, _cmdCount, 0);
 	SetSync();
+
 	glBindVertexArray(0);
 }
 

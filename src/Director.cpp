@@ -227,9 +227,7 @@ bool Director::_directing()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, _ScreenSize.x, _ScreenSize.y);
 
-	static constexpr std::size_t uint32_size = sizeof(std::uint32_t);
-
-	_screenDraw.GetInstBuffer().SetData(0, _instVar, instCount * uint32_size);
+	_screenDraw.GetInstBuffer().SetData(0, _instVar, instCount * sizeof(std::uint32_t));
 
 	GL::applyShader(_screenMat->GetShader());
 

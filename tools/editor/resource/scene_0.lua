@@ -56,17 +56,17 @@ return
 			      }
 			   }
 		     },
-		     -- {
-		     -- 	Name = "test",
-		     -- 	Elements =
-		     -- 	   {
-		     -- 	      {
-		     -- 		 Type = ElementType.Render,
-		     -- 		 Mesh = "Triangle.lua",
-		     -- 		 Material = "Tint.lua"
-		     -- 	      }
-		     -- 	   }
-		     -- },
+		     {
+		     	Name = "test",
+		     	Elements =
+		     	   {
+		     	      {
+		     		 Type = ElementType.Render,
+		     		 Mesh = "Triangle.lua",
+		     		 Material = "Tint.lua"
+		     	      }
+		     	   }
+		     },
 		     {
 			Name = "text",
 			Elements =
