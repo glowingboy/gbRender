@@ -29,7 +29,7 @@ void EntityPicker::Start()
 
 void EntityPicker::End()
 {
-	GB_UTILS_CALLBACK_UNREG(Input::Instance().GetClickedCBs(), EntityPicker::OnClicked);
+	GB_UTILS_CALLBACK_UNREG(Input::Instance().GetClickedCBs());
 }
 
 void EntityPicker::OnClicked()

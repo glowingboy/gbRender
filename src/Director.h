@@ -36,10 +36,10 @@ GB_RENDER_CLASS Director
 public:
 	struct Argument
 	{
-		Argument(const char* fileOfRootEntity, const gb::physics::vec2<gb::render::uint32>& sizeOfScreen, const std::map<gb::utils::string, gb::utils::string>& resCfg);
+		Argument(const char* fileOfRootEntity, const gb::physics::vec2<std::int32_t>& sizeOfScreen, const std::map<gb::utils::string, gb::utils::string>& resCfg);
 		Argument(Argument && other);
 		gb::utils::string rootEntity;
-		gb::physics::vec2<gb::render::uint32> screenSize;
+		gb::physics::vec2<std::int32_t> screenSize;
 		std::map<gb::utils::string, gb::utils::string> resCfgs;
 	};
 	GB_SINGLETON_NO_CTORDEF(Director);
@@ -58,7 +58,7 @@ private:
 	typedef std::set<Camera *, gb::utils::less_ptr<Camera>>::iterator _camItr;
 	std::set<Camera *, gb::utils::less_ptr<Camera>> _Cameras;
 	GB_PROPERTY_R(private, Root, Entity);
-	GB_PROPERTY_R(private, ScreenSize, gb::physics::vec2<gb::render::uint32>);
+	GB_PROPERTY_R(private, ScreenSize, gb::physics::vec2<std::int32_t>);
 	//GB_PROPERTY_R(private, RenderEntities, gb::physics::octree<Entity*>)
 
 	GLuint _frameBuffers[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];

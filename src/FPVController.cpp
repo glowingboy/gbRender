@@ -29,7 +29,7 @@ void FPVController::Start()
 
 void FPVController::End()
 {
-	GB_UTILS_CALLBACK_UNREG(Input::Instance().GetCBs(), FPVController::OnInput);
+	GB_UTILS_CALLBACK_UNREG(Input::Instance().GetCBs());
 }
 
 std::uint32_t FPVController::GetType() const
@@ -37,7 +37,7 @@ std::uint32_t FPVController::GetType() const
 	return Element::Type::FPVController;
 }
 
-void FPVController::OnInput(const char code, const bool down)
+void FPVController::OnInput(std::int32_t code, const bool down)
 {
 	logger::Instance().log(string("code: ") + code + ", down: " + down);
 

@@ -14,11 +14,11 @@ GB_RENDER_NS_BEGIN
 	{
 		GB_SINGLETON_NO_CTORDEF(Device);
 	public:
-	    bool Initialize(const gb::physics::vec2<uint32>& screenSize);
+	    bool Initialize(const gb::physics::vec2<std::int32_t>& screenSize);
 		bool Update()const;
 
 
-		inline const gb::physics::vec2<uint32>& GetScreenSize()const
+		inline const gb::physics::vec2<std::int32_t>& GetScreenSize()const
 		{
 			return _screenSize;
 		}
@@ -26,7 +26,7 @@ GB_RENDER_NS_BEGIN
 		inline bool IsInitialized()const { return _bInitialized; }
 
 	private:
-		gb::physics::vec2<uint32> _screenSize;
+		gb::physics::vec2<std::int32_t> _screenSize;
 		bool _bInitialized;
 		bool _bFullScreen;
 #ifdef _MSC_VER

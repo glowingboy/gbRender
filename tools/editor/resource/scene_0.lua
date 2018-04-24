@@ -13,7 +13,7 @@ return
 	    -- 		   {
 	    -- 		      {
 	    -- 			 Type = ElementType.Camera,
-	    -- 			 RenderQueue = RenderQueue.UI,
+	    -- 			 RenderQueue = CameraRenderQueue.UI,
 	    -- 			 ClearColor = {0.0, 0.0, 0.3, 1.0}
 	    -- 		      }
 	    -- 		   }
@@ -45,7 +45,7 @@ return
 			   {
 			      {
 				 Type = ElementType.Camera,
-				 RenderQueue = RenderQueue.Opaque,
+				 RenderQueue = CameraRenderQueue.Opaque,
 				 Frustum =
 				    {
 				       60.0, 640.0 / 480.0, 0.1, 100
@@ -57,15 +57,15 @@ return
 			   }
 		     },
 		     {
-		     	Name = "test",
-		     	Elements =
-		     	   {
-		     	      {
-		     		 Type = ElementType.Render,
-		     		 Mesh = "Triangle.lua",
-		     		 Material = "Tint.lua"
-		     	      }
-		     	   }
+		     	Name = "test"--,
+		     	-- Elements =
+		     	--    {
+		     	--       {
+		     	-- 	 Type = ElementType.Render,
+		     	-- 	 Mesh = "Triangle.lua",
+		     	-- 	 Material = "Tint.lua"
+		     	--       }
+		     	--    }
 		     },
 		     {
 			Name = "text",
@@ -74,7 +74,7 @@ return
 			      {
 				 Type = ElementType.Text,
 				 Material = "SDFText.lua",
-				 Text = "hello world!"
+				 Text = "he"
 			      }
 			   }
 		     },

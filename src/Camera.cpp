@@ -62,7 +62,7 @@ void Camera::Start()
 void Camera::End()
 {
 	Director::Instance().RemoveCamera(this);
-	GB_UTILS_MULTI_CALLBACK_UNREG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, Camera::_onOwnerTransformChanged);
+	GB_UTILS_MULTI_CALLBACK_UNREG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED);
 }
 
 void Camera::SetRenderQueue(const uint32 rq)
@@ -113,7 +113,7 @@ void Camera::Shoot()
 	//3rd classify according to material
 
 	//classify according to renderQueue
-	std::unordered_map<std::uint32_t, std::vector<BaseRender*>> renderQueueRenders;
+	std::map<std::uint32_t, std::vector<BaseRender*>> renderQueueRenders;
 	std::for_each(ret.begin(), ret.end(), [this, &renderQueueRenders](Entity* e)
 	{
 		if (_InterestTag & e->GetTag())

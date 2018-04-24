@@ -22,7 +22,7 @@ return
 	 },
       Misc =
 	 {
-	    --	    RenderQueue = 
+	    --	       RenderQueue = ShaderRenderQueue.Background
 	 }
    }
 GB_RENDER_DATA_SHADER_INFO_END

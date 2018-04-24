@@ -30,6 +30,10 @@ return
 	       {
 		  Enabled = false
 	       }
+	 },
+      Misc =
+	 {
+	    RenderQueue = ShaderRenderQueue.Background
 	 }
    }
 GB_RENDER_DATA_SHADER_INFO_END
@@ -63,6 +67,7 @@ void main()
 	float r = texture(font, uv).r;
 	if(r < 0.5)
 		color.r = 0.3f;
+	color.b = 0.3f;
 }
 
 GB_RENDER_DATA_SHADER_FRAG_END

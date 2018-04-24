@@ -6,7 +6,7 @@ using namespace gb::render;
 using namespace gb::utils;
 using namespace gb::physics;
 
-Director::Argument::Argument(const char* fileOfRootEntity, const gb::physics::vec2<gb::render::uint32>& sizeOfScreen, const std::map<gb::utils::string, gb::utils::string>& resCfg):
+Director::Argument::Argument(const char* fileOfRootEntity, const gb::physics::vec2<std::int32_t>& sizeOfScreen, const std::map<gb::utils::string, gb::utils::string>& resCfg):
 	rootEntity(fileOfRootEntity),
 	screenSize(sizeOfScreen),
 	resCfgs(resCfg)
