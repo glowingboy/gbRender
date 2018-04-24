@@ -44,7 +44,7 @@ data::Font* Font::ParseFromFile(const char* filePath)const
 	fontFile.read(&buf_uint32, 4);
 	const std::uint32_t height = buf_uint32;
 
-	char* tex_data = new char[width * height]{ 0 };
+	char* tex_data = new char[width * height]{0};
 	fontFile.read(tex_data, width * height);
 
 	GLTexture::ImageData imgData;

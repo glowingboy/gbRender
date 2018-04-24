@@ -46,7 +46,7 @@ public:
 	Element(const std::uint32_t type);
 public:
 	virtual gb::render::Element* Instantiate(gb::render::Entity* owner) const = 0;
-	virtual void from_lua(const gb::utils::luatable_mapper & mapper) = 0;
+	virtual void from_lua(const gb::utils::luatable_mapper & mapper);
 	GB_PROPERTY_R(protected, Type, std::uint32_t);
 };
 

@@ -23,6 +23,13 @@ return
 		 Name = "cameraTexs",
 		 Type = slType.Sampler
 	      }
+	   },
+	GLCfg =
+	   {
+	      DepthTest =
+		 {
+		    Enabled = false
+		 }
 	   }
 }
 GB_RENDER_DATA_SHADER_INFO_END

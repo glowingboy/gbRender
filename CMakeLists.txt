@@ -34,6 +34,7 @@ gb_add_class(Material src/data srcs)
 gb_add_class(Shader src/data srcs)
 gb_add_class(Text src/data srcs)
 gb_add_class(FPVController src/data srcs)
+gb_add_class(EntityPicker src/data srcs)
 
 # file
 gb_add_class(FileNS src/file srcs)
@@ -62,7 +63,7 @@ gb_add_class(Texture src srcs)
 gb_add_class(Sprite src srcs)
 gb_add_class(Text src srcs)
 gb_add_class(FPVController src srcs)
-
+gb_add_class(EntityPicker src srcs)
 # resource
 gb_add_class(Resource src/resource srcs)
 

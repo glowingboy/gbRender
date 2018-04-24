@@ -6,11 +6,11 @@
 
 #define GB_RENDER_CAMERA_DEFAULT_INTERESTTAG 0xffffffffu
 
-#define GB_RENDER_DATA_SHADER_RENDERQUEUE_BACKGROUND 0X00
-#define GB_RENDER_DATA_SHADER_RENDERQUEUE_OPAQUE 0xf
-#define GB_RENDER_DATA_SHADER_RENDERQUEUE_TRANSPARENT 0xff
-#define GB_RENDER_DATA_SHADER_RENDERQUEUE_UI 0x8ff
-#define GB_RENDER_DATA_SHADER_RENDERQUEUE_GIZMO 0xfff
+#define GB_RENDER_CAMERA_RENDERQUEUE_BACKGROUND 0X00
+#define GB_RENDER_CAMERA_RENDERQUEUE_OPAQUE 0xf
+#define GB_RENDER_CAMERA_RENDERQUEUE_TRANSPARENT 0xff
+#define GB_RENDER_CAMERA_RENDERQUEUE_UI 0x8ff
+#define GB_RENDER_CAMERA_RENDERQUEUE_GIZMO 0xfff
 
 GB_RENDER_NS_BEGIN
 
@@ -56,7 +56,7 @@ private:
 	//range[0, 1]
 	GB_PROPERTY(private, ViewPort, gb::physics::vec4F);
 
-	const gb::physics::vec2<gb::render::uint32>& _screenSize;
+	const gb::physics::vec2<std::int32_t>& _screenSize;
 
 	GB_PROPERTY(private, ClearColor, gb::physics::vec4F);
 

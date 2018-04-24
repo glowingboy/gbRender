@@ -6,7 +6,7 @@ using namespace gb::render;
 using namespace gb::utils;
 using namespace gb::physics;
 
-Director::Argument::Argument(const char* fileOfRootEntity, const gb::physics::vec2<gb::render::uint32>& sizeOfScreen, const std::map<gb::utils::string, gb::utils::string>& resCfg):
+Director::Argument::Argument(const char* fileOfRootEntity, const gb::physics::vec2<std::int32_t>& sizeOfScreen, const std::map<gb::utils::string, gb::utils::string>& resCfg):
 	rootEntity(fileOfRootEntity),
 	screenSize(sizeOfScreen),
 	resCfgs(resCfg)
@@ -157,8 +157,8 @@ bool Director::Ready(const Argument& arg)
 	//2 idx
 	GLBuffer::CtorParam& idxParam = drawParam[1];
 	idxParam.type = GLBuffer::Type::Static;
-	const GLVar* idxVar = square->GetIdxVar();
-	idxParam.size = idxVar->byteSize();
+	const GLVar& idxVar = square->GetIdxVar();
+	idxParam.size = idxVar.byteSize();
 
 	//inst
 	GLBuffer::CtorParam& instParam = drawParam[2];
@@ -172,12 +172,7 @@ bool Director::Ready(const Argument& arg)
 	_screenDraw.GetVtxBuffer().SetData(_screenMat->GetShader()->GetVtxVarInfo(0), square->GetVtxVars());
 
 	//idx
-	if (idxVar == nullptr)
-	{
-		logger::Instance().error("Director::Ready idxVar nullptr");
-		return false;
-	}
-	_screenDraw.GetIdxBuffer().SetData(0, idxVar->data(), idxVar->byteSize());
+	_screenDraw.GetIdxBuffer().SetData(0, idxVar.data(), idxVar.byteSize());
 
 	//_screenDraw.SetCount(idxVar->count());
 
@@ -232,9 +227,7 @@ bool Director::_directing()
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glViewport(0, 0, _ScreenSize.x, _ScreenSize.y);
 
-	static constexpr std::size_t uint32_size = sizeof(std::uint32_t);
-
-	_screenDraw.GetInstBuffer().SetData(0, _instVar, instCount * uint32_size);
+	_screenDraw.GetInstBuffer().SetData(0, _instVar, instCount * sizeof(std::uint32_t));
 
 	GL::applyShader(_screenMat->GetShader());
 

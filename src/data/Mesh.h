@@ -15,14 +15,14 @@ class Mesh
 public:
 	Mesh();
     void from_lua(const gb::utils::luatable_mapper & mapper);
+	std::size_t GetVtxAttribByteSize() const;
 	gb::render::GLVar* InitializeAVtxVar(const char* key, const std::size_t unitSize);
 	void UpdateSphereBB();
 private:
     GB_PROPERTY_R(private, VtxVars, std::unordered_map <const gb::utils::string, gb::render::GLVar>);
-	GB_PROPERTY_R(private, IdxVar, const gb::render::GLVar*);
+	GB_PROPERTY_R(private, IdxVar, gb::render::GLVar);
+	GB_PROPERTY_R(private, PosVar, gb::render::GLVar*);
 	GB_PROPERTY_R(private, SphereBB, gb::physics::spherebb<>);
-
-	GB_PROPERTY_R(private, VtxAttribByteSize, std::size_t);
 
 };
 

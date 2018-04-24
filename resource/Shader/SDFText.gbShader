@@ -23,6 +23,17 @@ return
 	       Name = "font",
 	       Type = slType.Sampler
 	    }
+	 },
+      GLCfg =
+	 {
+	    DepthTest =
+	       {
+		  Enabled = false
+	       }
+	 },
+      Misc =
+	 {
+	    RenderQueue = ShaderRenderQueue.Background
 	 }
    }
 GB_RENDER_DATA_SHADER_INFO_END
@@ -54,8 +65,9 @@ out vec4 color;
 void main()
 {
 	float r = texture(font, uv).r;
-	if(r > 0.4)
-		color.r = r;
+	if(r < 0.495f)
+		color.r = 0.3f;
+	color.b = r;
 }
 
 GB_RENDER_DATA_SHADER_FRAG_END

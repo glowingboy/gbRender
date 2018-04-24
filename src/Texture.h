@@ -3,7 +3,7 @@
 #include "Render.h"
 #include "GLTexture.h"
 
-#define GB_RENDER_TEXTURE_DEFAULT_SIDE 10.0f
+#define GB_RENDER_TEXTURE_DEFAULT_SIDE 5.0f
 
 GB_RENDER_NS_BEGIN
 

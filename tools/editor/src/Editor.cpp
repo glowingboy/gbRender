@@ -15,9 +15,8 @@ int main(int argc, char** argv)
 	//entity_ls.dofile(filesystem::Instance().get_absolute_path("../resource/RenderQueue.lua"));
 
 	editor::data::ElementRecipe::Instance().Reg();
-	
 
-	if (!Director::Instance().Ready(Director::Argument("scene_0.lua", vec2<uint32>(640, 480), 
+	if (!Director::Instance().Ready(Director::Argument("scene_0.lua", vec2<std::int32_t>(640, 480), 
 		{
 			{ GB_RENDER_RESOURCE_CFG_SHADER, filesystem::Instance().get_absolute_path("../resource/Shader/Config.lua") },
 			{ GB_RENDER_RESOURCE_CFG_MATERIAL, filesystem::Instance().get_absolute_path("../resource/Material/Config.lua") },

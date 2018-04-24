@@ -20,7 +20,7 @@ GLVar::GLVar(const std::size_t unitSize, const std::size_t capacity) :
 	_capacity(capacity),
 	_byteSize(0)
 {
-	_data = new char[unitSize * capacity];
+    _data = new char[unitSize * capacity]{0};
 }
 
 
@@ -37,13 +37,13 @@ GLVar::GLVar(GLVar && o) :
 GLVar::GLVar(const GLVar & o):
 	_unitSize(o._unitSize),
 	_count(o._count),
-	_capacity(o._count),
+	_capacity(o._capacity),
 	_byteSize(o._byteSize)
 {
 	const std::size_t size = _unitSize * _capacity;
 	_data = new char[size];
 
-	std::memcpy(_data, o._data, size);
+	std::memcpy(_data, o._data, _byteSize);
 }
 
 GLVar::GLVar(const gb::render::data::VtxVarStubInfo & info):
@@ -52,7 +52,7 @@ GLVar::GLVar(const gb::render::data::VtxVarStubInfo & info):
 	_capacity(1),
 	_byteSize(info.count * info.typeSize)
 {
-	_data = new char[_unitSize] {0};
+	_data = new char[_unitSize] {};
 }
 
 GLVar::~GLVar()
@@ -62,6 +62,7 @@ GLVar::~GLVar()
 
 void GLVar::append(const void* data, const std::size_t count)
 {
+	assert(data != nullptr);
 	const std::size_t newCount = _count + count;
 	if (newCount <= _capacity)
 	{
@@ -89,7 +90,7 @@ void GLVar::append(const void* data, const std::size_t count)
 
 void GLVar::set(const void * data, const std::size_t idx)
 {
-	assert(idx < _count);
+	assert(data != nullptr && idx < _count);
 	std::memcpy(_data + idx * _unitSize, data, _unitSize);
 }
 

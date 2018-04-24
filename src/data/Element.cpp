@@ -3,9 +3,10 @@
 #include "Render.h"
 #include "Camera.h"
 #include "Texture.h"
-
 #include "Text.h"
 #include "FPVController.h"
+#include "EntityPicker.h"
+
 #include <gbUtils/logger.h>
 #include <gbUtils/string.h>
 using namespace gb;
@@ -33,8 +34,12 @@ void Element::Recipe::PreReg()
 	GB_RENDER_DATA_ELEMENT_RECIPE_REG(render::Element::Type::Texture, Texture);
 	GB_RENDER_DATA_ELEMENT_RECIPE_REG(render::Element::Type::Text, Text);
 	GB_RENDER_DATA_ELEMENT_RECIPE_REG(render::Element::Type::FPVController, FPVController);
-
+	GB_RENDER_DATA_ELEMENT_RECIPE_REG(render::Element::Type::EntityPicker, EntityPicker);
 }
+
+void Element::from_lua(const gb::utils::luatable_mapper & mapper)
+{}
+
 void ElementAdapter::from_lua(const luatable_mapper& mapper)
 {
 	if (mapper.has_key(GB_RENDER_DATA_ELEMENT_KEY_TYPE))

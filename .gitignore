@@ -41,3 +41,7 @@ Win32/
 
 *.dir/
 resource/Font/
+*.TTF
+*.ttc
+*.ttf
+*.gbFont

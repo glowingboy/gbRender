@@ -279,7 +279,7 @@ UniformVar::UniformVar(const GLint index_, const std::size_t typeSize, const std
 	{
 		_setter = Shader::SetUniform1i;
 		_lua_getter = &UniformVar::_lua_getter_samplers;
-		textureObjs = new UniformTextureVar{ {0} };
+		textureObjs = new UniformTextureVar{ 0, 0 };
 	}
 		
 }
@@ -425,7 +425,7 @@ bool Shader::from_lua(luatable_mapper & mapper, const char* shaderName)
 		if (mapper.map_string(info->second.c_str()))
 		{
 			std::vector<VtxVarStub> vtxVarStubs[2];
-			GLsizei strides[2] = { 0 };
+			GLsizei strides[2] = {0};
 
 			//VtxVars
 			if (mapper.has_key(GB_RENDER_DATA_SHADER_INFO_KEY_VTXVARS))
@@ -741,6 +741,31 @@ void GLCfg::Blend::from_lua(const gb::utils::luatable_mapper& mapper)
 	}
 }
 
+void GLCfg::Blend::apply() const
+{
+	if (enabled)
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc(sfactor, dfactor);
+	}
+	else
+		glDisable(GL_BLEND);	
+}
+
+void GLCfg::Blend::applyFrom(const Blend & other) const
+{
+	const bool o_enabled = other.enabled;
+	if (enabled)
+	{
+		if (!o_enabled)
+			glEnable(GL_BLEND);
+		if (sfactor != other.sfactor || dfactor != other.dfactor)
+			glBlendFunc(sfactor, dfactor);
+	}
+	else if (o_enabled)
+		glDisable(GL_BLEND);
+}
+
 void GLCfg::DepthTest::from_lua(const gb::utils::luatable_mapper& mapper)
 {
 	mapper.checkout_boolean_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_DEPTHTEST_ENABLED, enabled);
@@ -749,6 +774,32 @@ void GLCfg::DepthTest::from_lua(const gb::utils::luatable_mapper& mapper)
 	{
 		mapper.checkout_integer_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_DEPTHTEST_FUNC, func);
 	}
+}
+
+void GLCfg::DepthTest::apply() const
+{
+	if (enabled)
+	{
+		glEnable(GL_DEPTH_TEST);
+		glDepthFunc(func);
+	}
+	else
+		glDisable(GL_DEPTH_TEST);
+
+}
+
+void GLCfg::DepthTest::applyFrom(const DepthTest& other) const
+{
+	const bool o_enabled = other.enabled;
+	if (enabled)
+	{
+		if (!o_enabled)
+			glEnable(GL_DEPTH_TEST);
+		if (func != other.func)
+			glDepthFunc(func);
+	}
+	else if (o_enabled)
+		glDisable(GL_DEPTH_TEST);
 }
 
 void GLCfg::AlphaTest::from_lua(const gb::utils::luatable_mapper& mapper)
@@ -763,6 +814,33 @@ void GLCfg::AlphaTest::from_lua(const gb::utils::luatable_mapper& mapper)
 	}
 }
 
+void GLCfg::AlphaTest::apply() const
+{
+	if (enabled)
+	{
+		glEnable(GL_ALPHA_TEST);
+		glAlphaFunc(func, ref);
+	}
+	else
+		glDisable(GL_ALPHA_TEST);
+
+}
+
+void GLCfg::AlphaTest::applyFrom(const AlphaTest & other) const
+{
+	const bool o_enabled = other.enabled;
+
+	if (enabled)
+	{
+		if (!o_enabled)
+			glEnable(GL_ALPHA_TEST);
+		if (func != other.func || ref != other.func)
+			glAlphaFunc(func, ref);
+	}
+	else if (o_enabled)
+		glDisable(GL_ALPHA_TEST);
+}
+
 GLCfg::GLCfg() :
 	blend{ false, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA },
 	depthTest{ true, GL_LEQUAL },
@@ -770,6 +848,30 @@ GLCfg::GLCfg() :
 	polygonMode(GL_FILL)
 {}
 
+void GLCfg::apply() const
+{
+	blend.apply();
+	depthTest.apply();
+	alphaTest.apply();
+
+	glPolygonMode(GL_FRONT_AND_BACK, polygonMode);
+}
+
+void GLCfg::applyFrom(const GLCfg * other) const
+{
+	if (other != nullptr)
+	{
+		blend.applyFrom(other->blend);
+		depthTest.applyFrom(other->depthTest);
+		alphaTest.applyFrom(other->alphaTest);
+
+		if (polygonMode != other->polygonMode)
+			glPolygonMode(GL_FRONT_AND_BACK, polygonMode);
+	}
+	else
+		apply();
+
+}
 void GLCfg::from_lua(const gb::utils::luatable_mapper& mapper)
 {
 	mapper.checkout_table_by_key(GB_RENDER_DATA_SHADER_GLCFG_KEY_BLEND, blend);

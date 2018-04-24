@@ -11,3 +11,12 @@ slType =
       Handleui64 = 8,
       Sampler = 9
    }
+
+ShaderRenderQueue =
+   {
+      Background = 0x00,
+      Opaque = 0xf,
+      Transparent = 0xff,
+      UI = 0x8ff,
+      Gizmo = 0xfff
+   }

@@ -29,7 +29,7 @@ void FPVController::Start()
 
 void FPVController::End()
 {
-	GB_UTILS_CALLBACK_UNREG(Input::Instance().GetCBs(), FPVController::OnInput);
+	GB_UTILS_CALLBACK_UNREG(Input::Instance().GetCBs());
 }
 
 std::uint32_t FPVController::GetType() const
@@ -37,18 +37,32 @@ std::uint32_t FPVController::GetType() const
 	return Element::Type::FPVController;
 }
 
-void FPVController::OnInput(const char code, const bool down)
+void FPVController::OnInput(const std::int32_t code, const bool down)
 {
 	logger::Instance().log(string("code: ") + code + ", down: " + down);
 
 	Transform& trans = _Owner->GetTransform();
 	const vec4F oldPosition = trans.GetLocalPosition();
-	if (code == 'W' && down)
+	if (down)
 	{
-		trans.SetPosition(vec3F(oldPosition.x, oldPosition.y, oldPosition.z + _PosStep));
+		switch (code)
+		{
+		case 'W':
+			trans.SetPosition(vec3F(oldPosition.x, oldPosition.y, oldPosition.z + _PosStep));
+			break;
+		case 'S':
+			trans.SetPosition(vec3F(oldPosition.x, oldPosition.y, oldPosition.z - _PosStep));
+			break;
+		case 'A':
+			trans.SetPosition(vec3F(oldPosition.x + _PosStep, oldPosition.y, oldPosition.z));
+			break;
+		case 'D':
+			trans.SetPosition(vec3F(oldPosition.x - _PosStep, oldPosition.y, oldPosition.z));
+			break;
+		default:
+			break;
+		}
+		
 	}
-	else if (code == 'S' && down)
-	{
-		trans.SetPosition(vec3F(oldPosition.x, oldPosition.y, oldPosition.z - _PosStep));
-	}
+
 }

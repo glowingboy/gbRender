@@ -6,7 +6,8 @@ ElementType =
       Mesh = 3,
       Texture = 4,
       Text = 5,
-      FPVController = 6
+      FPVController = 6,
+      EntityPicker = 7
    }
 
 function ElementType:Register(types)

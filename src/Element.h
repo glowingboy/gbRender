@@ -15,6 +15,7 @@ public:
 		static constexpr std::uint32_t Texture = 0x04;
 		static constexpr std::uint32_t Text = 0x05;
 		static constexpr std::uint32_t FPVController = 0x06;
+		static constexpr std::uint32_t EntityPicker = 0x07;
 	};
 	inline static gb::utils::string TypeToString(const std::uint32_t t)
 	{

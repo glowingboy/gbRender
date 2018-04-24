@@ -1,4 +1,4 @@
-RenderQueue =
+CameraRenderQueue =
    {
       Background = 0x00,
       Opaque = 0xf,

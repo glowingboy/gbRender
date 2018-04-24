@@ -13,8 +13,3 @@ gb::render::Element * FPVController::Instantiate(gb::render::Entity * owner) con
 {
 	return new render::FPVController(owner);
 }
-
-void FPVController::from_lua(const gb::utils::luatable_mapper & mapper)
-{
-
-}

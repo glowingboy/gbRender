@@ -10,8 +10,7 @@ public:
 	FPVController();
 public:
 
-	virtual gb::render::Element* Instantiate(gb::render::Entity* owner) const;
-	virtual void from_lua(const gb::utils::luatable_mapper & mapper);
+	virtual gb::render::Element* Instantiate(gb::render::Entity* owner) const override;
 };
 
 GB_RENDER_DATA_NS_END

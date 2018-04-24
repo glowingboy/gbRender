@@ -51,10 +51,12 @@ class Input
 
 public:
 	
-	void Process(const std::uint8_t code, const bool down);
+	void Process(const std::int32_t code, const bool down);
 
 private:
-	GB_PROPERTY_R(private, CBs, gb::utils::callback<const char, const bool>);
+	GB_PROPERTY_R(private, CBs, gb::utils::callback<const std::int32_t, const bool>);
+	GB_PROPERTY_R(private, ClickedCBs, gb::utils::callback<>);
+	GB_PROPERTY_R(private, ClickDown, bool);
 
 };
 

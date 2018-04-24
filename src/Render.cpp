@@ -39,7 +39,7 @@ void BaseRender::End()
 	logger::Instance().log("render::End @ " + _Owner->GetName());
 
 	Director::Instance().RemoveRenderEntity(_Owner);
-	GB_UTILS_MULTI_CALLBACK_UNREG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED, BaseRender::_onOwnerTransformChanged);
+	GB_UTILS_MULTI_CALLBACK_UNREG(_Owner->GetCBs(), GB_RENDER_ENTITY_MSG_TRANSFORM_CHANGED);
 }
 
 std::uint32_t BaseRender::GetType() const
