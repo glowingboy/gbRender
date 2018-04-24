@@ -65,9 +65,9 @@ out vec4 color;
 void main()
 {
 	float r = texture(font, uv).r;
-	if(r < 0.5)
+	if(r < 0.495f)
 		color.r = 0.3f;
-	color.b = 0.3f;
+	color.b = r;
 }
 
 GB_RENDER_DATA_SHADER_FRAG_END

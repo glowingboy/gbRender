@@ -27,10 +27,11 @@ Texture::Texture(Entity * owner):
 	_vtxPos->append(&r_b, 1);
 	_vtxPos->append(&l_b, 1);
 
-	vec2F uv_l_t(0.0f, 0.0f);
-	vec2F uv_r_t(1.0f, 0.0f);
-	vec2F uv_r_b(1.0f, 1.0f);
-	vec2F uv_l_b(0.0f, 1.0f);
+	//texture origin is at left-bottom corner
+	vec2F uv_l_t(0.0f, 1.0f);
+	vec2F uv_r_t(1.0f, 1.0f);
+	vec2F uv_r_b(1.0f, 0.0f);
+	vec2F uv_l_b(0.0f, 0.0f);
 
 	_vtxUV->append(&uv_l_t, 1);
 	_vtxUV->append(&uv_r_t, 1);

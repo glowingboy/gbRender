@@ -279,7 +279,7 @@ UniformVar::UniformVar(const GLint index_, const std::size_t typeSize, const std
 	{
 		_setter = Shader::SetUniform1i;
 		_lua_getter = &UniformVar::_lua_getter_samplers;
-		textureObjs = new UniformTextureVar{ {0} };
+		textureObjs = new UniformTextureVar{ {0, 0} };
 	}
 		
 }
@@ -425,7 +425,7 @@ bool Shader::from_lua(luatable_mapper & mapper, const char* shaderName)
 		if (mapper.map_string(info->second.c_str()))
 		{
 			std::vector<VtxVarStub> vtxVarStubs[2];
-			GLsizei strides[2] = { 0 };
+			GLsizei strides[2] = {};
 
 			//VtxVars
 			if (mapper.has_key(GB_RENDER_DATA_SHADER_INFO_KEY_VTXVARS))

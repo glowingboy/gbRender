@@ -307,8 +307,6 @@ void GLMultiIndirectDraw::Initialize(const GLBuffer::CtorParam(&param)[4])
 		_needSync = true;
 }
 
-std::vector<GLMultiIndirectDraw::IndirectCommand> g_test_cmd;
-
 void GLMultiIndirectDraw::SetData(const std::vector<BaseRender*> renders)
 {
 	if (renders.size() > 0)
@@ -331,28 +329,28 @@ void GLMultiIndirectDraw::SetData(const std::vector<BaseRender*> renders)
 
 		GLuint & count = cmd.count;
 		GLuint & instanceCount = cmd.instanceCount;
-		GLuint& firstIndex = cmd.firstIndex;
+		GLuint & firstIndex = cmd.firstIndex;
 		GLuint & baseVertex = cmd.baseVertex;
 		GLuint & baseInstance = cmd.baseInstance;
 
 		_cmdCount = 0;
-
-		g_test_cmd.clear();
-
-		std::for_each(meshRenders.begin(), meshRenders.end(), [this, &shader, &cmd, &count, &instanceCount, &firstIndex, &baseVertex, &baseInstance](const std::pair<const data::Mesh*, std::vector<BaseRender*>>& mr)
+		std::size_t vtxVarOffset = 0;
+		std::size_t instVarOffset = 0;
+		std::size_t idxVarOffset = 0;
+		std::for_each(meshRenders.begin(), meshRenders.end(), [this, &shader, &cmd, &count, &instanceCount, &firstIndex, &baseVertex, &baseInstance, &vtxVarOffset, &instVarOffset, &idxVarOffset](const std::pair<const data::Mesh*, std::vector<BaseRender*>>& mr)
 		{
 			const data::Mesh* m = mr.first;
 
 			//vtx
-			_VtxBuffer.SetData(shader->GetVtxVarInfo(0), m->GetVtxVars(), baseVertex);
-			
+			_VtxBuffer.SetData(shader->GetVtxVarInfo(0), m->GetVtxVars(), vtxVarOffset);
+			vtxVarOffset += m->GetVtxAttribByteSize();
 			//idx
 			const GLVar& idxVar = m->GetIdxVar();
-			_IdxBuffer.SetData(firstIndex, idxVar.data(), idxVar.byteSize());
+			_IdxBuffer.SetData(idxVarOffset, idxVar.data(), idxVar.byteSize());
+			idxVarOffset += idxVar.byteSize();
 			count = idxVar.count();
 
 			//inst
-			GLuint baseInstance_tmp = baseInstance;
 			auto& instVarInfo = shader->GetVtxVarInfo(1);
 			if (instVarInfo.size() > 0)
 			{
@@ -360,8 +358,8 @@ void GLMultiIndirectDraw::SetData(const std::vector<BaseRender*> renders)
 				const std::size_t stride = instVarInfo.begin()->stride;
 				for (std::size_t i = 0; i < vRs.size(); i++)
 				{
-					_InstBuffer.SetData(instVarInfo, vRs[i]->GetInstVar(), baseInstance_tmp);
-					baseInstance_tmp += (i + 1)* stride;
+					_InstBuffer.SetData(instVarInfo, vRs[i]->GetInstVar(), instVarOffset);
+					instVarOffset += (i + 1)* stride;
 				}
 
 				instanceCount = vRs.size();
@@ -370,13 +368,11 @@ void GLMultiIndirectDraw::SetData(const std::vector<BaseRender*> renders)
 			//indirect
 			_IndirectCmdBuffer.SetData(_cmdCount * sizeof(IndirectCommand), &cmd, sizeof(IndirectCommand));
 
-			g_test_cmd.push_back(cmd);
-
 			_cmdCount++;
 
-			baseVertex += m->GetVtxAttribByteSize();
-			firstIndex += idxVar.byteSize();
-			baseInstance = baseInstance_tmp;
+			baseVertex += m->GetPosVar()->count();
+			firstIndex += count;
+			baseInstance += instanceCount;
 		});
 	}
 }
@@ -390,32 +386,9 @@ void GLMultiIndirectDraw::Draw()
 {
 	glBindVertexArray(_VAO);
 
-	//glBindBuffer(GL_DRAW_INDIRECT_BUFFER, _IndirectCmdBuffer.GetBufferO());
-
-	//glMultiDrawElementsIndirect(_Mode, GL_UNSIGNED_INT, 0, _cmdCount, 0);
-
-	//GLsizei n;
-	//for (n = 0; n < _cmdCount; n++) {
-	//	const IndirectCommand *cmd;
-
-	//		cmd = (const IndirectCommand  *)g_test_cmd.data() + n;
-	//	
-	//	glDrawElementsInstancedBaseVertexBaseInstance(_Mode,
-	//		cmd->count,
-	//		GL_UNSIGNED_INT,
-	//		(GLvoid*)(cmd->firstIndex),
-	//		cmd->instanceCount,
-	//		cmd->baseVertex,
-	//		cmd->baseInstance);
-	//}
-
-	glDrawElementsInstancedBaseVertexBaseInstance(_Mode,
-		12,
-		GL_UNSIGNED_INT,
-		0,
-		1,
-		0,
-		0);
+	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, _IndirectCmdBuffer.GetBufferO());
+	
+	glMultiDrawElementsIndirect(_Mode, GL_UNSIGNED_INT, 0, _cmdCount, 0);
 
 	SetSync();
 

@@ -102,7 +102,7 @@ public:
 		IndirectCommand();
 		GLuint  count;
 		GLuint  instanceCount;
-		GLuint  firstIndex;
+		GLuint  firstIndex;// pointer offset
 		GLuint  baseVertex;
 		GLuint  baseInstance;
 	};

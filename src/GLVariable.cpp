@@ -52,7 +52,7 @@ GLVar::GLVar(const gb::render::data::VtxVarStubInfo & info):
 	_capacity(1),
 	_byteSize(info.count * info.typeSize)
 {
-	_data = new char[_unitSize] {0};
+	_data = new char[_unitSize] {};
 }
 
 GLVar::~GLVar()
@@ -126,7 +126,7 @@ void GLVar::reserve(const std::size_t capacity)
 {
 	if (_capacity < capacity)
 	{
-		char* newData = new char[capacity * _unitSize] {0};
+		char* newData = new char[capacity * _unitSize] {};
 		if (_data != nullptr)
 		{
 			std::memcpy(newData, _data, _count * _unitSize);

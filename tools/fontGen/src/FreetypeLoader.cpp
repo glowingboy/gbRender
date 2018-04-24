@@ -124,7 +124,7 @@ void freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFon
 		// std::vector<array_2d<std::uint8_t>> sdfs;
 	std::mutex mtx;
 
-	const FT_ULong startCode = 0x5f;
+	const FT_ULong startCode = 0;
 	const FT_ULong endCode = 65535;
 	const FT_ULong totalCode = endCode - startCode;
 	auto gen_sdf = [&glyphs, &mtx, &th_vas, totalCode](const std::uint8_t threadIdx, const size_t taskCount, FT_ULong idx)
@@ -191,12 +191,16 @@ void freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFon
 		}
 	};
 
-
-	for (FT_ULong i = startCode; i < endCode; i++)
+	//std::wstring testCode = L"ÄãºÃ°¡";
+	std::string testCode = "hello, world!!!";
+	for (std::uint32_t i = 0; i < testCode.size(); i++)
 	{
-		loader.pushtask(concurrency_ti_tc<FT_ULong>::task(gen_sdf, L'ºÃ', GB_UTILS_CONCURRENCY_TASK_PRIORITY_MID));
-		break;
+		loader.pushtask(concurrency_ti_tc<FT_ULong>::task(gen_sdf, testCode[i], GB_UTILS_CONCURRENCY_TASK_PRIORITY_MID));
 	}
+	//for (FT_ULong i = startCode; i < endCode; i++)
+	//{
+	//	loader.pushtask(concurrency_ti_tc<FT_ULong>::task(gen_sdf, i, GB_UTILS_CONCURRENCY_TASK_PRIORITY_MID));
+	//}
 	loader.done();
 	logger::Instance().progress_done();
 
@@ -206,10 +210,24 @@ void freetypeLoader::load2gbFont(const char* szSrcFontName, const char* szDstFon
 	logger::Instance().log("sdfs generating completed");
 
 	//packing to one big array_2d
-	array_2d<std::uint8_t> bin = image::packing<Glyph_ex, std::uint8_t>(glyphs);
+	if (glyphs.size() != 0)
+	{
+#ifdef _MSC_VER
+#undef max
+#endif
 
-	Font::Instance().SerializeToFile(GB_FREETYPE_RENDER_GLYPH_SIZE / GB_FREETYPE_SAMPLESCALE,
-		glyphs,
-		bin,
-		szDstFontName);
+		char a[10] = {};
+		array_2d<std::uint8_t> bin = image::packing<Glyph_ex, std::uint8_t>(glyphs, std::numeric_limits<std::uint8_t>::max());
+		Font::Instance().SerializeToFile(GB_FREETYPE_RENDER_GLYPH_SIZE / GB_FREETYPE_SAMPLESCALE,
+			glyphs,
+			bin,
+			szDstFontName);
+	}
+	else
+	{
+		logger::Instance().error("no glyph found!!!");
+		return;
+	}
+
+	
 }
