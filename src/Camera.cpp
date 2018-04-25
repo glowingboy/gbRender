@@ -87,16 +87,30 @@ void Camera::SetIsStatic(const bool isStatic)
 
 }
 
+gb::physics::vec3F Camera::Screen2World(const gb::physics::vec2F & screenPosition)
+{
+	vec3F scrnPos(screenPosition.x, screenPosition.y, -_Frustum.clipNear);
+
+	math::interval_mapper<float, float> mapper(_screenSize.x * _ViewPort[0], _screenSize.x * _ViewPort[2], _Frustum.left, _Frustum.right);
+
+	scrnPos.x = mapper.map(scrnPos.x);
+
+	mapper.reset(_screenSize.y * _ViewPort[1], _screenSize.y * _ViewPort[3], _Frustum.bottom, _Frustum.top);
+	scrnPos.y = mapper.map(scrnPos.y);
+
+
+}
+
 void Camera::Shoot()
 {
 	glClearColor(_ClearColor.r, _ClearColor.g, _ClearColor.b, _ClearColor.a);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	//viewport setup
-	glViewport((GLint)(_screenSize.x * _ViewPort.x),
-		(GLint)(_screenSize.y * _ViewPort.y),
-		(GLsizei)(_screenSize.x * _ViewPort.z),
-		(GLsizei)(_screenSize.y * _ViewPort.w));
+	glViewport((GLint)(_screenSize.x * _ViewPort[0]),
+		(GLint)(_screenSize.y * _ViewPort[1]),
+		(GLsizei)(_screenSize.x * _ViewPort[2]),
+		(GLsizei)(_screenSize.y * _ViewPort[3]));
 
 	const Director::octreeEntity& renderEntities = Director::Instance().GetRenderEntities();
 	struct intersectMethod//TODO change to _Ele Type?
@@ -106,7 +120,7 @@ void Camera::Shoot()
 			return octanBB.intersect(q);
 		}
 	};
-	auto ret = renderEntities.query_intersect<spherebb<>, intersectMethod>(_transformedFSBB);
+	_ViewRangeEntites = renderEntities.query_intersect<spherebb<>, intersectMethod>(_transformedFSBB);
 
 	//1st classify according to renderQueue
 	//2nd classify according to shader
@@ -114,7 +128,7 @@ void Camera::Shoot()
 
 	//classify according to renderQueue
 	std::map<std::uint32_t, std::vector<BaseRender*>> renderQueueRenders;
-	std::for_each(ret.begin(), ret.end(), [this, &renderQueueRenders](Entity* e)
+	std::for_each(_ViewRangeEntites.begin(), _ViewRangeEntites.end(), [this, &renderQueueRenders](Entity* e)
 	{
 		if (_InterestTag & e->GetTag())
 		{

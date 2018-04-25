@@ -34,5 +34,8 @@ void EntityPicker::End()
 
 void EntityPicker::OnClicked()
 {
-	logger::Instance().log("EntityPicker::OnClicked");
+	const vec2<long>& cursorPos = Input::Instance().GetCursorPosition();
+
+	logger::Instance().log(string("EntityPicker::OnClicked,cursorPos: x@ ") + cursorPos.x + ", y@ " + cursorPos.y);
+	
 }

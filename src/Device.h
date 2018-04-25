@@ -24,11 +24,13 @@ GB_RENDER_NS_BEGIN
 		}
 
 		inline bool IsInitialized()const { return _bInitialized; }
-
+		void ForceCursorPositionUpdate() const;
 	private:
 		gb::physics::vec2<std::int32_t> _screenSize;
 		bool _bInitialized;
 		bool _bFullScreen;
+		HWND _hWnd;
+		GB_PROPERTY_R(private, CursorPosition, gb::physics::vec2<long>);
 #ifdef _MSC_VER
 	private:
 		static HGLRC _glContext;

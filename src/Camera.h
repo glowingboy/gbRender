@@ -29,6 +29,9 @@ public:
 	void Shoot();
 	void SetRenderQueue(const uint32 rq);
 	void SetIsStatic(const bool isStatic);
+
+	gb::physics::vec3F Screen2World(const gb::physics::vec2F& screenPosition);
+	
 private:
 	virtual void Awake() override;
 	virtual void Start() override;
@@ -65,6 +68,8 @@ private:
 	GB_PROPERTY_R(private, IsStatic, bool);
 
 	gb::physics::mat4F _projMatProductViewMat;
+
+	GB_PROPERTY_R(private, ViewRangeEntites, std::vector<Entity*>);
 	private:
 	void _onOwnerTransformChanged();
 };

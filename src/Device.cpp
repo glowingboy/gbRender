@@ -7,8 +7,8 @@
 #include "Input.h"
 
 using namespace gb::render;
-using gb::utils::string;
-using gb::utils::logger;
+using namespace gb::utils;
+using namespace gb::physics;
 #ifdef _MSC_VER
 HDC Device::_hDC;
 HGLRC Device::_glContext;
@@ -16,7 +16,8 @@ HGLRC Device::_glContext;
 
 Device::Device():
 	_bInitialized(false),
-	_bFullScreen(false)
+	_bFullScreen(false),
+	_hWnd(0)
 {
 
 }
@@ -69,12 +70,12 @@ bool Device::Initialize(const gb::physics::vec2<std::int32_t>& screenSize)
 	if (!_bFullScreen)
 		dwStyle = WS_POPUP;
 	::AdjustWindowRectEx(&rect, dwStyle, FALSE, 0);
-	const HWND hWnd = ::CreateWindow(wc.lpszClassName, TEXT("gbRender"), dwStyle, 0, 0, rect.right - rect.left, rect.bottom - rect.top, 0, 0, wc.hInstance, 0);
+	_hWnd = ::CreateWindow(wc.lpszClassName, TEXT("gbRender"), dwStyle, 0, 0, rect.right - rect.left, rect.bottom - rect.top, 0, 0, wc.hInstance, 0);
 
-	if (hWnd == NULL)
+	if (_hWnd == NULL)
 		return false;
 
-	::ShowWindow(hWnd, SW_SHOW);
+	::ShowWindow(_hWnd, SW_SHOW);
 
 	_bInitialized = true;
 	return true;
@@ -84,7 +85,7 @@ bool Device::Initialize(const gb::physics::vec2<std::int32_t>& screenSize)
 #ifdef _MSC_VER
 LRESULT CALLBACK Device::_windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	static bool bShouldGetCursorPos = false;
+	bool bShouldGetCursorPos = false;
 
 	switch (uMsg)
 	{
@@ -98,7 +99,6 @@ LRESULT CALLBACK Device::_windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 		ValidateRect(hWnd, &rect);
 		break;
 	case WM_KEYDOWN:
-		bShouldGetCursorPos = true;
 		Input::Instance().Process(wParam, true);
 		break;
 	case WM_LBUTTONDOWN:
@@ -110,7 +110,6 @@ LRESULT CALLBACK Device::_windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 		Input::Instance().Process(VK_RBUTTON, true);
 		break;
 	case WM_KEYUP:
-		bShouldGetCursorPos = true;
 		Input::Instance().Process(wParam, false);
 		break;
 	case WM_LBUTTONUP:
@@ -133,14 +132,7 @@ LRESULT CALLBACK Device::_windowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM
 
 	if (bShouldGetCursorPos)
 	{
-		POINT point;
-		BOOL ret = ::GetCursorPos(&point);
-		assert(ret);
-
-		ret = ::ScreenToClient(hWnd, &point);
-		assert(ret);
-		// gbInput::_cursorPos.X = point.x;
-		// gbInput::_cursorPos.Y = point.y;
+		Device::Instance().ForceCursorPositionUpdate();
 		bShouldGetCursorPos = false;
 	}
 	return DefWindowProc(hWnd, uMsg, wParam, lParam);
@@ -267,4 +259,22 @@ bool Device::Update()const
 	}
 	return true;
 #endif
+}
+
+void Device::ForceCursorPositionUpdate() const
+{
+	POINT point;
+	if (::GetCursorPos(&point))
+	{
+		if (::ScreenToClient(_hWnd, &point))
+		{
+			vec2<long>& cursorPos = Device::Instance()._CursorPosition;
+			cursorPos.x = point.x;
+			cursorPos.y = point.y;
+		}
+		else
+			throw "error";
+	}
+	else
+		throw "error";
 }

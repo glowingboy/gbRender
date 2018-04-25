@@ -2,6 +2,7 @@
 
 #include "RenderNS.h"
 #include <gbUtils/callback.h>
+#include <gbPhysics/type.h>
 
 #ifdef _MSC_VER
 
@@ -52,7 +53,7 @@ class Input
 public:
 	
 	void Process(const std::int32_t code, const bool down);
-
+	gb::physics::vec2<long> GetCursorPosition() const;
 private:
 	GB_PROPERTY_R(private, CBs, gb::utils::callback<const std::int32_t, const bool>);
 	GB_PROPERTY_R(private, ClickedCBs, gb::utils::callback<>);
