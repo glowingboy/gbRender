@@ -30,7 +30,7 @@ public:
 	void SetRenderQueue(const uint32 rq);
 	void SetIsStatic(const bool isStatic);
 
-	gb::physics::vec3F Screen2World(const gb::physics::vec2F& screenPosition);
+	gb::physics::vec3F Screen2World(const gb::physics::vec2F& screenPosition) const;
 	
 private:
 	virtual void Awake() override;
@@ -66,6 +66,8 @@ private:
 	GLMultiIndirectDraw _multiIndirectDraw;
 
 	GB_PROPERTY_R(private, IsStatic, bool);
+
+	const gb::physics::mat4F& _worldMat;
 
 	gb::physics::mat4F _projMatProductViewMat;
 

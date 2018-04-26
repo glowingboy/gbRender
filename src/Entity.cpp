@@ -157,6 +157,16 @@ void Entity::Destroy()
 //		logger::Instance().warning("more than one count of same type Element @ " + Element::TypeToString(t));
 //}
 
+
+Element * Entity::GetElement(const std::uint32_t type)
+{
+	const auto iter = _Elements.find(type);
+	if (iter != _Elements.end())
+		return iter->second;
+	else
+		return nullptr;
+}
+
 void Entity::_updateWorldTransform()
 {
 	std::deque<const Entity*> qParents;

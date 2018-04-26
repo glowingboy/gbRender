@@ -51,6 +51,8 @@ public:
 		return ele;
 	}
 
+	Element* GetElement(const std::uint32_t type);
+
 	//void RegisterCB(const uint32 triggerKey, const std::uintptr_t cbAddr, const std::function<void(void)>& cb);
 	//void UnregisterCB(const uint32 triggerKey, const std::uintptr_t cbAddr);
 	//void Trigger(const uint32 triggerKey);
@@ -61,7 +63,7 @@ private:
 	void _instantiate(const gb::render::data::Entity* dEntity);
 	GB_PROPERTY(private, Name, gb::utils::string);
 	GB_PROPERTY_R(private, Children, std::unordered_multimap<const gb::utils::string, Entity*>);
-	GB_PROPERTY_R(private, Elements, std::map<const std::uint32_t, Element*>);
+	GB_PROPERTY_R(private, Elements, std::unordered_map<const std::uint32_t, Element*>);
 	GB_PROPERTY_R(private, Transform, Transform);
 
 	GB_PROPERTY_R(private, WorldTransformMatrix, gb::physics::mat4F);

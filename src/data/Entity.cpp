@@ -1,6 +1,7 @@
 #include "Entity.h"
 #include <algorithm>
 #include <gbUtils/logger.h>
+#include "..\Entity.h"
 using namespace gb::render::data;
 using namespace gb::utils;
  

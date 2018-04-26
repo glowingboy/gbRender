@@ -2,8 +2,10 @@
 
 #include "Element.h"
 #include <gbUtils/callback.h>
-#include <gbPhysics/type.h>
+#include <gbPhysics/ray.h>
 GB_RENDER_NS_BEGIN
+
+class Camera;
 
 class EntityPicker : public Element
 {
@@ -21,6 +23,7 @@ private:
 	GB_PROPERTY_R(private, CBs, gb::utils::callback<gb::physics::vec3F>);
 	GB_PROPERTY_R(private, Ray, gb::physics::ray<gb::physics::Float>);
 
+	GB_PROPERTY_W(private, Camera, const Camera*);
 private:
 	void OnClicked();
 };

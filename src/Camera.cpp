@@ -14,7 +14,8 @@ Camera::Camera(Entity * const owner) :
 	_projectionMatrix(_Frustum.projectionMatrix),
 	_ViewPort(0.0f, 0.0f, 1.0f, 1.0f),
 	_screenSize(Director::Instance().GetScreenSize()),
-	_IsStatic(false)
+	_IsStatic(false),
+	_worldMat(owner->GetWorldTransformMatrix())
 {
 	_Frustum.set(60.0f, ((float)_screenSize.x) / _screenSize.y, 10, 100);
 }
@@ -87,9 +88,10 @@ void Camera::SetIsStatic(const bool isStatic)
 
 }
 
-gb::physics::vec3F Camera::Screen2World(const gb::physics::vec2F & screenPosition)
+gb::physics::vec3F Camera::Screen2World(const gb::physics::vec2F & screenPosition) const
 {
-	vec3F scrnPos(screenPosition.x, screenPosition.y, -_Frustum.clipNear);
+	//map form screen space to camera space [frustum.near_plane]
+	vec4F scrnPos(screenPosition.x, screenPosition.y, -_Frustum.clipNear, 1.0f);
 
 	math::interval_mapper<float, float> mapper(_screenSize.x * _ViewPort[0], _screenSize.x * _ViewPort[2], _Frustum.left, _Frustum.right);
 
@@ -98,7 +100,16 @@ gb::physics::vec3F Camera::Screen2World(const gb::physics::vec2F & screenPositio
 	mapper.reset(_screenSize.y * _ViewPort[1], _screenSize.y * _ViewPort[3], _Frustum.bottom, _Frustum.top);
 	scrnPos.y = mapper.map(scrnPos.y);
 
+	//camera space to world space
+	mat4F worldMat_inverse;
+	if(_worldMat.inverse(worldMat_inverse))
+		scrnPos = worldMat_inverse * scrnPos;
+	else
+	{
+		GB_ASSERT(false, "Camera::Screen2World worldMat inverse failed");
+	}
 
+	return scrnPos;
 }
 
 void Camera::Shoot()
@@ -203,10 +214,9 @@ void Camera::_onOwnerTransformChanged()
 {
 	logger::Instance().log("Camera::_onOwnerTransformChanged");
 
-	const mat4F& worldMat = _Owner->GetWorldTransformMatrix();
-	_transformedFSBB = _frustumSphereBB * worldMat;
+	_transformedFSBB = _frustumSphereBB * _worldMat;
 
-	_projMatProductViewMat = _projectionMatrix * worldMat;
+	_projMatProductViewMat = _projectionMatrix * _worldMat;
 }
 
 void Camera::_setFrameBufferIdx(const std::uint8_t idx)
