@@ -46,7 +46,7 @@
 - End :: from top to bottom
 **** NOTE!!!
      Entity::AddChild can be invoked in either Element::Awake() or Element::Start() 
-     but not in Element::End() where the Entity::Start will never have a change to be called.
+     but not in Element::End() where the Entity::Start will never have a chance to be called.
      Entity::AddElement can only be invoked in Element::Awake(), 
      otherwise the Entity::Start() will never be called.
      
@@ -67,7 +67,7 @@
 *** absolute static render(/environment buildings/)
     vtxAttrib, instVar, UnifVar never changed
 *** partial static render(same type NPC)
-    only instaVar changed
+    only instVar changed
 *** dynamic render
     all changed in every frame
     
@@ -107,7 +107,7 @@
 **** mesh
 + Data Members
   - sphere boundingbox :: calculating on the fly every time or storing in mesh file?
-  - vertex data
+  - vertex data ::
     
 **** material
 + Data Members
@@ -125,7 +125,7 @@
    
 *** Mesh
     - name ::
-	     gb_vtx_{pos, idx, uv, color}
+	     gb_vtx_[pos, idx, uv, color]
     example:
     #+BEGIN_SRC lua
 return
@@ -139,6 +139,101 @@ return
       gb_vtx_index = {0, 1, 2}
    }
     #+END_SRC
+
+*** Material
+    - Shader :: shader file
+    - UniformVars :: uniform variables
+
+    example:		
+    #+BEGIN_SRC lua
+    return
+    {
+      Shader = "Default.gbShader",
+      UniformVars =
+      {
+        tint = {0.0, 0.0, 1.0, 1.0}
+      }
+    }
+    #+END_SRC
+
+*** Shader
+    example : 
+    #+BEGIN_SRC C
+GB_RENDER_DATA_SHADER_INFO_BEGIN
+return
+   {
+      VtxVars =
+	 {
+	    {
+	       Name = "gb_vtxVar_pos",
+	       Type = slType.Vec3
+	    },
+	    {
+	       Name = "gb_vtxVar_uv",
+	       Type = slType.Vec2
+	    },
+	    {
+	       Name = "gb_instVar_mvp",
+	       Type = slType.Mat4,
+	       Divisor = 1
+	    }
+	 },
+      UniformVars =
+	 {
+	    {
+	       Name = "font",
+	       Type = slType.Sampler
+	    }
+	 },
+      GLCfg =
+	 {
+	    DepthTest =
+	       {
+		  Enabled = false
+	       }
+	 },
+      Misc =
+	 {
+	    RenderQueue = ShaderRenderQueue.Background
+	 }
+   }
+GB_RENDER_DATA_SHADER_INFO_END
+
+GB_RENDER_DATA_SHADER_VERT_BEGIN
+#version 450 core
+
+in vec3 gb_vtxVar_pos;
+in vec2 gb_vtxVar_uv;
+in mat4 gb_instVar_mvp;
+
+out vec2 uv;
+
+void main()
+{
+  gl_Position = gb_instVar_mvp * vec4(gb_vtxVar_pos, 1.0f);
+  uv = gb_vtxVar_uv;
+}
+
+GB_RENDER_DATA_SHADER_VERT_END
+
+GB_RENDER_DATA_SHADER_FRAG_BEGIN
+#version 450 core
+
+uniform sampler2D font;
+in vec2 uv;
+out vec4 color;
+
+void main()
+{
+  float r = texture(font, uv).r;
+  if(r < 0.495f)
+    color.r = 0.3f;
+  color.b = r;
+}
+
+GB_RENDER_DATA_SHADER_FRAG_END
+
+#+END_SRC
 
 ** TODO 
    - using cache algorithm for vtxData storing in GPU memory
