@@ -63,7 +63,7 @@ private:
 	void _instantiate(const gb::render::data::Entity* dEntity);
 	GB_PROPERTY(private, Name, gb::utils::string);
 	GB_PROPERTY_R(private, Children, std::unordered_multimap<const gb::utils::string, Entity*>);
-	GB_PROPERTY_R(private, Elements, std::unordered_map<const std::uint32_t, Element*>);
+	GB_PROPERTY_R(private, Elements, std::unordered_map<std::uint32_t, Element*>);
 	GB_PROPERTY_R(private, Transform, Transform);
 
 	GB_PROPERTY_R(private, WorldTransformMatrix, gb::physics::mat4F);

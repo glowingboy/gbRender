@@ -109,7 +109,7 @@ gb::physics::vec3F Camera::Screen2World(const gb::physics::vec2F & screenPositio
     // homogeneous to cartesian space
     retPos = retPos / retPos.w;
 
-    return retPos;
+    return vec3F(retPos.x, retPos.y, retPos.z);
 }
 
 void Camera::Shoot()

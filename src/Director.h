@@ -27,6 +27,7 @@
 static_assert(GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT > 0, "GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT must greater than 0");
 
 GB_RENDER_NS_BEGIN
+
 GB_RENDER_CLASS Director
 {
 	friend class Camera;
@@ -82,4 +83,5 @@ public:
 	*/
 	GB_PROPERTY_R(private, RenderEntities, octreeEntity);
 };
+
 GB_RENDER_NS_END
