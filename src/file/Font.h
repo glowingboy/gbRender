@@ -98,7 +98,7 @@ public:
 		fontFile.write(GB_RENDER_FILE_FONT_IDENDIFIER, strlen(GB_RENDER_FILE_FONT_IDENDIFIER));
 
 		fontFile.write(&glyphSize, 4);
-		const std::uint32_t count = glyphs.size();
+		const std::size_t count = glyphs.size();
 		fontFile.write(&count, 4);
 
 		std::for_each(glyphs.begin(), glyphs.end(), [&fontFile](const Glyph_ex& gly)

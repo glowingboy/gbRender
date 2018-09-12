@@ -71,26 +71,37 @@ return
 		     	   }
 		     },
 		     {
-			Name = "text",
+			Name = "qingdao",
 			Elements =
 			   {
 			      {
-				 Type = ElementType.Text,
-				 Material = "SDFText.lua",
-				 Text = "hello,glowingboy"
-			      }
-			   }
-		     },
-		     {
-			Name = "texture",
-			Elements =
-			   {
-			      {
-				 Type = ElementType.Texture,
-				 Material = "SDFText.lua"
+				 Type = ElementType.Render,
+				 Mesh = "",
+				 Material = "Tint.lua"
 			      }
 			   }
 		     }
+		     -- {
+		     -- 	Name = "text",
+		     -- 	Elements =
+		     -- 	   {
+		     -- 	      {
+		     -- 		 Type = ElementType.Text,
+		     -- 		 Material = "SDFText.lua",
+		     -- 		 Text = "hello,glowingboy"
+		     -- 	      }
+		     -- 	   }
+		     -- },
+		     -- {
+		     -- 	Name = "texture",
+		     -- 	Elements =
+		     -- 	   {
+		     -- 	      {
+		     -- 		 Type = ElementType.Texture,
+		     -- 		 Material = "SDFText.lua"
+		     -- 	      }
+		     -- 	   }
+		     -- }
 		  }
 	    }
 	 }

@@ -16,17 +16,18 @@ int main(int argc, char** argv)
 
 	editor::data::ElementRecipe::Instance().Reg();
 
-	if (!Director::Instance().Ready(Director::Argument("scene_0.lua", vec2<std::int32_t>(640, 480), 
-		{
-			{ GB_RENDER_RESOURCE_CFG_SHADER, filesystem::Instance().get_absolute_path("../resource/Shader/Config.lua") },
-			{ GB_RENDER_RESOURCE_CFG_MATERIAL, filesystem::Instance().get_absolute_path("../resource/Material/Config.lua") },
-			{ GB_RENDER_RESOURCE_CFG_MESH, filesystem::Instance().get_absolute_path("../resource/Mesh/Config.lua") },
-			{ GB_RENDER_RESOURCE_CFG_ENTITY, filesystem::Instance().get_absolute_path("../resource/Entity/Config.lua") },
-			{ GB_RENDER_RESOURCE_CFG_FONT, filesystem::Instance().get_absolute_path("../resource/Font/Config.lua")}
-		}
+	if (Director::Instance().Ready(Director::Argument("scene_0.lua", vec2<std::int32_t>(640, 480),
+	{
+		{ GB_RENDER_RESOURCE_CFG_SHADER, filesystem::Instance().get_absolute_path("../resource/Shader/Config.lua") },
+		{ GB_RENDER_RESOURCE_CFG_MATERIAL, filesystem::Instance().get_absolute_path("../resource/Material/Config.lua") },
+		{ GB_RENDER_RESOURCE_CFG_MESH, filesystem::Instance().get_absolute_path("../resource/Mesh/Config.lua") },
+		{ GB_RENDER_RESOURCE_CFG_ENTITY, filesystem::Instance().get_absolute_path("../resource/Entity/Config.lua") }//,
+		//{ GB_RENDER_RESOURCE_CFG_FONT, filesystem::Instance().get_absolute_path("../resource/Font/Config.lua")}
+	}
 	)))
-		return 1;
-	Director::Instance().Action();
+		Director::Instance().Action();
+	else
+		return -1;
 	::system("pause");
     return 0;
 }

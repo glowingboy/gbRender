@@ -13,7 +13,7 @@ Camera::Camera() :
 }
 void Camera::from_lua(const gb::utils::luatable_mapper & mapper)
 {
-	_RenderQueue = mapper.get_integer_by_key(GB_RENDER_DATA_CAMERA_KEY_RENDERQUEUE);
+	_RenderQueue = (std::uint32_t)(mapper.get_integer_by_key(GB_RENDER_DATA_CAMERA_KEY_RENDERQUEUE));
 	
 	if (mapper.has_key(GB_RENDER_DATA_CAMERA_KEY_CLEARCOLOR))
 		_ClearColor = mapper.get_numbers_by_key(GB_RENDER_DATA_CAMERA_KEY_CLEARCOLOR);

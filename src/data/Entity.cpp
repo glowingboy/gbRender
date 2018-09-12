@@ -38,7 +38,7 @@ void Entity::from_lua(const luatable_mapper& mapper)
 
 	//elements
 	if(mapper.has_key(GB_RENDER_DATA_ENTITY_KEY_ELEMENTS))
-		mapper.for_each_in([this, &mapper](const size_t idx)
+		mapper.for_each_in([this, &mapper](const int idx)
 		{
 			Element* ele = mapper.get_table_by_idx<ElementAdapter>(idx).GetElement();
 			if(ele != nullptr)
@@ -47,7 +47,7 @@ void Entity::from_lua(const luatable_mapper& mapper)
 
 	//children
 	if(mapper.has_key(GB_RENDER_DATA_ENTITY_KEY_CHILDREN))
-		mapper.for_each_in([this, &mapper](const size_t idx)
+		mapper.for_each_in([this, &mapper](const int idx)
 		{
 			Entity* e = new Entity(mapper.get_table_by_idx<Entity>(idx));
 			_Children.insert(std::pair<string, Entity*>(e->GetName(), e));

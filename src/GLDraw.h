@@ -122,7 +122,7 @@ private:
 
 private:
 	//IndirectCommand * _pCmd;
-	std::size_t _cmdCount;
+	GLsizei _cmdCount;
 };
 
 GB_RENDER_NS_END

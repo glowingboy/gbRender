@@ -35,7 +35,7 @@ void Mesh::from_lua(const gb::utils::luatable_mapper & mapper)
 	{
 		std::vector<_lua_vec<3>> pos;
 		mapper.checkout_tables_by_key(GB_RENDER_VTXVAR_POS, pos);
-		_PosVar->append(pos.data(), pos.size());
+		_PosVar->append(pos.data(), (GLsizei)(pos.size()));
 	}
 	else
 	{
@@ -47,8 +47,9 @@ void Mesh::from_lua(const gb::utils::luatable_mapper & mapper)
 	//idx
 	if (mapper.has_key(GB_RENDER_VTXVAR_IDX))
 	{
-		std::vector<lua_Integer> idx = mapper.get_integers_by_key(GB_RENDER_VTXVAR_IDX);
-		_IdxVar.append(idx.data(), idx.size());
+		std::vector<std::uint32_t> idx;
+		mapper.checkout_integers_by_key(GB_RENDER_VTXVAR_IDX, idx);
+		_IdxVar.append(idx.data(), (GLsizei)(idx.size()));
 	}
 	else
 	{

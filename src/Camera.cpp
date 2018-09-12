@@ -212,7 +212,7 @@ void Camera::Shoot()
 
 void Camera::_onOwnerTransformChanged()
 {
-    logger::Instance().log("Camera::_onOwnerTransformChanged");
+    //logger::Instance().log("Camera::_onOwnerTransformChanged");
 
     _transformedFSBB = _frustumSphereBB * _worldMat;
 

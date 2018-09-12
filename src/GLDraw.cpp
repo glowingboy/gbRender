@@ -120,7 +120,7 @@ void GLBuffer::SetData(const std::vector<data::VtxVarStubInfo>& rule, const std:
 			if (iter != data.cend())
 			{
 				const GLVar& var = iter->second;
-				const std::uint8_t unitSize = info.typeSize * info.count;
+				const std::uint8_t unitSize = (std::uint8_t)(info.typeSize * info.count);
 				if (unitSize == var.unitSize())
 				{
 					assert(stride == info.stride);
@@ -362,7 +362,7 @@ void GLMultiIndirectDraw::SetData(const std::vector<BaseRender*> renders)
 					instVarOffset += (i + 1)* stride;
 				}
 
-				instanceCount = vRs.size();
+				instanceCount = (GLuint)(vRs.size());
 			}
 
 			//indirect

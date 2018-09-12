@@ -24,18 +24,18 @@ void VtxVarStub::from_lua(const gb::utils::luatable_mapper& mapper)
 
 	if (mapper.has_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_TYPE))
 	{
-		sl_type = mapper.get_integer_by_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_TYPE);
+		sl_type = (std::uint8_t)mapper.get_integer_by_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_TYPE);
 	}
 	else
 		logger::Instance().error("VtxVarStub::from_lua no Type found mapper@" + mapper.GetData());
 
 	//optional
 	if (mapper.has_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_COUNT))
-		count = mapper.get_integer_by_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_COUNT);
+		count = (std::uint32_t)mapper.get_integer_by_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_COUNT);
 
 
 	if (mapper.has_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_DIVISOR))
-		divisor = mapper.get_integer_by_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_DIVISOR);
+		divisor = (std::uint32_t)mapper.get_integer_by_key(GB_RENDER_DATA_SHADER_VTXVARSTUB_KEY_DIVISOR);
 
 	byteSize = slType::typeSize(sl_type) * slType::typeCount(sl_type) * count;
 }
@@ -112,9 +112,9 @@ std::uint32_t slType::typeCount(const std::uint8_t type)
 	return 0;
 }
 
-std::size_t slType::typeSize(const std::uint8_t type)
+std::uint32_t slType::typeSize(const std::uint8_t type)
 {
-	size_t size = 0;
+	std::uint32_t size = 0;
 	if (type == slType::Int)
 		size = sizeof(int);
 	else if (type == slType::UInt)
@@ -208,7 +208,7 @@ void UniformVarStub::from_lua(const gb::utils::luatable_mapper& mapper)
 
 	if (mapper.has_key(GB_RENDER_DATA_SHADER_UNIFORMVARSTUB_KEY_TYPE))
 	{
-		sl_type = mapper.get_integer_by_key(GB_RENDER_DATA_SHADER_UNIFORMVARSTUB_KEY_TYPE);
+		sl_type = (std::uint8_t)mapper.get_integer_by_key(GB_RENDER_DATA_SHADER_UNIFORMVARSTUB_KEY_TYPE);
 		typeSize = slType::typeSize(sl_type);
 	}
 	else
@@ -225,7 +225,7 @@ UniformVar UniformVarStub::genUniformVar() const
 	return UniformVar(index, typeSize, count * slType::typeCount(sl_type), sl_type);
 }
 
-UniformVar::UniformVar(const GLint index_, const std::size_t typeSize, const std::size_t count_, const std::uint8_t sl_type) :
+UniformVar::UniformVar(const GLint index_, const std::size_t typeSize, const GLsizei count_, const std::uint8_t sl_type) :
 	index(index_),
 	byteSize(typeSize * count_),
 	count(count_),
@@ -324,7 +324,7 @@ void UniformVar::Update() const
 		if (textureObjs != nullptr)
 		{
 			std::int32_t* texUnit = (std::int32_t*)data;
-			for (std::uint32_t i = 0; i < count; i++)
+			for (GLsizei i = 0; i < count; i++)
 			{
 				glActiveTexture(GL_TEXTURE0 + texUnit[i]);
 				const UniformTextureVar& texVar = textureObjs[i];
@@ -432,7 +432,7 @@ bool Shader::from_lua(luatable_mapper & mapper, const char* shaderName)
 			{
 				mapper.for_each_in([&mapper, &vtxVarStubs, &strides, this](const std::size_t idx)
 				{
-					VtxVarStub stub = mapper.get_table_by_idx<VtxVarStub>(idx);
+					VtxVarStub stub = mapper.get_table_by_idx<VtxVarStub>((int)idx);
 					stub.index = GetVtxAttribLocation(stub.name);
 
 					if (stub.divisor == 0)
@@ -473,7 +473,7 @@ bool Shader::from_lua(luatable_mapper & mapper, const char* shaderName)
 			if (mapper.has_key(GB_RENDER_DATA_SHADER_INFO_KEY_UNIFORMVARS))
 				mapper.for_each_in([&mapper, &vtxVarStubs, &strides, this](const std::size_t idx)
 				{
-					UniformVarStub stub = mapper.get_table_by_idx<UniformVarStub>(idx);
+					UniformVarStub stub = mapper.get_table_by_idx<UniformVarStub>((int)idx);
 					stub.index = GetUniformLocation(stub.name);
 
 					_uniformVarSubs.push_back(std::move(stub));
@@ -515,7 +515,7 @@ void Shader::VtxPointerSetup(const std::uint8_t idx, const GLuint vbo) const
 		const GLsizei stride = info.stride;
 		const GLsizei offset = info.offset;
 		const std::uint32_t count = info.count;
-		const std::uint32_t typeSize = info.typeSize;
+		const std::size_t typeSize = info.typeSize;
 		const VtxVarBriefType briefType = info.briefType;
 
 		for (std::uint32_t i = 0; i < count; i++)
@@ -673,7 +673,7 @@ std::unordered_map<gb::utils::string, UniformVar> Shader::GenUniformVars() const
 		std::int32_t* texUnits = (std::int32_t*)uVar.data;
 		if (uVar.textureObjs != nullptr)
 		{
-			for (std::uint32_t i = 0; i < uVar.count; i++)
+			for (GLsizei i = 0; i < uVar.count; i++)
 			{
 				if (baseTexUnit <= maxTexUnits)
 				{

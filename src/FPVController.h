@@ -18,7 +18,7 @@ public:
 	virtual std::uint32_t GetType() const override;
 
 private:
-	void OnInput(const std::int32_t code, const bool down);
+	void OnInput(const std::size_t code, const bool down);
 
 	GB_PROPERTY(private, PosStep, std::int32_t);
 };

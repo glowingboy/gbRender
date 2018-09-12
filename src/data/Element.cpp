@@ -43,7 +43,7 @@ void Element::from_lua(const gb::utils::luatable_mapper & mapper)
 void ElementAdapter::from_lua(const luatable_mapper& mapper)
 {
 	if (mapper.has_key(GB_RENDER_DATA_ELEMENT_KEY_TYPE))
-		_Type = mapper.get_integer_by_key(GB_RENDER_DATA_ELEMENT_KEY_TYPE);
+		_Type = (std::uint32_t)(mapper.get_integer_by_key(GB_RENDER_DATA_ELEMENT_KEY_TYPE));
 	else
 	{
 		logger::Instance().error(string("ElementAdapter::from_lua error@ ") + mapper.GetData());

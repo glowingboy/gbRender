@@ -154,7 +154,7 @@ void Text::_genText(const wchar_t* strText, const std::size_t beginOffset, const
 				_vtxUV->append(&uv_r_b, 1);
 				_vtxUV->append(&uv_l_b, 1);
 
-				const std::uint32_t baseIdx = i * 4;
+				const std::uint32_t baseIdx = (std::uint32_t)(i * 4);
 
 				std::uint32_t tmp = baseIdx;
 				_vtxIdx->append(&tmp, 1);

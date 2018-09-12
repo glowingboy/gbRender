@@ -29,7 +29,7 @@ public:
 	template <typename T>
 	GLVar(const std::vector<T> & vec) :
 		_unitSize(sizeof(T)),
-		_count(vec.size()),
+		_count((GLsizei)(vec.size())),
 		_capacity(_count)
 	{
 		_byteSize = _unitSize * _capacity;
@@ -41,19 +41,19 @@ public:
 	GLVar(const gb::render::data::VtxVarStubInfo& info);
     ~GLVar();
 public:
-    void append(const void* data, const std::size_t count);
+    void append(const void* data, const GLsizei count);
 	
 	void set(const void* data, const std::size_t idx = 0);
     const char* data() const;
 	std::size_t unitSize() const;
-    std::size_t count() const;
+    GLsizei count() const;
 	std::size_t byteSize()const;
 	void clear();
 	void reserve(const std::size_t capacity);
 	
 private:
     std::size_t _unitSize;
-	std::size_t _count;
+	GLsizei _count;
 	std::size_t _capacity;
     char* _data;
 

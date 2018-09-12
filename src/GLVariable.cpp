@@ -60,10 +60,21 @@ GLVar::~GLVar()
 	GB_SAFE_DELETE_ARRAY(_data);
 }
 
-void GLVar::append(const void* data, const std::size_t count)
+static std::size_t _findLeastCapacity(std::size_t oldCapacity, const std::size_t count)
+{
+	if (oldCapacity < count)
+	{
+		oldCapacity *= 2;
+		return _findLeastCapacity(oldCapacity, count);
+	}
+	else
+		return oldCapacity;
+}
+
+void GLVar::append(const void* data, const GLsizei count)
 {
 	assert(data != nullptr);
-	const std::size_t newCount = _count + count;
+	const GLsizei newCount = _count + count;
 	if (newCount <= _capacity)
 	{
 		std::memcpy(_data + _count * _unitSize, data, count * _unitSize);
@@ -73,7 +84,7 @@ void GLVar::append(const void* data, const std::size_t count)
     else
     {
 		assert(_capacity != 0);
-		_capacity = 2 * _capacity;
+		_capacity = _findLeastCapacity(_capacity, count);
 		char * newData = new char[ _capacity * _unitSize];
 
 		// old data
@@ -104,7 +115,7 @@ std::size_t GLVar::unitSize() const
 {
     return _unitSize;
 }
-std::size_t GLVar::count() const
+GLsizei GLVar::count() const
 {
     return _count;
 }

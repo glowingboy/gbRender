@@ -52,10 +52,10 @@ class Input
 
 public:
 	
-	void Process(const std::int32_t code, const bool down);
+	void Process(const std::size_t code, const bool down);
 	gb::physics::vec2<long> GetCursorPosition() const;
 private:
-	GB_PROPERTY_R(private, CBs, gb::utils::callback<const std::int32_t, const bool>);
+	GB_PROPERTY_R(private, CBs, gb::utils::callback<const std::size_t, const bool>);
 	GB_PROPERTY_R(private, ClickedCBs, gb::utils::callback<>);
 	GB_PROPERTY_R(private, ClickDown, bool);
 

@@ -51,6 +51,6 @@ void EntityPicker::OnClicked()
 
 	
 
-	logger::Instance().log(string("EntityPicker::OnClicked,cursorPos: x@ ") + cursorPos.x + ", y@ " + cursorPos.y);
+	//logger::Instance().log(string("EntityPicker::OnClicked,cursorPos: x@ ") + cursorPos.x + ", y@ " + cursorPos.y);
 	
 }

@@ -47,7 +47,7 @@ struct slType
 	static GLint componentCount(const std::uint8_t type);
 	static GLenum glType(const std::uint8_t type);
 	static std::uint32_t typeCount(const std::uint8_t type);
-	static std::size_t typeSize(const std::uint8_t type);
+	static std::uint32_t typeSize(const std::uint8_t type);
 
 };
 
@@ -78,7 +78,7 @@ struct VtxVarStubInfo
 	std::uint32_t count;
 
 	//mat4 typeSize = typeSize(vec4)
-	std::uint32_t typeSize;
+	std::size_t typeSize;
 
 	GLuint divisor;
 	gb::utils::string name;
@@ -94,7 +94,7 @@ struct VtxVarStub
 	std::uint32_t divisor;
 	gb::utils::string name;
 	GLuint index;
-	std::size_t byteSize;
+	GLsizei byteSize;
 
 	void from_lua(const gb::utils::luatable_mapper& mapper);
 
@@ -111,7 +111,7 @@ struct UniformTextureVar
 
 struct UniformVar
 {
-	UniformVar(const GLint index_, const std::size_t typeSize, const std::size_t count_, const std::uint8_t sl_type_);
+	UniformVar(const GLint index_, const std::size_t typeSize, const GLsizei count_, const std::uint8_t sl_type_);
 	~UniformVar();
 	UniformVar(UniformVar && other);
 	void SetData(const void* data_, const std::size_t size);
@@ -119,7 +119,7 @@ struct UniformVar
 	void Update() const;
 	GLint index;
 	std::size_t byteSize;
-	std::size_t count;
+	GLsizei count;
 	void* data;
 
 	UniformTextureVar* textureObjs;
