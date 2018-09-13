@@ -42,6 +42,7 @@ public:
 	Render(Entity* const owner);
 public:
 	void SetMesh(const gb::utils::string & mesh);
+	void tmpSetMesh(gb::render::data::Mesh * mesh); //TODO
 };
 GB_RENDER_NS_END
 

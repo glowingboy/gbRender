@@ -111,7 +111,7 @@ public:
 
 	GLMultiIndirectDraw(const GLBuffer::CtorParam(&param)[4]);
 	void Initialize(const GLBuffer::CtorParam(&param)[4]);
-	void SetData(const std::vector<BaseRender*> renders);
+	std::size_t SetData(const std::vector<BaseRender*> renders);
 	void Draw();
 	void Release();
 private:

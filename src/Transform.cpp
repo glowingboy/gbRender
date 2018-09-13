@@ -28,6 +28,13 @@ void Transform::SetPosition(const gb::physics::vec3F & newPosition)
 	_updateLocalMatrix();
 }
 
+void Transform::SetRotation(const physics::vec3F& angle)
+{
+	_LocalRotation = angle;
+
+	_updateLocalMatrix();
+}
+
 const gb::physics::vec4F & Transform::GetLocalPosition() const
 {
 	return _localPosition_Ref;
@@ -57,8 +64,8 @@ void Transform::_updateLocalMatrix()
 	_LocalTransMat *= scaleMat(_LocalScale);
 
 	_LocalTransMat *= rotateXAxisMat<Float>(_LocalRotation[0]);
-	_LocalTransMat *= rotateXAxisMat<Float>(_LocalRotation[1]);
-	_LocalTransMat *= rotateXAxisMat<Float>(_LocalRotation[2]);
+	_LocalTransMat *= rotateYAxisMat<Float>(_LocalRotation[1]);
+	_LocalTransMat *= rotateZAxisMat<Float>(_LocalRotation[2]);
 
 	_owner->_updateWorldTransform();
 

@@ -112,3 +112,13 @@ void Render::SetMesh(const gb::utils::string & mesh)
 
 	logger::Instance().log("render::setMesh @ " + mesh);
 }
+
+void Render::tmpSetMesh(gb::render::data::Mesh * mesh)
+{
+	_Mesh = mesh;
+
+	_originSBB = &(_Mesh->GetSphereBB());
+
+	_TransformedSphereBB = (*_originSBB) * _Owner->GetWorldTransformMatrix();
+
+}

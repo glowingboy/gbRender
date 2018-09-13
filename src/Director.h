@@ -19,7 +19,7 @@
 #include <queue>
 #include "Camera.h"
 
-#define GB_RENDER_DIRECTOR_SCENE_SIZE 100u
+#define GB_RENDER_DIRECTOR_SCENE_SIZE 100000u
 
 #define GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT 5u
 //#define GB_RENDER_DIRECTOR_CAMERA_TEXTURE_LEVEL 6
@@ -76,7 +76,7 @@ private:
 	std::uint32_t _instVar[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];
 
 public:
-	typedef gb::physics::octree<Entity*, Entity::octreeSBBContain, Entity::octreeSBBAPG, gb::physics::Float> octreeEntity;
+	typedef gb::physics::octree<Entity*, Entity::octreeSBBContain, Entity::octreeSBBAPG, gb::physics::Float, 1> octreeEntity;
 
 	/*
 		in world space

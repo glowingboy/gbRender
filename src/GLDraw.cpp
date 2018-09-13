@@ -127,6 +127,7 @@ void GLBuffer::SetData(const std::vector<data::VtxVarStubInfo>& rule, const std:
 
 					char* curData = _pData + offset + info.offset;
 
+					GLsizeiptr leftSize = _Size - offset - info.offset;
 
 					const std::size_t count = var.count();
 					const char* srcData = var.data();
@@ -134,7 +135,14 @@ void GLBuffer::SetData(const std::vector<data::VtxVarStubInfo>& rule, const std:
 
 					for (std::size_t i = 0; i < count; i++)
 					{
-						std::memcpy(curData + i * stride, srcData + i * unitSize, unitSize);
+						const GLsizeiptr strideOffset = (GLsizeiptr)(i * stride);
+						if(unitSize <= (leftSize - strideOffset))
+							std::memcpy(curData + strideOffset, srcData + i * unitSize, unitSize);
+						else
+						{
+							logger::Instance().error("unitSize <= (leftSize - strideOffset)");
+							return;
+						}
 					}
 				}
 				else
@@ -307,8 +315,10 @@ void GLMultiIndirectDraw::Initialize(const GLBuffer::CtorParam(&param)[4])
 		_needSync = true;
 }
 
-void GLMultiIndirectDraw::SetData(const std::vector<BaseRender*> renders)
+std::size_t GLMultiIndirectDraw::SetData(const std::vector<BaseRender*> renders)
 {
+	std::size_t triCount = 0;
+
 	if (renders.size() > 0)
 	{
 		const data::Shader* shader = renders[0]->GetMaterial()->GetShader();
@@ -337,7 +347,8 @@ void GLMultiIndirectDraw::SetData(const std::vector<BaseRender*> renders)
 		std::size_t vtxVarOffset = 0;
 		std::size_t instVarOffset = 0;
 		std::size_t idxVarOffset = 0;
-		std::for_each(meshRenders.begin(), meshRenders.end(), [this, &shader, &cmd, &count, &instanceCount, &firstIndex, &baseVertex, &baseInstance, &vtxVarOffset, &instVarOffset, &idxVarOffset](const std::pair<const data::Mesh*, std::vector<BaseRender*>>& mr)
+
+		std::for_each(meshRenders.begin(), meshRenders.end(), [this, &shader, &cmd, &count, &instanceCount, &firstIndex, &baseVertex, &baseInstance, &vtxVarOffset, &instVarOffset, &idxVarOffset, &triCount](const std::pair<const data::Mesh*, std::vector<BaseRender*>>& mr)
 		{
 			const data::Mesh* m = mr.first;
 
@@ -363,6 +374,7 @@ void GLMultiIndirectDraw::SetData(const std::vector<BaseRender*> renders)
 				}
 
 				instanceCount = (GLuint)(vRs.size());
+				triCount += (instanceCount * (count / 3));
 			}
 
 			//indirect
@@ -375,6 +387,8 @@ void GLMultiIndirectDraw::SetData(const std::vector<BaseRender*> renders)
 			baseInstance += instanceCount;
 		});
 	}
+
+	return triCount;
 }
 
 void GLMultiIndirectDraw::Release()

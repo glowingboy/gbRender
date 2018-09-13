@@ -45,3 +45,6 @@ resource/Font/
 *.ttc
 *.ttf
 *.gbFont
+
+*.FBX
+*.fbx

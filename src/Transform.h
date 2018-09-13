@@ -18,6 +18,7 @@ public:
 	void operator=(const gb::render::data::Transform & dataTrans);
 public:
 	void SetPosition(const gb::physics::vec3F& newPosition);
+	void SetRotation(const physics::vec3F& angle);
 	const gb::physics::vec4F& GetLocalPosition() const;
 
 	GB_PROPERTY_R(private, LocalTransMat, gb::physics::mat4F);

@@ -37,16 +37,16 @@ void Camera::Awake()
 
     //1 vtx
     param[0].type = GLBuffer::Type::Dynamic;
-    param[0].size = 50 * 1024 * 1024;
+    param[0].size = 1000 * 1024 * 1024;
     //2 idx
     param[1].type = GLBuffer::Type::Dynamic;
-    param[1].size = 10 * 1024 * 1024;
+    param[1].size = 500 * 1024 * 1024;
     //3 inst
     param[2].type = GLBuffer::Type::Dynamic;
-    param[2].size = 10 * 1024 * 1024;
+    param[2].size = 100 * 1024 * 1024;
     //5 indirect
     param[3].type = GLBuffer::Type::Dynamic;
-    param[3].size = 50 * 1024;
+    param[3].size = 10240 * 1024;
 
     _multiIndirectDraw.Initialize(param);
 
@@ -112,7 +112,9 @@ gb::physics::vec3F Camera::Screen2World(const gb::physics::vec2F & screenPositio
     return vec3F(retPos.x, retPos.y, retPos.z);
 }
 
-void Camera::Shoot()
+std::size_t triCount = 0; //TODO
+
+std::size_t Camera::Shoot()
 {
     glClearColor(_ClearColor.r, _ClearColor.g, _ClearColor.b, _ClearColor.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -128,7 +130,8 @@ void Camera::Shoot()
     {
 	bool operator()(const aabb<>& octanBB, const spherebb<>& q) const
 	{
-	    return octanBB.intersect(q);
+	    //return octanBB.intersect(q);
+		return true;
 	}
     };
     _ViewRangeEntites = renderEntities.query_intersect<spherebb<>, intersectMethod>(_transformedFSBB);
@@ -159,7 +162,7 @@ void Camera::Shoot()
 									      }
 								      });
 
-	
+
     std::for_each(renderQueueRenders.begin(), renderQueueRenders.end(), [this](std::pair<const std::uint32_t, std::vector<BaseRender*>>& pr)
 									{
 									    const std::vector<BaseRender*>& renders = pr.second;
@@ -202,12 +205,15 @@ void Camera::Shoot()
 																									{
 																									    mr.first->Update();
 																									    //dynamic draw
-																									    _multiIndirectDraw.SetData(mr.second);
+																										if(triCount == 0)
+																											triCount +=_multiIndirectDraw.SetData(mr.second);
 																									    _multiIndirectDraw.Draw();
 																									});
 																      });
 									});
 
+
+	return triCount;
 }
 
 void Camera::_onOwnerTransformChanged()

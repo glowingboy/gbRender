@@ -7,6 +7,8 @@ using namespace gb;
 
 #include "data/Element.h"
 
+#pragma comment(lib, "assimp-vc140-mt.lib")
+
 int main(int argc, char** argv)
 {
 	//resource::Res<data::Entity>::Instance().SetResRoot(filesystem::Instance().get_absolute_path("../tools/editor/resource/"));

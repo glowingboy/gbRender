@@ -10,11 +10,6 @@
 #include "../data/Shader.h"
 #include "../data/Font.h"
 #include "../file/Font.h"
-#include "../data/Entity.h"
-
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
 
 #define GB_RENDER_RESOURCE_CFG_SHADER "Shader"
 #define GB_RENDER_RESOURCE_CFG_MATERIAL "Material"
@@ -128,8 +123,26 @@ public:
 
 		}
 	}
+private:
+	virtual T* _load_res(const char* data) = 0;
 protected:
-	virtual T* _load_res(const char* data)
+	typedef typename std::unordered_map<const gb::utils::string, T*>::const_iterator const_mp_itr;
+	typedef typename std::unordered_map<const gb::utils::string, T*>::iterator mp_itr;
+	std::unordered_map<const gb::utils::string, T*> _mpRes;
+
+	GB_PROPERTY(protected, ResRoot, gb::utils::string);
+	GB_PROPERTY_R(protected, LuaStates, gb::utils::luastate_mt);
+	GB_PROPERTY_R(protected, Initialized, bool);
+	GB_PROPERTY_R(protected, DefaultRes, gb::utils::string)
+};
+
+
+template<typename T>
+class Res : public _Res_base<T>
+{
+	GB_SINGLETON(Res);
+private:
+	virtual T* _load_res(const char* data) override
 	{
 		gb::utils::luatable_mapper mapper(_LuaStates[0]);
 		if (mapper.map_file(data))
@@ -145,22 +158,6 @@ protected:
 		else
 			return nullptr;
 	}
-protected:
-	typedef typename std::unordered_map<const gb::utils::string, T*>::const_iterator const_mp_itr;
-	typedef typename std::unordered_map<const gb::utils::string, T*>::iterator mp_itr;
-	std::unordered_map<const gb::utils::string, T*> _mpRes;
-
-	GB_PROPERTY(protected, ResRoot, gb::utils::string);
-	GB_PROPERTY_R(protected, LuaStates, gb::utils::luastate_mt);
-	GB_PROPERTY_R(protected, Initialized, bool);
-	GB_PROPERTY_R(protected, DefaultRes, gb::utils::string)
-};
-
-//general case
-template<typename T>
-class Res : public _Res_base<T>
-{
-	GB_SINGLETON(Res);
 };
 
 //specialization for Shader
@@ -225,54 +222,6 @@ public:
 	{
 		//TODO:
 		return nullptr;
-	}
-};
-
-//entity
-//TODO : 1. render supporting multi-mesh 2. mesh mgr sln
-template <>
-class Res < gb::render::data::Entity> : public _Res_base<gb::render::data::Entity>
-{
-	GB_SINGLETON(Res);
-
-public:
-	virtual gb::render::data::Entity * _load_res(const char* data) override
-	{
-		using namespace gb::utils;
-		using namespace gb::render;
-
-		string extension = string(data).file_extension();
-		if (extension == "lua")
-			return _Res_base::_load_res(data);
-		else
-		{
-			//assimp
-			Assimp::Importer imp;
-			const aiScene * scene = imp.ReadFile(data, aiProcess_Triangulate);
-			const aiNode * root = scene->mRootNode;
-
-			const aiMesh ** meshes = scene->mMeshes;
-			while (true)
-			{
-				const aiNode ** curNodes = root->mChildren;
-				if (curNodes == nullptr)
-					break;
-				const unsigned int nodeCount = root->mNumChildren;
-				for (unsigned int i = 0; i < nodeCount; i++)
-				{
-					const aiNode * curNode = curNodes[i];
-					GB_ASSERT(curNode != nullptr);
-
-					const unsigned int meshCount = curNode->mNumMeshes;
-					for (unsigned int j = 0; j < meshCount; j++)
-					{
-						data::Mesh * mesh = new data::Mesh;
-						mesh->
-						meshes[j]->mVertices->x
-					}
-				}
-			}
-		}
 	}
 };
 GB_RENDER_RESOURCE_NS_END

@@ -5,7 +5,8 @@ using namespace gb::render::data;
 using namespace gb;
 
 Render::Render() :
-	Element(render::Element::Type::Render)
+	Element(render::Element::Type::Render),
+	tmpMesh(nullptr)
 {}
 
 void Render::from_lua(const gb::utils::luatable_mapper & mapper)
@@ -18,7 +19,10 @@ void Render::from_lua(const gb::utils::luatable_mapper & mapper)
 render::Element* Render::Instantiate(render::Entity* owner) const
 {
 	render::Render* r = new render::Render(owner);
-	r->SetMesh(_Mesh);
+	if (tmpMesh != nullptr)
+		r->tmpSetMesh(tmpMesh);
+	else
+		r->SetMesh(_Mesh);
 	r->SetMaterial(_Material);
 	return r;
 }

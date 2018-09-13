@@ -84,7 +84,7 @@ void GLVar::append(const void* data, const GLsizei count)
     else
     {
 		assert(_capacity != 0);
-		_capacity = _findLeastCapacity(_capacity, count);
+		_capacity = _findLeastCapacity(_capacity, newCount);
 		char * newData = new char[ _capacity * _unitSize];
 
 		// old data

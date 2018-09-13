@@ -26,7 +26,7 @@ public:
 	virtual std::uint32_t GetType() const override;
 
 	bool operator < (const Camera & o) const;
-	void Shoot();
+	std::size_t Shoot();
 	void SetRenderQueue(const uint32 rq);
 	void SetIsStatic(const bool isStatic);
 

@@ -189,7 +189,7 @@ void Director::Action()
 		{
 			if (!_directing())
 				break;
-
+			
 		}
 //	}
 	//catch (const string& error)
@@ -204,6 +204,8 @@ void Director::Action()
 
 bool Director::_directing()
 {
+	const std::uint64_t beginTime = utils::time::Instance().timestamp();
+
 	//clear
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	glClearColor(_ClearColor.r, _ClearColor.g, _ClearColor.b, _ClearColor.a);
@@ -211,15 +213,15 @@ bool Director::_directing()
 
 	//camera shooting
 	std::uint8_t instCount = 0;
-	
-	std::for_each(_Cameras.begin(), _Cameras.end(), [this, &instCount](Camera* cam)
+	std::size_t triCount = 0;
+	std::for_each(_Cameras.begin(), _Cameras.end(), [this, &instCount, &triCount](Camera* cam)
 	{
 		const std::uint8_t frameBufferIdx = cam->GetFrameBufferIdx();
 		_instVar[instCount] = frameBufferIdx;
 		instCount++;
 
 		glBindFramebuffer(GL_FRAMEBUFFER, _frameBuffers[frameBufferIdx]);
-		cam->Shoot();
+		triCount += cam->Shoot();
 
 	});
 
@@ -238,7 +240,15 @@ bool Director::_directing()
 
 	_screenDraw.Draw(6, instCount);
 
-	return Device::Instance().Update();
+	bool ret = Device::Instance().Update();
+	glFinish();//ref: https://www.opengl.org/discussion_boards/showthread.php/176807-why-does-SwapBuffers-take-up-so-much-cpu-time?p=1233596&viewfull=1#post1233596
+	const std::uint64_t durationTime = utils::time::Instance().timestamp() - beginTime;
+
+	const std::uint32_t fps = durationTime == 0 ? 0 : 1000 / durationTime;
+
+	logger::Instance().log(string("fps:") + fps + "triCount@" + triCount);
+
+	return ret;
 }
 
 void Director::AddCamera(Camera * const cam)

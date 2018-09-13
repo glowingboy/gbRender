@@ -1,7 +1,7 @@
 #pragma once
 #include "Element.h"
 #include <gbUtils/string.h>
-
+#include "Mesh.h"
 #define GB_RENDER_DATA_RENDER_KEY_MESH "Mesh"
 #define GB_RENDER_DATA_RENDER_KEY_MATERIAL "Material"
 
@@ -12,6 +12,7 @@ class Render : public Element
 public:
 	Render();
 public:
+	data::Mesh * tmpMesh;//TODO
 	virtual void from_lua(const gb::utils::luatable_mapper & mapper) override;
 	virtual gb::render::Element* Instantiate(gb::render::Entity* owner) const override;
 	GB_PROPERTY_R(private, Mesh, gb::utils::string);

@@ -48,7 +48,7 @@ return
 				 RenderQueue = CameraRenderQueue.Opaque,
 				 Frustum =
 				    {
-				       60.0, 640.0 / 480.0, 0.1, 100
+				       60.0, 640.0 / 480.0, 0.1, 100000
 				    }
 			      },
 			      {
@@ -69,18 +69,10 @@ return
 		     		 Material = "Tint.lua"
 		     	      }
 		     	   }
-		     },
-		     {
-			Name = "qingdao",
-			Elements =
-			   {
-			      {
-				 Type = ElementType.Render,
-				 Mesh = "",
-				 Material = "Tint.lua"
-			      }
-			   }
-		     }
+		     } ,
+		      {
+		      	Entity = "3517.FBX"
+		      }
 		     -- {
 		     -- 	Name = "text",
 		     -- 	Elements =
