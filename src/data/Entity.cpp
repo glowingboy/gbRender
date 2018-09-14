@@ -64,7 +64,7 @@ void Entity::from_lua(const luatable_mapper& mapper)
 				data::Transform & transform = e->GetTransform();
 				transform.position = { position.x, position.y, position.z };
 				transform.scale = { scale.x, scale.y, scale.z };
-				transform.rotation = { rotation.x, rotation.y, rotation.z };
+				transform.rotation = { 180.0f * rotation.x, 180.0f * rotation.y, 180.0f * rotation.z };
 
 				
 
@@ -78,11 +78,14 @@ void Entity::from_lua(const luatable_mapper& mapper)
 					//fetch mesh
 					data::Mesh * mesh = new data::Mesh;//TODO, mesh* mgr
 					int idxBase = 0;
+					const unsigned int * meshIdx = curNode->mMeshes;
 					for (unsigned int j = 0; j < meshCount; j++)
 					{
-						const aiMesh * curMesh = meshes[j];
+						const aiMesh * curMesh = meshes[meshIdx[j]];
 
-						mesh->GetPosVar()->append(curMesh->mVertices, curMesh->mNumVertices);
+						const unsigned int vtxCount = curMesh->mNumVertices;
+						for(unsigned int vIdx = 0; vIdx < vtxCount; vIdx ++)
+							mesh->GetPosVar()->append(&(curMesh->mVertices[vIdx]), 1);
 
 						const unsigned int faceCount = curMesh->mNumFaces;
 						std::vector<unsigned int> indices;

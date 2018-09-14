@@ -16,9 +16,9 @@ struct Transform
 	Transform();
 	void from_lua(const gb::utils::luatable_mapper & mapper);
 
-	gb::physics::vec3F scale;
-	gb::physics::vec3F rotation;
-	gb::physics::vec3F position;
+	physics::vec3f scale;
+	physics::vec3f rotation;
+	physics::vec3f position;
 };
 
 GB_RENDER_DATA_NS_END

@@ -88,10 +88,10 @@ void Camera::SetIsStatic(const bool isStatic)
 
 }
 
-gb::physics::vec3F Camera::Screen2World(const gb::physics::vec2F & screenPosition) const
+gb::physics::vec3f Camera::Screen2World(const gb::physics::vec2f & screenPosition) const
 {
     //map form screen space to NDC space
-    vec4F retPos(1.0f);
+    vec4f retPos(1.0f);
     math::interval_mapper<float, float> mapper(_screenSize.x * _ViewPort[0], _screenSize.x * _ViewPort[2], -1.0f, 1.0f);
     retPos.x = mapper.map(screenPosition.x);
 
@@ -99,7 +99,7 @@ gb::physics::vec3F Camera::Screen2World(const gb::physics::vec2F & screenPositio
     retPos.y = mapper.map(screenPosition.y);
 
     //world space
-    mat4F inverseVP;
+    mat4f inverseVP;
     if(_projMatProductViewMat.inverse(inverseVP))
 	retPos = inverseVP * retPos;
     else
@@ -109,10 +109,10 @@ gb::physics::vec3F Camera::Screen2World(const gb::physics::vec2F & screenPositio
     // homogeneous to cartesian space
     retPos = retPos / retPos.w;
 
-    return vec3F(retPos.x, retPos.y, retPos.z);
+    return vec3f(retPos.x, retPos.y, retPos.z);
 }
 
-std::size_t triCount = 0; //TODO
+
 
 std::size_t Camera::Shoot()
 {
@@ -130,12 +130,13 @@ std::size_t Camera::Shoot()
     {
 	bool operator()(const aabb<>& octanBB, const spherebb<>& q) const
 	{
-	    //return octanBB.intersect(q);
-		return true;
+	    return octanBB.intersect(q);
+		//return true;
 	}
     };
     _ViewRangeEntites = renderEntities.query_intersect<spherebb<>, intersectMethod>(_transformedFSBB);
 
+	std::size_t triCount = 0; //TODO
     //1st classify according to renderQueue
     //2nd classify according to shader
     //3rd classify according to material
@@ -163,7 +164,7 @@ std::size_t Camera::Shoot()
 								      });
 
 
-    std::for_each(renderQueueRenders.begin(), renderQueueRenders.end(), [this](std::pair<const std::uint32_t, std::vector<BaseRender*>>& pr)
+    std::for_each(renderQueueRenders.begin(), renderQueueRenders.end(), [this, &triCount](std::pair<const std::uint32_t, std::vector<BaseRender*>>& pr)
 									{
 									    const std::vector<BaseRender*>& renders = pr.second;
 									    std::unordered_map<const data::Shader*, std::vector<BaseRender*>> shaderRenders;
@@ -182,7 +183,7 @@ std::size_t Camera::Shoot()
 															  });
 
 
-									    std::for_each(shaderRenders.begin(), shaderRenders.end(), [this](const std::pair<const data::Shader*, std::vector<BaseRender*>>& sr)
+									    std::for_each(shaderRenders.begin(), shaderRenders.end(), [this, &triCount](const std::pair<const data::Shader*, std::vector<BaseRender*>>& sr)
 																      {
 																	  const data::Shader* shader = sr.first;
 																	  GL::applyShader(shader);
@@ -201,12 +202,17 @@ std::size_t Camera::Shoot()
 																							materialRenders.insert(std::make_pair(m, std::vector<BaseRender*>{r}));
 																						});
 			
-																	  std::for_each(materialRenders.begin(), materialRenders.end(), [this](const std::pair<data::Material*, std::vector<BaseRender*>>& mr)
+																	  std::for_each(materialRenders.begin(), materialRenders.end(), [this, &triCount](const std::pair<data::Material*, std::vector<BaseRender*>>& mr)
 																									{
 																									    mr.first->Update();
 																									    //dynamic draw
-																										if(triCount == 0)
-																											triCount +=_multiIndirectDraw.SetData(mr.second);
+																										//if(triCount == 0)
+																										//static bool tmp = false;
+																										//if (!tmp)
+																										//{
+																											triCount += _multiIndirectDraw.SetData(mr.second);
+																											//tmp = true;
+																										//}
 																									    _multiIndirectDraw.Draw();
 																									});
 																      });

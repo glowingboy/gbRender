@@ -182,7 +182,7 @@ void Entity::_updateWorldTransform()
 		parent = parent->_Parent;
 	}
 
-	_WorldTransformMatrix = mat4F::make_identity();
+	_WorldTransformMatrix = mat4f::make_identity();
 
 	std::for_each(qParents.rbegin(), qParents.rend(), [this](const Entity*& e)
 	{
@@ -247,8 +247,8 @@ bool Entity::octreeSBBContain::operator()(const Entity* entity, const gb::physic
 }
 
 
-static const vec3F __error__apg__('e', 'r', 'r');
-const vec3F & Entity::octreeSBBAPG::operator()(const Entity* entity) const
+static const vec3f __error__apg__('e', 'r', 'r');
+const vec3f & Entity::octreeSBBAPG::operator()(const Entity* entity) const
 {
 	BaseRender* render = entity->GetRender();
 	if (render != nullptr)

@@ -69,14 +69,14 @@ private:
 	//GLuint _cameraTexIndices[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];
 	std::queue<GLuint> _cameraFBOIndices;
 
-	GB_PROPERTY(private, ClearColor, gb::physics::vec4F);
+	GB_PROPERTY(private, ClearColor, gb::physics::vec4f);
 
 	GLInstancedDraw _screenDraw;
 	data::Material* _screenMat;
 	std::uint32_t _instVar[GB_RENDER_DIRECTOR_MAX_CAMERA_COUNT];
 
 public:
-	typedef gb::physics::octree<Entity*, Entity::octreeSBBContain, Entity::octreeSBBAPG, gb::physics::Float, 1> octreeEntity;
+	typedef gb::physics::octree<Entity*, Entity::octreeSBBContain, Entity::octreeSBBAPG, float, 1> octreeEntity;
 
 	/*
 		in world space

@@ -30,7 +30,7 @@ public:
 	void SetRenderQueue(const uint32 rq);
 	void SetIsStatic(const bool isStatic);
 
-	gb::physics::vec3F Screen2World(const gb::physics::vec2F& screenPosition) const;
+	gb::physics::vec3f Screen2World(const gb::physics::vec2f& screenPosition) const;
 	
 private:
 	virtual void Awake() override;
@@ -43,7 +43,7 @@ private:
 	// bitfiled
 	GB_PROPERTY_R(private, InterestTag, uint32);
 
-	GB_PROPERTY_R(private, Frustum, gb::physics::frustum<gb::physics::Float>);
+	GB_PROPERTY_R(private, Frustum, gb::physics::frustum<float>);
 	//gb::physics::frustum<gb::physics::Float> _frustum;
 	
 	//const gb::physics::aabb<>& _frustumAABB;
@@ -52,24 +52,24 @@ private:
 	//but the sphere not.
 	const gb::physics::spherebb<>& _frustumSphereBB;
 	gb::physics::spherebb<> _transformedFSBB;
-	const gb::physics::mat4F& _projectionMatrix;
+	const gb::physics::mat4f& _projectionMatrix;
 
 	GB_PROPERTY_R(private, FrameBufferIdx, std::uint8_t);
 
 	//range[0, 1]
-	GB_PROPERTY(private, ViewPort, gb::physics::vec4F);
+	GB_PROPERTY(private, ViewPort, gb::physics::vec4f);
 
 	const gb::physics::vec2<std::int32_t>& _screenSize;
 
-	GB_PROPERTY(private, ClearColor, gb::physics::vec4F);
+	GB_PROPERTY(private, ClearColor, gb::physics::vec4f);
 
 	GLMultiIndirectDraw _multiIndirectDraw;
 
 	GB_PROPERTY_R(private, IsStatic, bool);
 
-	const gb::physics::mat4F& _worldMat;
+	const gb::physics::mat4f& _worldMat;
 
-	gb::physics::mat4F _projMatProductViewMat;
+	gb::physics::mat4f _projMatProductViewMat;
 
 	GB_PROPERTY_R(private, ViewRangeEntites, std::vector<Entity*>);
 	private:

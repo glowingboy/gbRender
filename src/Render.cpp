@@ -87,7 +87,7 @@ void BaseRender::SetMaterial(const string & material)
 
 void BaseRender::_onOwnerTransformChanged()
 {
-	const mat4F& worldTransMat = _Owner->GetWorldTransformMatrix();
+	const mat4f& worldTransMat = _Owner->GetWorldTransformMatrix();
 	_TransformedSphereBB = (*_originSBB) * worldTransMat;
 
 	//if (_instVar_mvp != nullptr)

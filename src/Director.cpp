@@ -21,8 +21,8 @@ Director::Argument::Argument(Argument && other) :
 }
 
 Director::Director():
-	_RenderEntities(aabb<>(vec3F(-(signed)GB_RENDER_DIRECTOR_SCENE_SIZE, -(signed)GB_RENDER_DIRECTOR_SCENE_SIZE, -(signed)GB_RENDER_DIRECTOR_SCENE_SIZE),
-		vec3F(GB_RENDER_DIRECTOR_SCENE_SIZE, GB_RENDER_DIRECTOR_SCENE_SIZE, GB_RENDER_DIRECTOR_SCENE_SIZE))),
+	_RenderEntities(aabb<>(vec3f(-(signed)GB_RENDER_DIRECTOR_SCENE_SIZE, -(signed)GB_RENDER_DIRECTOR_SCENE_SIZE, -(signed)GB_RENDER_DIRECTOR_SCENE_SIZE),
+		vec3f(GB_RENDER_DIRECTOR_SCENE_SIZE, GB_RENDER_DIRECTOR_SCENE_SIZE, GB_RENDER_DIRECTOR_SCENE_SIZE))),
 	_frameBuffers{0},
 	//_cameraTextures{0},
 	_cameraDepthBuffers{0},
@@ -244,7 +244,7 @@ bool Director::_directing()
 	glFinish();//ref: https://www.opengl.org/discussion_boards/showthread.php/176807-why-does-SwapBuffers-take-up-so-much-cpu-time?p=1233596&viewfull=1#post1233596
 	const std::uint64_t durationTime = utils::time::Instance().timestamp() - beginTime;
 
-	const std::uint32_t fps = durationTime == 0 ? 0 : 1000 / durationTime;
+	const std::uint32_t fps = durationTime == 0 ? 0 : (std::uint32_t)(1000 / durationTime);
 
 	logger::Instance().log(string("fps:") + fps + "triCount@" + triCount);
 

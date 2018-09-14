@@ -134,20 +134,20 @@ void Text::_genText(const wchar_t* strText, const std::size_t beginOffset, const
 				triangle:0-1-2, 2-3-0, 4-5-6, 6-7-4
 				*/
 
-				vec3F l_t(xOffset, top, 0.0f);
-				vec3F r_t(right, top, 0.0f);
-				vec3F r_b(right, bottom, 0.0f);
-				vec3F l_b(xOffset, bottom, 0.0f);
+				vec3f l_t((float)xOffset, top, 0.0f);
+				vec3f r_t(right, top, 0.0f);
+				vec3f r_b(right, bottom, 0.0f);
+				vec3f l_b((float)xOffset, bottom, 0.0f);
 
 				_vtxPos->append(&l_t, 1);
 				_vtxPos->append(&r_t, 1);
 				_vtxPos->append(&r_b, 1);
 				_vtxPos->append(&l_b, 1);
 
-				vec2F uv_l_t(gly.uv_l, gly.uv_t);
-				vec2F uv_r_t(gly.uv_r, gly.uv_t);
-				vec2F uv_r_b(gly.uv_r, gly.uv_b);
-				vec2F uv_l_b(gly.uv_l, gly.uv_b);
+				vec2f uv_l_t(gly.uv_l, gly.uv_t);
+				vec2f uv_r_t(gly.uv_r, gly.uv_t);
+				vec2f uv_r_b(gly.uv_r, gly.uv_b);
+				vec2f uv_l_b(gly.uv_l, gly.uv_b);
 
 				_vtxUV->append(&uv_l_t, 1);
 				_vtxUV->append(&uv_r_t, 1);

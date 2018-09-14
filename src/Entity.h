@@ -66,7 +66,7 @@ private:
 	GB_PROPERTY_R(private, Elements, std::unordered_map<std::uint32_t, Element*>);
 	GB_PROPERTY_R(private, Transform, Transform);
 
-	GB_PROPERTY_R(private, WorldTransformMatrix, gb::physics::mat4F);
+	GB_PROPERTY_R(private, WorldTransformMatrix, gb::physics::mat4f);
 	GB_PROPERTY_R(private, Parent, Entity*);
 
 	GB_PROPERTY_R(private, Render, gb::render::BaseRender*);
@@ -91,7 +91,7 @@ public:
 
 	struct octreeSBBAPG
 	{
-		const gb::physics::vec3F & operator()(const Entity* entity) const;
+		const gb::physics::vec3f & operator()(const Entity* entity) const;
 	};
 
 };

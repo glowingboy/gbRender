@@ -11,7 +11,7 @@ using namespace gb::utils;
 
 EntityPicker::EntityPicker(Entity * owner):
 	Element(owner),
-	_Ray(vec3F(0.0f)),
+	_Ray(vec3f(0.0f)),
 	_Camera(nullptr)
 {
 }
@@ -45,7 +45,7 @@ void EntityPicker::End()
 
 void EntityPicker::OnClicked()
 {
-	const vec2F cursorPos(Input::Instance().GetCursorPosition());
+	const vec2f cursorPos(Input::Instance().GetCursorPosition());
 	
 	_Ray.update(_Camera->Screen2World(cursorPos));
 

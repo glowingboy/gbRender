@@ -20,8 +20,8 @@ private:
 	virtual void End() override;
 
 private:
-	GB_PROPERTY_R(private, CBs, gb::utils::callback<gb::physics::vec3F>);
-	GB_PROPERTY_R(private, Ray, gb::physics::ray<gb::physics::Float>);
+	GB_PROPERTY_R(private, CBs, gb::utils::callback<gb::physics::vec3f>);
+	GB_PROPERTY_R(private, Ray, gb::physics::ray<float>);
 
 	GB_PROPERTY_W(private, Camera, const Camera*);
 private:

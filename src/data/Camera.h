@@ -16,7 +16,7 @@ public:
 	virtual gb::render::Element* Instantiate(gb::render::Entity* owner) const override;
 	
 	GB_PROPERTY_R(private, RenderQueue, uint32);
-	GB_PROPERTY_R(private, ClearColor, gb::physics::vec4F);
+	GB_PROPERTY_R(private, ClearColor, gb::physics::vec4f);
 	GB_PROPERTY_R(private, Frustum, std::vector<float>);
 };
 

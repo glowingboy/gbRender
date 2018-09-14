@@ -86,7 +86,9 @@ render::GLVar * Mesh::InitializeAVtxVar(const char * key, const std::size_t unit
 	return &(ret.first->second);
 }
 
+#include <Eigen/Core/Matrix.h>
+
 void Mesh::UpdateSphereBB()
 {
-	_SphereBB = genSphereBB((vec3F*)(_PosVar->data()), _PosVar->count());
+	_SphereBB = genSphereBB((vec3<float>*)(_PosVar->data()), _PosVar->count());
 }

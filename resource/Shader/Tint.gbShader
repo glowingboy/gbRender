@@ -20,6 +20,10 @@ return
 	       Type = slType.Vec4
 	    }
 	 },
+      GLCfg = 
+	 {
+	    PolygonMode = 0x1B01
+	 },
       Misc =
 	 {
 	    --	       RenderQueue = ShaderRenderQueue.Background

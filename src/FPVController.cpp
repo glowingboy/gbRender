@@ -42,7 +42,7 @@ void FPVController::OnInput(const std::size_t code, const bool down)
 	//logger::Instance().log(string("code: ") + code + ", down: " + down);
 
 	Transform& trans = _Owner->GetTransform();
-	const vec4F oldPosition = trans.GetLocalPosition();
+	const vec4f oldPosition = trans.GetLocalPosition();
 
 	static float rotationY = 0.0f;
 	static float rotationX = 0.0f;
@@ -51,32 +51,32 @@ void FPVController::OnInput(const std::size_t code, const bool down)
 		switch (code)
 		{
 		case 'W':
-			trans.SetPosition(vec3F(oldPosition.x, oldPosition.y, oldPosition.z + _PosStep));
+			trans.SetPosition(vec3f(oldPosition.x, oldPosition.y, oldPosition.z + _PosStep));
 			break;
 		case 'S':
-			trans.SetPosition(vec3F(oldPosition.x, oldPosition.y, oldPosition.z - _PosStep));
+			trans.SetPosition(vec3f(oldPosition.x, oldPosition.y, oldPosition.z - _PosStep));
 			break;
 		case 'A':
-			trans.SetPosition(vec3F(oldPosition.x + _PosStep, oldPosition.y, oldPosition.z));
+			trans.SetPosition(vec3f(oldPosition.x + _PosStep, oldPosition.y, oldPosition.z));
 			break;
 		case 'D':
-			trans.SetPosition(vec3F(oldPosition.x - _PosStep, oldPosition.y, oldPosition.z));
+			trans.SetPosition(vec3f(oldPosition.x - _PosStep, oldPosition.y, oldPosition.z));
 			break;
 		case 'Q':
 			rotationY += 1.0f;
-			trans.SetRotation(vec3F(rotationX, rotationY, 0.0f));
+			trans.SetRotation(vec3f(rotationX, rotationY, 0.0f));
 			break;
 		case 'E':
 			rotationY -= 1.0f;
-			trans.SetRotation(vec3F(rotationX, rotationY, 0.0f));
+			trans.SetRotation(vec3f(rotationX, rotationY, 0.0f));
 			break;
 		case 'Z':
 			rotationX += 1.0f;
-			trans.SetRotation(vec3F(rotationX, rotationY, 0.0f));
+			trans.SetRotation(vec3f(rotationX, rotationY, 0.0f));
 			break;
 		case 'C':
 			rotationX -= 1.0f;
-			trans.SetRotation(vec3F(rotationX, rotationY, 0.0f));
+			trans.SetRotation(vec3f(rotationX, rotationY, 0.0f));
 			break;
 		default:
 			break;
